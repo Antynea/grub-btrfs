@@ -1,0 +1,86 @@
+#! /bin/sh
+set -e
+
+. /usr/share/grub/grub-mkconfig_lib
+. /etc/default/grub
+
+### variables modifiable ###
+## nom du sous-menu
+submenuname="ArchLinux Snapshots"
+## préfixe de l'entrée
+prefixentry="Snapshot"
+## nom(s) du ou des kernel(s)
+nkernel=("vmlinuz-linux")
+## nom(s) de(s) l'init
+ninit=("initramfs-linux.img" "initramfs-linux-fallback.img")
+
+
+#######################
+### DÉBUT DU SCRIPT ###
+### NE PAS TOUCHER  ###
+#######################
+## paramêtre des chaînes --hint
+pboot=$(${grub_probe} --target="hints_string" "/boot" 2>/dev/null)
+## uuid de la partition root
+uuid=$(${grub_probe} "/" --target="fs_uuid" 2>/dev/null)
+## uuid de la partition boot
+buuid=$(${grub_probe} --target="fs_uuid" "/boot" 2>/dev/null)
+## paramêtre passé au kernel
+params="$GRUB_CMDLINE_LINUX $GRUB_CMDLINE_LINUX_DEFAULT"
+
+
+# on affiche le menu
+echo "submenu '$submenuname' {"
+
+# on traite la variable kernel
+for kernel in ${nkernel[@]}; do
+	# on test si le(s) nom(s) du(des) kernel existe(nt), autrement on affiche une erreur et on sort
+	if [ ! -f /boot/$kernel ]; then echo "/boot/$kernel: Fichier inexistant" >&2; exit 1; fi
+	# on vérifie le nombre de kernel présent, si >1 on crée un menu
+	if [ ${#nkernel[*]} != 1 ]; then echo "	submenu '$kernel' {
+		submenu '---> Kernel: $kernel <---' { echo }"; fi
+	
+	# On liste les snapshots présent sur le système de fichier
+	for item in $($bindir/btrfs subvolume list -s / --sort=-ogen | $bindir/awk '{print $NF}'); do
+		# On écarte les snapshots avec un statut de suppression
+		if [ $item = "DELETED" ]; then continue; fi
+		# on crée un menu pour chaque snapshot présent
+		echo "		submenu '$prefixentry $item' {"
+		# si plusieurs kernel on été trouvé, on affiche un titre indicatif
+		if [ ${#nkernel[*]} != 1 ]; then echo "			submenu '---> Kernel: $kernel <---' { echo }"; fi
+		# on traite la variable de l'initframs
+		for init in ${ninit[@]}; do
+			# on test si le(s) nom(s) du(des) initframs existe(nt), autrement on affiche une erreur et on sort
+			if [ ! -f /boot/$init ]; then echo "/boot/$init: Fichier inexistant" >&2; exit 1; fi
+			# on traite chaque entrée des snapshots avec leurs kernel et initframs respectifs
+			echo "\
+			menuentry '$item $init' --class arch --class gnu-linux --class gnu --class os "\$menuentry_id_option" 'gnulinux-snapshots-$uuid'{
+				load_video
+				set gfxpayload=$GRUB_GFXPAYLOAD_LINUX
+				if [ x"\$feature_platform_search_hint" = xy ]; then
+					search --no-floppy --fs-uuid --set=root $pboot $buuid
+				else
+					search --no-floppy --fs-uuid --set=root $buuid
+				fi
+				echo	'Loading Linux snapshot ...'"
+				# on vérifie l'emplacement de la partition /boot
+				if [ $uuid = $buuid ]; then
+					echo "\
+				linux	/$item/boot/$kernel root=UUID=$uuid rw rootflags=subvol=$item $params
+				echo    'Loading initial ramdisk ...'
+				initrd	/$item/boot/$init"
+				else
+					echo "\
+				linux	/$kernel root=UUID=$uuid rw rootflags=subvol=$item $params
+				echo    'Loading initial ramdisk ...'
+				initrd  /$init"
+				fi
+				echo "\
+			}"
+		done
+		echo "		}"
+	done
+	# on oubli pas de fermer le menu si plusieurs kernels ont été trouvé
+	if [ ${#nkernel[*]} != 1 ]; then echo "	}"; fi
+done
+echo "}"
