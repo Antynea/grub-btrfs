@@ -5,54 +5,75 @@ set -e
 . /etc/default/grub
 
 ### variables modifiable ###
-## nom du sous-menu
+## fr: nom du sous-menu 
+## en: Name of the submenu
 submenuname="ArchLinux Snapshots"
-## préfixe de l'entrée
+## fr: préfixe de l'entrée 
+## en: Prefix entry
 prefixentry="Snapshot"
-## nom(s) du ou des kernel(s)
+## fr: nom(s) du ou des kernel(s)
+## en: Name(s) of the kernel(s)
 nkernel=("vmlinuz-linux")
-## nom(s) de(s) l'init
+## fr: nom(s) de(s) l'init
+## en: Name(s) of the init(s)
 ninit=("initramfs-linux.img" "initramfs-linux-fallback.img")
 
 
-#######################
-### DÉBUT DU SCRIPT ###
-### NE PAS TOUCHER  ###
-#######################
-## paramêtre des chaînes --hint
+###########################
+### fr: DÉBUT DU SCRIPT ###
+### en: NAME OF SCRIPT  ###
+### fr: NE PAS TOUCHER  ###
+### en: DO NOT TOUCH    ###
+###########################
+## fr: paramêtre des chaînes --hint
+## en: Parameter of the chains --hint (Translation unclear)
 pboot=$(${grub_probe} --target="hints_string" "/boot" 2>/dev/null)
-## uuid de la partition root
+## fr: uuid de la partition root
+## en: UUID of the root partition
 uuid=$(${grub_probe} "/" --target="fs_uuid" 2>/dev/null)
-## uuid de la partition boot
+## fr: uuid de la partition boot
+## en: UUID of the boot partition
 buuid=$(${grub_probe} --target="fs_uuid" "/boot" 2>/dev/null)
-## paramêtre passé au kernel
+## fr: paramêtre passé au kernel
+## en: Parameters passed to the kernel
 params="$GRUB_CMDLINE_LINUX $GRUB_CMDLINE_LINUX_DEFAULT"
 
 
-# on affiche le menu
+# fr: on affiche le menu
+# en: Display the menu
 echo "submenu '$submenuname' {"
 
-# on traite la variable kernel
+# fr: on traite la variable kernel
+# en: Treat the kernel variables (Translation unclear)
 for kernel in ${nkernel[@]}; do
-	# on test si le(s) nom(s) du(des) kernel existe(nt), autrement on affiche une erreur et on sort
-	if [ ! -f /boot/$kernel ]; then echo "/boot/$kernel: Fichier inexistant" >&2; exit 1; fi
-	# on vérifie le nombre de kernel présent, si >1 on crée un menu
+	# fr: on test si le(s) nom(s) du(des) kernel existe(nt), autrement on affiche une erreur et on sort
+	# en: Check the specified kernel(s) exist, if it/they don't display an error and exit
+	if [ ! -f /boot/$kernel ]; then echo "/boot/$kernel: fr: Fichier inexistant en: File does not exist" >&2; exit 1; fi
+	# fr: on vérifie le nombre de kernel présent, si >1 on crée un menu
+	# en: If there are >1 kernels, create a menu
 	if [ ${#nkernel[*]} != 1 ]; then echo "	submenu '$kernel' {
 		submenu '---> Kernel: $kernel <---' { echo }"; fi
 	
-	# On liste les snapshots présent sur le système de fichier
+	# fr: On liste les snapshots présent sur le système de fichier
+	# en: List filesystem snapshots
 	for item in $($bindir/btrfs subvolume list -s / --sort=-ogen | $bindir/awk '{print $NF}'); do
-		# On écarte les snapshots avec un statut de suppression
+		# fr: On écarte les snapshots avec un statut de suppression
+		# en: Discard deleted snapshots
 		if [ $item = "DELETED" ]; then continue; fi
-		# on crée un menu pour chaque snapshot présent
+		# fr: on crée un menu pour chaque snapshot présent
+		# en: Create a menu for remaining snapshots
 		echo "		submenu '$prefixentry $item' {"
-		# si plusieurs kernel on été trouvé, on affiche un titre indicatif
+		# fr: si plusieurs kernel on été trouvé, on affiche un titre indicatif
+		# en: Display message if more than one kernel is found
 		if [ ${#nkernel[*]} != 1 ]; then echo "			submenu '---> Kernel: $kernel <---' { echo }"; fi
-		# on traite la variable de l'initframs
+		# fr: on traite la variable de l'initframs
+		# en: Treat the initramfs variables (Translation unclear)
 		for init in ${ninit[@]}; do
-			# on test si le(s) nom(s) du(des) initframs existe(nt), autrement on affiche une erreur et on sort
+			# fr: on test si le(s) nom(s) du(des) initframs existe(nt), autrement on affiche une erreur et on sort
+			# en: Check the specified initramfs(es) exist, if it/they don't display an error and exit
 			if [ ! -f /boot/$init ]; then echo "/boot/$init: Fichier inexistant" >&2; exit 1; fi
-			# on traite chaque entrée des snapshots avec leurs kernel et initframs respectifs
+			# fr: on traite chaque entrée des snapshots avec leurs kernel et initframs respectifs
+			# en: Specify a kernel and initramfs for every snapshot
 			echo "\
 			menuentry '$item $init' --class arch --class gnu-linux --class gnu --class os "\$menuentry_id_option" 'gnulinux-snapshots-$uuid'{
 				load_video
@@ -63,7 +84,8 @@ for kernel in ${nkernel[@]}; do
 					search --no-floppy --fs-uuid --set=root $buuid
 				fi
 				echo	'Loading Linux snapshot ...'"
-				# on vérifie l'emplacement de la partition /boot
+				# fr: on vérifie l'emplacement de la partition /boot
+				# en: Check the location of the /boot partition
 				if [ $uuid = $buuid ]; then
 					echo "\
 				linux	/$item/boot/$kernel root=UUID=$uuid rw rootflags=subvol=$item $params
@@ -80,7 +102,8 @@ for kernel in ${nkernel[@]}; do
 		done
 		echo "		}"
 	done
-	# on oubli pas de fermer le menu si plusieurs kernels ont été trouvé
+	# fr: on oubli pas de fermer le menu si plusieurs kernels ont été trouvé
+	# en: Don't forget to close menus if more than one kernel is found
 	if [ ${#nkernel[*]} != 1 ]; then echo "	}"; fi
 done
 echo "}"
