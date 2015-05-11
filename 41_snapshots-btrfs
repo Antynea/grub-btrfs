@@ -60,6 +60,8 @@ for kernel in ${nkernel[@]}; do
 		# fr: On écarte les snapshots avec un statut de suppression
 		# en: Discard deleted snapshots
 		if [ $item = "DELETED" ]; then continue; fi
+		#en: Output name of snapshot
+		gettext_printf "Found Snapshot: %s\n" "$item" >&2
 		# fr: on crée un menu pour chaque snapshot présent
 		# en: Create a menu for remaining snapshots
 		echo "		submenu '$prefixentry $item' {"
