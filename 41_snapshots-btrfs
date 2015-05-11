@@ -7,7 +7,7 @@ set -e
 ### variables modifiable ###
 ## fr: nom du sous-menu 
 ## en: Name of the submenu
-submenuname="ArchLinux Snapshots devel"
+submenuname="ArchLinux Snapshots"
 ## fr: préfixe de l'entrée 
 ## en: Prefix entry
 prefixentry="Snapshot"
