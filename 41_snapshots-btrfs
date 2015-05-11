@@ -62,7 +62,8 @@ for kernel in ${nkernel[@]}; do
 		if [ $item = "DELETED" ]; then continue; fi
 		# fr: on crée un menu pour chaque snapshot présent
 		# en: Create a menu for remaining snapshots
-		echo "		submenu '$prefixentry $item' {"
+		date_time=$($bindir/btrfs subvolume list -s / | $bindir/grep $item | $bindir/cut -d" " -f 11-12)
+		echo "		submenu '$prefixentry $item [$date_time]' {"
 		# fr: si plusieurs kernel on été trouvé, on affiche un titre indicatif
 		# en: Display message if more than one kernel is found
 		if [ ${#nkernel[*]} != 1 ]; then echo "			submenu '---> Kernel: $kernel <---' { echo }"; fi
