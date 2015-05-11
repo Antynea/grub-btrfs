@@ -7,7 +7,7 @@ set -e
 ### variables modifiable ###
 ## fr: nom du sous-menu 
 ## en: Name of the submenu
-submenuname="ArchLinux Snapshots"
+submenuname="ArchLinux Snapshots devel"
 ## fr: préfixe de l'entrée 
 ## en: Prefix entry
 prefixentry="Snapshot"
@@ -47,7 +47,7 @@ echo "submenu '$submenuname' {"
 # en: Treat the kernel variables (Translation unclear)
 for kernel in ${nkernel[@]}; do
 	# fr: on test si le(s) nom(s) du(des) kernel existe(nt), autrement on affiche une erreur et on sort
-	# en: Check the specified kernel(s) exist, if it/they don't display an error and exit
+	# en: Check the specified kernel(s) exist, if it/they don't, display an error and exit
 	if [ ! -f /boot/$kernel ]; then echo "/boot/$kernel: fr: Fichier inexistant en: File does not exist" >&2; exit 1; fi
 	# fr: on vérifie le nombre de kernel présent, si >1 on crée un menu
 	# en: If there are >1 kernels, create a menu
@@ -60,19 +60,23 @@ for kernel in ${nkernel[@]}; do
 		# fr: On écarte les snapshots avec un statut de suppression
 		# en: Discard deleted snapshots
 		if [ $item = "DELETED" ]; then continue; fi
-		# fr: on crée un menu pour chaque snapshot présent
-		# en: Create a menu for remaining snapshots
-		echo "		submenu '$prefixentry $item' {"
+		# fr: affiche la liste des snapshots trouvés
+		# en: Output name of snapshot
+		gettext_printf "Found Snapshot: %s\n" "$item" >&2
+		# fr: on crée un menu pour chaque snapshot présent (nom + date de création)
+		# en: Create a menu for remaining snapshots (name + creation date)
+		date_time=$($bindir/btrfs subvolume list -s / | $bindir/grep $item | $bindir/cut -d" " -f 11-12)
+		echo "		submenu '$prefixentry $item [$date_time]' {"
 		# fr: si plusieurs kernel on été trouvé, on affiche un titre indicatif
 		# en: Display message if more than one kernel is found
 		if [ ${#nkernel[*]} != 1 ]; then echo "			submenu '---> Kernel: $kernel <---' { echo }"; fi
-		# fr: on traite la variable de l'initframs
+		# fr: on traite la variable de l'initramfs
 		# en: Treat the initramfs variables (Translation unclear)
 		for init in ${ninit[@]}; do
-			# fr: on test si le(s) nom(s) du(des) initframs existe(nt), autrement on affiche une erreur et on sort
-			# en: Check the specified initramfs(es) exist, if it/they don't display an error and exit
+			# fr: on test si le(s) nom(s) du(des) initramfs existe(nt), autrement on affiche une erreur et on sort
+			# en: Check the specified initramfs(es) exist, if it/they don't, display an error and exit
 			if [ ! -f /boot/$init ]; then echo "/boot/$init: Fichier inexistant" >&2; exit 1; fi
-			# fr: on traite chaque entrée des snapshots avec leurs kernel et initframs respectifs
+			# fr: on traite chaque entrée des snapshots avec leurs kernel et initramfs respectifs
 			# en: Specify a kernel and initramfs for every snapshot
 			echo "\
 			menuentry '$item $init' --class arch --class gnu-linux --class gnu --class os "\$menuentry_id_option" 'gnulinux-snapshots-$uuid'{
