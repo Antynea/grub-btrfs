@@ -25,6 +25,10 @@ ninit=("initramfs-linux.img" "initramfs-linux-fallback.img")
 ### fr: NE PAS TOUCHER  ###
 ### en: DO NOT TOUCH    ###
 ###########################
+## fr: internationalisation
+## en: Internationalization
+export TEXTDOMAIN=grub-btrfs-git
+export TEXTDOMAINDIR="/usr/share/locale"
 ## fr: paramêtre des chaînes --hint
 ## en: Parameter of the chains --hint (Translation unclear)
 pboot=$(${grub_probe} --target="hints_string" "/boot" 2>/dev/null)
@@ -48,7 +52,7 @@ echo "submenu '$submenuname' {"
 for kernel in ${nkernel[@]}; do
 	# fr: on test si le(s) nom(s) du(des) kernel existe(nt), autrement on affiche une erreur et on sort
 	# en: Check the specified kernel(s) exist, if it/they don't, display an error and exit
-	if [ ! -f /boot/$kernel ]; then echo "/boot/$kernel: fr: Fichier inexistant en: File does not exist" >&2; exit 1; fi
+	if [ ! -f /boot/$kernel ]; then gettext_printf $"Error: /boot/$kernel, kernel does not exist" >&2; exit 1; fi
 	# fr: on vérifie le nombre de kernel présent, si >1 on crée un menu
 	# en: If there are >1 kernels, create a menu
 	if [ ${#nkernel[*]} != 1 ]; then echo "	submenu '$kernel' {
@@ -62,20 +66,20 @@ for kernel in ${nkernel[@]}; do
 		if [ $item = "DELETED" ]; then continue; fi
 		# fr: affiche la liste des snapshots trouvés
 		# en: Output name of snapshot
-		gettext_printf "Found Snapshot: %s\n" "$item" >&2
+		gettext_printf $"Found Snapshot: %s\n" "$item" >&2
 		# fr: on crée un menu pour chaque snapshot présent (nom + date de création)
 		# en: Create a menu for remaining snapshots (name + creation date)
 		date_time=$($bindir/btrfs subvolume list -s / | $bindir/grep $item | $bindir/cut -d" " -f 11-12)
 		echo "		submenu '$prefixentry $item [$date_time]' {"
 		# fr: si plusieurs kernel on été trouvé, on affiche un titre indicatif
-		# en: Display message if more than one kernel is found
+		# en: if more than one kernel is found, create a menu
 		if [ ${#nkernel[*]} != 1 ]; then echo "			submenu '---> Kernel: $kernel <---' { echo }"; fi
 		# fr: on traite la variable de l'initramfs
 		# en: Treat the initramfs variables (Translation unclear)
 		for init in ${ninit[@]}; do
 			# fr: on test si le(s) nom(s) du(des) initramfs existe(nt), autrement on affiche une erreur et on sort
 			# en: Check the specified initramfs(es) exist, if it/they don't, display an error and exit
-			if [ ! -f /boot/$init ]; then echo "/boot/$init: Fichier inexistant" >&2; exit 1; fi
+			if [ ! -f /boot/$init ]; then gettext_printf $"Error: /boot/$init, initramfs does not exist" >&2; exit 1; fi
 			# fr: on traite chaque entrée des snapshots avec leurs kernel et initramfs respectifs
 			# en: Specify a kernel and initramfs for every snapshot
 			echo "\
