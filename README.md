@@ -1,20 +1,19 @@
-=encoding utf8
-
-=head1 grub-btrfs
+grub-btrfs
+######
 
 This is a version 0.xx of grub-btrfs :
 
-=head1 Desciption
+ Desciption
 
 grub-btrfs, add support for btrfs snapshots into grub menu
 
-=head1 What does grub-btrfs v0.xx do :
+ What does grub-btrfs v0.xx do :
 
 Simple rollback using snapshots you made previous.
 
 Makes a list of all snapshots, kernels, initramfs present on the filesystem and then creates a corresponding entered with name and date of snapshots in grub.cfg, which ensures a very easy rollback.
 
-=head1 How to use it :
+ How to use it :
 
 Edit 41_snapshots-btrfs file :
 
