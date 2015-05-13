@@ -15,7 +15,7 @@ Makes a list of all snapshots, kernels, initramfs present on the filesystem and 
 
 #### How to use it :
 
-Edit 41_snapshots-btrfs file :
+1. Edit 41_snapshots-btrfs file :
 
 * submenuname = name menu appear in grub
 
@@ -27,7 +27,7 @@ Edit 41_snapshots-btrfs file :
 
 * intel_ucode= name intel microcode you use it
 
-Generate grub.cfg (on Archlinux is grub-mkconfig -o /boot/grub/grub.cfg )
+2. Generate grub.cfg (on Archlinux is grub-mkconfig -o /boot/grub/grub.cfg )
 
 grub-btrfs automatically generates snapshots entries.
 
