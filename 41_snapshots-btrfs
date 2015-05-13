@@ -16,7 +16,7 @@ prefixentry="Snapshot"
 nkernel=("vmlinuz-linux")
 ## fr: nom(s) de(s) l'init
 ## en: Name(s) of the init(s)
-ninit=("initramfs-linux.img")
+ninit=("initramfs-linux.img" "initramfs-linux-fallback.img")
 ## fr: nom du microcode intel
 ## en: Name intel-ucode
 intel_ucode=("intel-ucode.img")
