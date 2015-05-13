@@ -17,15 +17,15 @@ Makes a list of all snapshots, kernels, initramfs present on the filesystem and 
 
 1. Edit 41_snapshots-btrfs file :
 
-* submenuname = name menu appear in grub
+	* submenuname = name menu appear in grub
 
-* prefixentry = add a name ahead your snapshots entries
+	* prefixentry = add a name ahead your snapshots entries
 
-* nkernel= name kernel you use it
+	* nkernel= name kernel you use it
 
-* ninit= name initramfs (ramdisk) you use it
+	* ninit= name initramfs (ramdisk) you use it
 
-* intel_ucode= name intel microcode you use it
+	* intel_ucode= name intel microcode you use it
 
 2. Generate grub.cfg (on Archlinux is grub-mkconfig -o /boot/grub/grub.cfg )
 
