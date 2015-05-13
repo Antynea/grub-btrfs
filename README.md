@@ -36,7 +36,7 @@ You will see it appear different entries, e.g : Prefixentry name of snapshot [20
 #### Warning
 
 Version 0.xx detect kernels,initramfs,intel microcode only in boot partition, not in snapshot.
-If kernels,initramfs,intel microcode, are present in partition boot but not in snapshot, entry will be created but not fonctional, you don't boot it.
+If kernels,initramfs,intel microcode, are present in boot partition but not in snapshot, entry will be created but not fonctional, you don't boot it.
 
 Version 1.xx will do it, release soon.
 
