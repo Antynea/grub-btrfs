@@ -1,5 +1,5 @@
-grub-btrfs
-######
+## grub-btrfs
+
 
 This is a version 0.xx of grub-btrfs :
 
