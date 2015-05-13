@@ -16,7 +16,10 @@ prefixentry="Snapshot"
 nkernel=("vmlinuz-linux")
 ## fr: nom(s) de(s) l'init
 ## en: Name(s) of the init(s)
-ninit=("initramfs-linux.img" "initramfs-linux-fallback.img")
+ninit=("initramfs-linux.img")
+## fr: nom du microcode intel
+## en: Name intel-ucode
+intel_ucode=("intel-ucode.img")
 
 
 ###########################
@@ -97,13 +100,29 @@ for kernel in ${nkernel[@]}; do
 				if [ $uuid = $buuid ]; then
 					echo "\
 				linux	/$item/boot/$kernel root=UUID=$uuid rw rootflags=subvol=$item $params
-				echo    'Loading initial ramdisk ...'
+				echo    'Loading initial ramdisk ...'"
+				# fr: on vérifie la présence du microcode intel
+				# en: Check intel microcode exist
+					if [ -f /boot/$intel_ucode ]; then
+						echo "\
+				initrd	/$item/boot/$intel_ucode /$item/boot/$init"
+					else
+						echo "\
 				initrd	/$item/boot/$init"
+					fi
 				else
 					echo "\
 				linux	/$kernel root=UUID=$uuid rw rootflags=subvol=$item $params
-				echo    'Loading initial ramdisk ...'
+				echo    'Loading initial ramdisk ...'"
+				# fr: on vérifie la présence du microcode intel
+				# en: Check intel microcode exist
+				if [ -f /boot/$intel_ucode ]; then
+						echo "\
+				initrd	/$intel_ucode /$init"
+					else
+						echo "\
 				initrd  /$init"
+					fi
 				fi
 				echo "\
 			}"
