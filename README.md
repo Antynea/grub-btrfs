@@ -1,9 +1,9 @@
-###### grub-btrfs
+### grub-btrfs
 
 
 This is a version 0.xx of grub-btrfs :
 
-##### Desciption
+#### Desciption
 
 grub-btrfs, add support for btrfs snapshots into grub menu
 
@@ -13,7 +13,7 @@ Simple rollback using snapshots you made previous.
 
 Makes a list of all snapshots, kernels, initramfs present on the filesystem and then creates a corresponding entered with name and date of snapshots in grub.cfg, which ensures a very easy rollback.
 
-### How to use it :
+#### How to use it :
 
 Edit 41_snapshots-btrfs file :
 
