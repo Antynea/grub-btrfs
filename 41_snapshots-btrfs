@@ -7,19 +7,19 @@ set -e
 ### variables modifiable ###
 ## fr: nom du sous-menu 
 ## en: Name of the submenu
-submenuname="ArchLinux Snapshots"
+submenuname=${GRUB_BTRFS_SUBMENUNAME:-"ArchLinux Snapshots"}
 ## fr: préfixe de l'entrée 
 ## en: Prefix entry
-prefixentry="Snapshot"
+prefixentry=${GRUB_BTRFS_PREFIXENTRY:-"Snapshot"}
 ## fr: nom(s) du ou des kernel(s)
 ## en: Name(s) of the kernel(s)
-nkernel=("vmlinuz-linux")
+nkernel=("${GRUB_BTRFS_NKERNEL[@]:-vmlinuz-linux}")
 ## fr: nom(s) de(s) l'init
 ## en: Name(s) of the init(s)
-ninit=("initramfs-linux.img" "initramfs-linux-fallback.img")
+ninit=("${GRUB_BTRFS_NINIT[@]:-initramfs-linux.img initramfs-linux-fallback.img}")
 ## fr: nom du microcode intel
 ## en: Name intel-ucode
-intel_ucode=("intel-ucode.img")
+intel_ucode=("${GRUB_BTRFS_INTEL_UCODE[@]:-intel-ucode.img}")
 
 
 ###########################
