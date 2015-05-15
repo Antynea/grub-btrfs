@@ -3,7 +3,7 @@
 
 This is a version 0.xx of grub-btrfs
 
-#### Desciption
+#### Description
 
 grub-btrfs, add support for btrfs snapshots into grub menu
 
@@ -15,17 +15,17 @@ Makes a list of all snapshots, kernels, initramfs present on the filesystem and 
 
 #### How to use it :
 
-1. Add lines to /etc/default/grub as needed, defaults listed as examples:
-2. 
-	* submenuname = name menu appear in grub ( e.g: GRUB_BTRFS_SUBMENUNAME="ArchLinux Snapshots" )
+1. Edit 41_snapshots-btrfs file :
 
-	* prefixentry = add a name ahead your snapshots entries ( e.g: GRUB_BTRFS_PREFIXENTRY="Snapshot" )
+	* submenuname = name menu appear in grub ( e.g: submenuname="ArchLinux Snapshots" )
 
-	* nkernel= name kernel you use it ( e.g: GRUB_BTRFS_NKERNEL=("vmlinuz-linux") )
+	* prefixentry = add a name ahead your snapshots entries ( e.g: prefixentry="Snapshot" )
 
-	* ninit= name initramfs (ramdisk) you use it ( e.g: GRUB_BTRFS_NINIT=("initramfs-linux.img" "initramfs-linux-fallback.img") )
+	* nkernel= name kernel you use it ( e.g: nkernel=("vmlinuz-linux") )
 
-	* intel_ucode= name intel microcode you use it ( e.g: GRUB_BTRFS_INTEL_UCODE=("intel-ucode.img") )
+	* ninit= name initramfs (ramdisk) you use it ( e.g: ninit=("initramfs-linux.img" "initramfs-linux-fallback.img") )
+
+	* intel_ucode= name intel microcode you use it ( e.g: intel_ucode=("intel-ucode.img") )
 
 2. Generate grub.cfg (on Archlinux is grub-mkconfig -o /boot/grub/grub.cfg )
 
