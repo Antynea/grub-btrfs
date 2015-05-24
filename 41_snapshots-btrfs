@@ -63,16 +63,16 @@ for kernel in ${nkernel[@]}; do
 	
 	# fr: On liste les snapshots présent sur le système de fichier
 	# en: List filesystem snapshots
-	for item in $($bindir/btrfs subvolume list -s / --sort=-ogen | $bindir/awk '{print $NF}'); do
-		# fr: On écarte les snapshots avec un statut de suppression
+	for item in $($bindir/btrfs subvolume list -sa / --sort=-ogen | $bindir/awk '{gsub(/^["<FS_TREE>/"]+/,"",$NF);print $NF}'); do
+		# fr: On écarte les snapshots avec un status de suppression
 		# en: Discard deleted snapshots
 		if [ $item = "DELETED" ]; then continue; fi
 		# fr: affiche la liste des snapshots trouvés
 		# en: Output name of snapshot
-		gettext_printf $"Found Snapshot: %s\n" "$item" >&2
+		date_time=$($bindir/btrfs subvolume list -sa / | $bindir/grep $item | $bindir/cut -d" " -f 11-12)
+		gettext_printf $"Found Snapshot: %s\n" "$item $date_time" >&2
 		# fr: on crée un menu pour chaque snapshot présent (nom + date de création)
 		# en: Create a menu for remaining snapshots (name + creation date)
-		date_time=$($bindir/btrfs subvolume list -s / | $bindir/grep $item | $bindir/cut -d" " -f 11-12)
 		echo "		submenu '$prefixentry $item [$date_time]' {"
 		# fr: si plusieurs kernel on été trouvé, on affiche un titre indicatif
 		# en: if more than one kernel is found, create a menu
