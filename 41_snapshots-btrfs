@@ -41,13 +41,13 @@ params="$GRUB_CMDLINE_LINUX $GRUB_CMDLINE_LINUX_DEFAULT"
 typeset -A date_time
 unset snapshots
 
+# Create list of filesystem snapshots
 oldIFS=$IFS
 IFS=$'\n'
 
-# Create list of filesystem snapshots
 for snap in $($bindir/btrfs subvolume list -sa / --sort=-ogen | $bindir/awk '{gsub(/^["<FS_TREE>/"]+/,"",$NF);print $11" "$12"?"$NF}'); do
         snap_name="${snap#*"?"}"
-        # en: Discard deleted snapshots
+        # Discard deleted snapshots
         if [ $snap_name = "DELETED" ]; then continue; fi
         snapshots+=("$snap_name")
         date_time[$snap_name]="${snap%"?"*}"
