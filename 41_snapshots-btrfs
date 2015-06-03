@@ -45,7 +45,7 @@ unset snapshots
 oldIFS=$IFS
 IFS=$'\n'
 
-for snap in $($bindir/btrfs subvolume list -sa / --sort=-ogen | $bindir/awk '{gsub(/^["<FS_TREE>/"]+/,"",$NF);print $11" "$12"?"$NF}'); do
+for snap in $($bindir/btrfs subvolume list -sa / --sort=-ogen | $bindir/awk '{gsub(/^.*<FS_TREE>\//,"",$NF);print $11" "$12"?"$NF}'); do
         snap_name="${snap#*"?"}"
         # Discard deleted snapshots
         if [ $snap_name = "DELETED" ]; then continue; fi
