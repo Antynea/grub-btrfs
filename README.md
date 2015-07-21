@@ -15,7 +15,10 @@ Makes a list of all snapshots, kernels, initramfs present on the filesystem and 
 
 #### TO DO
 
-in progress ...
-fix bug
-improve perfomance
-auto-detect kernel,initramfs,intel-ucode
+* in progress ...
+
+* fix bug
+
+* improve perfomance
+
+* auto-detect kernel,initramfs,intel-ucode
