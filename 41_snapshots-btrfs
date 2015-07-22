@@ -1,4 +1,35 @@
 #! /usr/bin/bash
+#
+#
+#########################################################################################################################################
+# Written by: Antynea															#
+#																	#
+# Purpose: Include btrfs snapshots at boot options.											#
+#																	#
+# What this script does:														#
+# - List snapshots existing on root partition (btrfs).											#
+# - Create corresponding menuentry in grub.cfg , which ensures a very easy rollback.							#
+#																	#
+# How to use it:															#
+# - Add this lines to /etc/default/grub:												#
+#																	#
+# * GRUB_BTRFS_SUBMENUNAME="ArchLinux Snapshots" 					(Name menu appearing in grub.)	 		#
+# * GRUB_BTRFS_PREFIXENTRY="Snapshot"        		   				(Add a name ahead your snapshots entries.)	#
+# * GRUB_BTRFS_NKERNEL=("vmlinuz-linux") 		 				(Custom Name kernel you use it.) 		#
+# * GRUB_BTRFS_NINIT=("initramfs-linux.img" "initramfs-linux-fallback.img")		(Custom Name initramfs (ramdisk) you use it.)	#
+# * GRUB_BTRFS_INTEL_UCODE=("intel-ucode.img") 						(Custom Name intel microcode you use it.)	#
+#																	#
+# - Generate grub.cfg (on Archlinux use grub-mkconfig -o /boot/grub/grub.cfg )								#
+#																	#
+# - grub-btrfs automatically generates snapshots entries.										#
+# - You will see it appear different entries, e.g : Prefixentry name of snapshot [2013-02-11 04:00:00]					#
+#																	#
+# Warning:																#
+# This version detect kernels,initramfs,intel microcode only in boot partition, not in snapshot.					#
+# If those that are present in boot partition but not in snapshot,								   	#
+# entry will be created but not fonctional, you don't boot it.										#
+#																	#
+#########################################################################################################################################
 set -e
 
 . /usr/share/grub/grub-mkconfig_lib
@@ -24,8 +55,7 @@ intel_ucode=("${GRUB_BTRFS_INTEL_UCODE[@]:-intel-ucode.img}")
 ## Internationalization (default : english)
 export TEXTDOMAIN=grub-btrfs-git
 export TEXTDOMAINDIR="/usr/share/locale"
-## fr: paramêtre des chaînes --hint
-## en: Parameter of the chains --hint (Translation unclear)
+## hints string
 pboot=$(${grub_probe} --target="hints_string" "/boot" 2>/dev/null)
 ## UUID of the root partition
 uuid=$(${grub_probe} "/" --target="fs_uuid" 2>/dev/null)
@@ -54,40 +84,29 @@ for snap in $($bindir/btrfs subvolume list -sa / --sort=-ogen | $bindir/awk '{gs
 done
 IFS=$oldIFS
 
-# fr: on affiche le menu
-# en: Display the menu
+# Display the menu
 echo "submenu '$submenuname' {"
 
-# fr: on traite la variable kernel
-# en: Treat the kernel variables (Translation unclear)
+# Treat the kernel variables (Translation unclear)
 for kernel in ${nkernel[@]}; do
-	# fr: on test si le(s) nom(s) du(des) kernel existe(nt), autrement on affiche une erreur et on sort
-	# en: Check the specified kernel(s) exist, if it/they don't, display an error and exit
+	# Check the specified kernel(s) exist, if it/they don't, display an error and exit
 	if [ ! -f /boot/$kernel ]; then gettext_printf $"Error: /boot/$kernel, kernel does not exist" >&2; exit 1; fi
-	# fr: on vérifie le nombre de kernel présent, si >1 on crée un menu
-	# en: If there are >1 kernels, create a menu
+	# If there are >1 kernels, create a menu
 	if [ ${#nkernel[*]} != 1 ]; then echo "	submenu '$kernel' {
 		submenu '---> Kernel: $kernel <---' { echo }"; fi
-	# fr: On traite la variable snapshots
-	# en: Treat the snapshots variable
+	# Treat the snapshots variable
 	for item in ${snapshots[@]}; do
-		# fr: affiche la liste des snapshots trouvés
-		# en: Output name of snapshot
+		# Output name of snapshot
 		gettext_printf $"Found Snapshot: %s\n" "$item ${date_time[$item]}" >&2
-		# fr: on crée un menu pour chaque snapshot présent (nom + date de création)
-		# en: Create a menu for remaining snapshots (name + creation date)
+		# Create a menu for remaining snapshots (name + creation date)
 		echo "		submenu '$prefixentry $item [${date_time[$item]}]' {"
-		# fr: si plusieurs kernel on été trouvé, on affiche un titre indicatif
-		# en: if more than one kernel is found, create a menu
+		# if more than one kernel is found, create a menu
 		if [ ${#nkernel[*]} != 1 ]; then echo "			submenu '---> Kernel: $kernel <---' { echo }"; fi
-		# fr: on traite la variable de l'initramfs
-		# en: Treat the initramfs variables (Translation unclear)
+		# Treat the initramfs variable
 		for init in ${ninit[@]}; do
-			# fr: on test si le(s) nom(s) du(des) initramfs existe(nt), autrement on affiche une erreur et on sort
-			# en: Check the specified initramfs(es) exist, if it/they don't, display an error and exit
+			# Check the specified initramfs(es) exist, if it/they don't, display an error and exit
 			if [ ! -f /boot/$init ]; then gettext_printf $"Error: /boot/$init, initramfs does not exist" >&2; exit 1; fi
-			# fr: on traite chaque entrée des snapshots avec leurs kernel et initramfs respectifs
-			# en: Specify a kernel and initramfs for every snapshot
+			# Specify a kernel and initramfs for every snapshot
 			echo "\
 			menuentry '$item $init' --class arch --class gnu-linux --class gnu --class os "\$menuentry_id_option" 'gnulinux-snapshots-$uuid'{
 				load_video
@@ -98,14 +117,12 @@ for kernel in ${nkernel[@]}; do
 					search --no-floppy --fs-uuid --set=root $buuid
 				fi
 				echo	'Loading Linux snapshot ...'"
-				# fr: on vérifie l'emplacement de la partition /boot
-				# en: Check the location of the /boot partition
+				# Check the location of the /boot partition
 				if [ $uuid = $buuid ]; then
 					echo "\
 				linux	/$item/boot/$kernel root=UUID=$uuid rw rootflags=subvol=$item $params
 				echo    'Loading initial ramdisk ...'"
-				# fr: on vérifie la présence du microcode intel
-				# en: Check intel microcode exist
+				# Check intel microcode exist
 					if [ -f /boot/$intel_ucode ]; then
 						echo "\
 				initrd	/$item/boot/$intel_ucode /$item/boot/$init"
@@ -117,8 +134,7 @@ for kernel in ${nkernel[@]}; do
 					echo "\
 				linux	/$kernel root=UUID=$uuid rw rootflags=subvol=$item $params
 				echo    'Loading initial ramdisk ...'"
-				# fr: on vérifie la présence du microcode intel
-				# en: Check intel microcode exist
+				# Check intel microcode exist
 				if [ -f /boot/$intel_ucode ]; then
 						echo "\
 				initrd	/$intel_ucode /$init"
@@ -132,8 +148,7 @@ for kernel in ${nkernel[@]}; do
 		done
 		echo "		}"
 	done
-	# fr: on oubli pas de fermer le menu si plusieurs kernels ont été trouvé
-	# en: Don't forget to close menus if more than one kernel is found
+	# Don't forget to close menus if more than one kernel is found
 	if [ ${#nkernel[*]} != 1 ]; then echo "	}"; fi
 done
 echo "}"
