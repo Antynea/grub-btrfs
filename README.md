@@ -7,7 +7,7 @@ This is a version 1.xx of grub-btrfs
 
 grub-btrfs, add support for btrfs snapshots into grub menu
 
-#### What does grub-btrfs v0.xx do :
+#### What does grub-btrfs v1.xx do :
 
 Simple rollback using snapshots you made previous.
 
@@ -22,3 +22,7 @@ Makes a list of all snapshots, kernels, initramfs present on the filesystem and 
 * improve perfomance
 
 * auto-detect kernel,initramfs,intel-ucode
+
+* detect partition boot separate
+
+
