@@ -11,7 +11,7 @@ grub-btrfs, add support for btrfs snapshots into grub menu
 
 Simple rollback using snapshots you made previous.
 
-Makes a list of all snapshots, kernels, initramfs present on the filesystem and then creates a corresponding entered with name and date of snapshots in grub.cfg, which ensures a very easy rollback.
+Makes a list of all snapshots, kernels, initramfs present on the filesystem and then creates a corresponding input with name and date of snapshots in grub.cfg, which ensures a very easy rollback.
 
 #### TO DO
 
