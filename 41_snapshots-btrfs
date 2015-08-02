@@ -111,9 +111,9 @@ echo "	submenu '${1} ${2} ${3}' {"
 					echo 'Loading Kernel: ${k} ...'
 					linux /${snap_dir_name}/boot/${k} root=UUID=${root_uuid} rw rootflags=subvol=${snap_dir_name} ${kernel_parameters}
 					echo 'Loading Initramfs: ${i} ...'"
-			if [ -f /${snap_dir_name}/boot/intel-ucode.img ] ; then
+			if [ -f /${snap_dir_name}/boot/${microcode} ] ; then
 				echo "\
-					initrd	/${snap_dir_name}/boot/intel-ucode.img initrd /${snap_dir_name}/boot/${i}
+					initrd	/${snap_dir_name}/boot/${microcode} initrd /${snap_dir_name}/boot/${i}
 				"
 			else
 				echo "\
