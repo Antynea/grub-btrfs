@@ -21,7 +21,7 @@ Makes a list of all snapshots, kernels, initramfs present on the filesystem and 
 
 * improve perfomance
 
-* auto-detect kernel,initramfs,intel-ucode
+* auto-detect kernel,initramfs
 
 * detect partition boot separate
 
