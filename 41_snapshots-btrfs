@@ -212,6 +212,7 @@ list_kernels_initramfs()
 ### Choice of method ###
 if [ ${choise_of_method} = "1" ] ; then 
 	gettext_printf "###### - Grub-btrfs: Auto-detect - ######\n" >&2 ;
-	list_kernels_initramfs ; fi
+	list_kernels_initramfs ;
 	gettext_printf "###### - Grub-btrfs: Auto-detect - ######\n" >&2 ;
+fi
 ### End choice of method ###
