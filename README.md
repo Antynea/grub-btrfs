@@ -17,12 +17,6 @@ Makes a list of all snapshots, kernels, initramfs present on the filesystem and 
 
 * in progress ...
 
-* fix bug
-
-* improve perfomance
-
-* auto-detect initramfs
-
 * detect partition boot separate
 
 
