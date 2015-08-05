@@ -27,16 +27,20 @@
 #																			#
 # Warning:																		#
 #																			#
+#	Script in progress																#
+#	to do :																		#
 #																			#
+#	* auto-detect initramfs, custom Initramfs 													#
+#	* detect partition boot separate														#
 #																			#
 #########################################################################################################################################################
 
 set -e
 
-prefix="/usr"
-exec_prefix="${prefix}"
+#prefix="/usr"
+#exec_prefix="${prefix}"
 datarootdir="/usr/share"
-datadir="${datarootdir}"
+#datadir="${datarootdir}"
 sysconfdir="/etc"
 
 . "${datarootdir}/grub/grub-mkconfig_lib"
@@ -52,7 +56,7 @@ submenuname=${GRUB_BTRFS_SUBMENUNAME:-"ArchLinux Snapshots"}
 ## Prefix entry
 prefixentry=${GRUB_BTRFS_PREFIXENTRY:-"Snapshot:"}
 ## Kernel(s) name(s)
-#nkernel=("${GRUB_BTRFS_NKERNEL[@]}")
+nkernel=("${GRUB_BTRFS_NKERNEL[@]}")
 ## Initramfs name(s)
 #ninit=("${GRUB_BTRFS_NINIT[@]}")
 ## Microcode(s) name(s)
@@ -92,10 +96,10 @@ oldIFS=$IFS
 snapshots_entry()
 {
 echo "	submenu '${1} ${2} ${3}' {"
-	for k in ${name_kernel[@]}; do
-		for i in ${initramfs[@]}; do
+	for k in "${name_kernel[@]}"; do
+		for i in $(detect_initramfs); do
 			echo "\
-				menuentry '${2} with ${k} & ${i}' ${CLASS} "\$menuentry_id_option" 'gnulinux-snapshots-$boot_uuid'{
+				menuentry '${2} with "${k}" & ${i}' ${CLASS} "\$menuentry_id_option" 'gnulinux-snapshots-$boot_uuid'{
 					$(save_default_entry)
 					if [ x\$feature_all_video_module = xy ]; then
 						insmod all_video
@@ -108,16 +112,16 @@ echo "	submenu '${1} ${2} ${3}' {"
 						search --no-floppy --fs-uuid  --set=root ${boot_uuid}
 					fi
 					echo 'Loading Snapshot: ${snap_dir_name}'
-					echo 'Loading Kernel: ${k} ...'
-					linux /${snap_dir_name}/boot/${k} root=UUID=${root_uuid} rw rootflags=subvol=${snap_dir_name} ${kernel_parameters}
-					echo 'Loading Initramfs: ${i} ...'"
-			if [ -f /${snap_dir_name}/boot/${microcode} ] ; then
+					echo 'Loading Kernel: "${k}" ...'
+					linux \"/${snap_dir_name}/boot/"${k}"\" root=UUID=${root_uuid} rw rootflags=subvol=${snap_dir_name} ${kernel_parameters}
+					echo 'Loading Initramfs: "${i}" ...'"
+			if [ -f "/${snap_dir_name}/boot/${microcode}" ] ; then
 				echo "\
-					initrd	/${snap_dir_name}/boot/${microcode} initrd /${snap_dir_name}/boot/${i}
+					initrd	\"/${snap_dir_name}/boot/${microcode}\" initrd \"/${snap_dir_name}/boot/${i}\"
 				"
 			else
 				echo "\
-					initrd /${snap_dir_name}/boot/${i}
+					initrd \"/${snap_dir_name}/boot/${i}\"
 				"
 			fi
 				echo "}"
@@ -140,44 +144,64 @@ snapshot_list()
 	done
 }
 
+detect_kernel()
+{
+	## Arch original kernel (auto-detect)
+	for akernel in $snap_dir_boot/vmlinuz-* ; do 
+	list_kernel+=("$akernel")
+	done
+
+	## Custom name kernel in GRUB_BTRFS_NKERNEL
+	if [ ! -z ${nkernel} ] ; then
+		for ckernel in "${nkernel[@]}" ; do
+			[[ ! -f /${snap_dir_boot}/${ckernel} ]] && continue;
+			list_kernel+=("$ckernel")
+		done
+	fi
+}
+
+detect_initramfs()
+{
+	for init in "${version_kernel[@]}" ; do
+		if [ -e "$snap_dir_boot/initramfs-$init.img" ] ; then echo "initramfs-$init.img" ; fi ;
+		if [ -e "$snap_dir_boot/initramfs-$init-fallback.img" ] ; then echo "initramfs-$init-fallback.img" ; fi ;
+	done
+	
+}
+
 ## List of kernels and initramfs in snapshots
 list_kernels_initramfs()
 {
-[[ ! -d $gbgmp ]] && mkdir -p $gbgmp
-mount -o subvolid=0 /dev/disk/by-uuid/$root_uuid $gbgmp/
+	[[ ! -d $gbgmp ]] && mkdir -p $gbgmp
+	mount -o subvolid=0 /dev/disk/by-uuid/$root_uuid $gbgmp/
 
-echo "submenu '${submenuname}' {"
-	IFS=$'\n'
-	for item in $(snapshot_list); do
-		IFS=$oldIFS
-		item=($item)
-		snap_dir_name=${item[@]:2:${#item[@]}}
-		if [ -f $gbgmp/$snap_dir_name/boot/grub/grub.cfg ]; then
-			snap_date_time=${item[@]:0:2}
-			gettext_printf $"Found Snapshot: %s\n" "$snap_dir_name $snap_date_time" >&2 ;
-			snap_dir_boot=$gbgmp/$snap_dir_name/boot
-			list_kernel=($(for kernel in $snap_dir_boot/vmlinuz-*; do echo $kernel ; done))
-			#echo "list kernel = ${list_kernel[*]}" ;
-			name_kernel=(${list_kernel[@]##*"/"})
-			#echo "kernel = ${name_kernel[*]}" ;
-			version_kernel=(${name_kernel[@]#*"-"})
-			#echo "version = ${version_kernel[*]}" ;
-			initramfs=($(
-				for init in ${version_kernel[@]} ; do
-					if [ -e $snap_dir_boot/initramfs-$init.img ] ; then echo "initramfs-$init.img" ; fi ;
-					if [ -e $snap_dir_boot/initramfs-$init-fallback.img ] ; then echo "initramfs-$init-fallback.img" ; fi ;
-				done))
-			#echo "init = ${initramfs[@]}" ;
-			#echo "###" ;
-		fi
-		# Create menu entries
-		snapshots_entry "${prefixentry}" "${snap_dir_name}" "${snap_date_time}"
-	done
+	echo "submenu '${submenuname}' {"
+		IFS=$'\n'
+		for item in $(snapshot_list); do
+			IFS=$oldIFS
+			item=($item)
+			snap_dir_name=${item[@]:2:${#item[@]}}
+			if [ -f $gbgmp/$snap_dir_name/boot/grub/grub.cfg ]; then
+				snap_date_time=${item[@]:0:2}
+				gettext_printf $"Found Snapshot: %s\n" "$snap_dir_name $snap_date_time" >&2 ;
+				snap_dir_boot=$gbgmp/$snap_dir_name/boot
+				unset list_kernel
+				detect_kernel
+				name_kernel=("${list_kernel[@]##*"/"}")
+				#echo "kernel = ${#name_kernel[*]}"
+				version_kernel=(${name_kernel[@]#*"-"})
+				#echo "version = ${version_kernel[*]}"
+				#echo "###" ;
+			fi
+			# Create menu entries
+			snapshots_entry "${prefixentry}" "${snap_dir_name}" "${snap_date_time}"
+		done
 	echo "}"
 	IFS=$oldIFS
-	umount $gbgmp
+	umount $gbgmp	
 }
 ### END auto detect ###
 
 ### Choice of method ###
 if [ ${choise_of_method} = "1" ] ; then list_kernels_initramfs ; fi
+### End choice of method ###
