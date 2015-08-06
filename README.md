@@ -16,7 +16,6 @@ Makes a list of all snapshots, kernels, initramfs present on the filesystem and 
 #### TO DO
 
 * in progress ...
-
-* detect partition boot separate
+* verify compatibility with manjaro and snapper (but I don't use them, so it will take some time)
 
 
