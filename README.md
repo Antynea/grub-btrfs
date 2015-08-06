@@ -18,7 +18,7 @@ Simple rollback using snapshots you made previously.
 
 #### How to use it:
 
-- Add this lines to /etc/default/grub:
+Add this lines to /etc/default/grub:
 
 * GRUB_BTRFS_SUBMENUNAME="ArchLinux Snapshots" 					(Name menu appearing in grub.)
 * GRUB_BTRFS_PREFIXENTRY="Snapshot:"        		   			(Add a name ahead your snapshots entries.)
@@ -26,9 +26,11 @@ Simple rollback using snapshots you made previously.
 * GRUB_BTRFS_NINIT=("initramfs-linux.img" "initramfs-linux-fallback.img")	(Use only if you have custom initramfs name or auto-detect failed.)
 * GRUB_BTRFS_INTEL_UCODE=("intel-ucode.img") 					(Use only if you have custom intel-ucode or auto-detect failed.)
 
-- Generate grub.cfg (on Archlinux use grub-mkconfig -o /boot/grub/grub.cfg )
-- grub-btrfs automatically generates snapshots entries.
-- You will see it appear differents entries (e.g : Snapshot: my snapshot name overkill [2014-02-12 11:24:37])
+Generate grub.cfg (on Archlinux use grub-mkconfig -o /boot/grub/grub.cfg )
+
+grub-btrfs automatically generates snapshots entries.
+
+You will see it appear differents entries (e.g : Snapshot: my snapshot name overkill [2014-02-12 11:24:37])
 
 
 #### TO DO
