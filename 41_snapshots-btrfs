@@ -29,8 +29,7 @@
 #																			#
 #	Script in progress																#
 #	to do :																		#
-#																			#
-#	* auto-detect initramfs, custom Initramfs 													#
+#																			#													#
 #	* detect partition boot separate														#
 #																			#
 #########################################################################################################################################################
@@ -99,32 +98,30 @@ snapshots_entry()
 		for k in "${name_kernel[@]}"; do
 			for i in "${name_initramfs[@]}"; do
 				echo "\
-					menuentry '${2} with "${k}" & ${i}' ${CLASS} "\$menuentry_id_option" 'gnulinux-snapshots-$boot_uuid'{
-						$(save_default_entry)
-						if [ x\$feature_all_video_module = xy ]; then
-							insmod all_video
-						fi
-						set gfxpayload=keep
-						insmod ${boot_fs}
-						if [ x\$feature_platform_search_hint = xy ]; then
-							search --no-floppy --fs-uuid  --set=root ${hs_boot} ${boot_uuid}
-						else
-							search --no-floppy --fs-uuid  --set=root ${boot_uuid}
-						fi
-						echo 'Loading Snapshot: ${snap_dir_name}'
-						echo 'Loading Kernel: "${k}" ...'
-						linux \"/${snap_dir_name}/boot/"${k}"\" root=UUID=${root_uuid} rw rootflags=subvol=${snap_dir_name} ${kernel_parameters}
-						echo 'Loading Initramfs: "${i}" ...'"
+		menuentry '${2} with "${k}" & "${i}"' ${CLASS} "\$menuentry_id_option" 'gnulinux-snapshots-$boot_uuid'{
+			$(save_default_entry)
+			if [ x\$feature_all_video_module = xy ]; then
+				insmod all_video
+			fi
+			set gfxpayload=keep
+			insmod ${boot_fs}
+			if [ x\$feature_platform_search_hint = xy ]; then
+				search --no-floppy --fs-uuid  --set=root ${hs_boot} ${boot_uuid}
+			else
+				search --no-floppy --fs-uuid  --set=root ${boot_uuid}
+			fi
+			echo 'Loading Snapshot: ${snap_dir_name}'
+			echo 'Loading Kernel: "${k}" ...'
+			linux \"/${snap_dir_name}/boot/"${k}"\" root=UUID=${root_uuid} rw rootflags=subvol=${snap_dir_name} ${kernel_parameters}
+			echo 'Loading Initramfs: "${i}" ...'"
 				if [ -f "/${snap_dir_name}/boot/${microcode}" ] ; then
-					echo "\
-						initrd	\"/${snap_dir_name}/boot/${microcode}\" initrd \"/${snap_dir_name}/boot/${i}\"
-					"
+		echo "\
+			initrd	\"/${snap_dir_name}/boot/${microcode}\" initrd \"/${snap_dir_name}/boot/${i}\""
 				else
-					echo "\
-						initrd \"/${snap_dir_name}/boot/${i}\"
-					"
+		echo "\
+			initrd \"/${snap_dir_name}/boot/${i}\""
 				fi
-					echo "					}"
+		echo "		}"
 			done
 		done
 	echo "	}"
