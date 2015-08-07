@@ -35,5 +35,4 @@ You will see it appear differents entries (e.g : Snapshot: my snapshot name over
 
 #### TO DO
 
-* correct menuentry when /boot in separate partition
 * verify compatibility with manjaro and snapper (but I don't use them, so it will take some time)
