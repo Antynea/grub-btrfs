@@ -9,7 +9,7 @@
 # What this script does:																#
 # - Automatically List snapshots existing on root partition (btrfs).											#
 # - Automatically Detect kernel, initramfs and intel microcode in "/boot" directory on snapshots. (For custon name, see below.)				#
-# - Automatically Create corresponding menuentry in grub.cfg , which ensures a very easy rollback.							#
+# - Automatically Create corresponding "menuentry" in grub.cfg , which ensures a very easy rollback.							#
 #																			#
 # How to use it:																	#
 # - Add this lines to /etc/default/grub:														#
@@ -84,11 +84,11 @@ CLASS="--class snapshots --class gnu-linux --class gnu --class os"
 ## save IFS
 oldIFS=$IFS
 ## grub path (auto-detect if /boot is separate partition or not)
-grub_path()
+boot_dir()
 {
-	grub_path="$gbgmp/$snap_dir_name/boot"
-	[[ root_uuid != boot_uuid ]] && grub_path="/boot"
-	echo "$grub_path"
+	boot_dir="$gbgmp/$snap_dir_name/boot"
+	[[ "$root_uuid" != "$boot_uuid" ]] && boot_dir="/boot"
+	echo "$boot_dir"
 }
 
 
@@ -120,14 +120,14 @@ snapshots_entry()
 			fi
 			echo 'Loading Snapshot: "${snap_dir_name}" "${snap_date_time}"'
 			echo 'Loading Kernel: "${k}" ...'
-			linux \"/${snap_dir_name}/boot/"${k}"\" root=UUID=${root_uuid} rw rootflags=subvol=\""${snap_dir_name}"\" ${kernel_parameters}
+			linux \"${boot_dir_real_path}/"${k}"\" root=UUID=${root_uuid} rw rootflags=subvol=\""${snap_dir_name}"\" ${kernel_parameters}
 			echo 'Loading Initramfs: "${i}" ...'"
-				if [ -f "/${snap_dir_name}/boot/"${microcode}"" ] ; then
+				if [ -f "/${boot_dir_real_path}/"${microcode}"" ] ; then
 		echo "\
-			initrd	\"/${snap_dir_name}/boot/"${microcode}"\" initrd \"/${snap_dir_name}/boot/"${i}"\""
+			initrd	\"${boot_dir_real_path}/"${microcode}"\" initrd \"/${snap_dir_name}/boot/"${i}"\""
 				else
 		echo "\
-			initrd \"/${snap_dir_name}/boot/"${i}"\""
+			initrd \"${boot_dir_real_path}/"${i}"\""
 				fi
 		echo "		}"
 			done
@@ -152,14 +152,14 @@ snapshot_list()
 detect_kernel()
 {
 	## Arch original kernel (auto-detect)
-	for akernel in $(grub_path)/vmlinuz-* ; do 
+	for akernel in $(boot_dir)/vmlinuz-* ; do 
 		list_kernel+=("$akernel")
 	done
 
 	## Custom name kernel in GRUB_BTRFS_NKERNEL
 	if [ ! -z ${nkernel} ] ; then
 		for ckernel in "${nkernel[@]}" ; do
-			[[ ! -f /$(grub_path)/${ckernel} ]] && continue;
+			[[ ! -f /$(boot_dir)/${ckernel} ]] && continue;
 			list_kernel+=("$ckernel")
 		done
 	fi
@@ -168,14 +168,14 @@ detect_kernel()
 detect_initramfs()
 {
 	## Arch original kernel (auto-detect)
-	for ainitramfs in $(grub_path)/initramfs-* ; do 
+	for ainitramfs in $(boot_dir)/initramfs-* ; do 
 		list_initramfs+=("$ainitramfs")
 	done
 	
 	## Custom name initramfs in GRUB_BTRFS_NINIT
 	if [ ! -z ${ninit} ] ; then
 		for cinitramfs in "${ninit[@]}" ; do
-			[[ ! -f /$(grub_path)/${ninit} ]] && continue;
+			[[ ! -f /$(boot_dir)/${ninit} ]] && continue;
 			list_initramfs+=("$ninit")
 		done
 	fi
@@ -193,7 +193,8 @@ list_kernels_initramfs()
 		IFS=$oldIFS
 		item=($item)
 		snap_dir_name=${item[@]:2:${#item[@]}}
-		if [ -f $(grub_path)/grub/grub.cfg ]; then
+		boot_dir_real_path="$(make_system_path_relative_to_its_root "$(boot_dir)")"
+		if [ -f $(boot_dir)/grub/grub.cfg ]; then
 			snap_date_time=${item[@]:0:2}
 			gettext_printf $"# Found Snapshot: %s\n" "$snap_dir_name $snap_date_time" >&2 ;
 			unset list_kernel
