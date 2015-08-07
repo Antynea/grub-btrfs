@@ -89,6 +89,7 @@ boot_dir()
 	boot_dir="$gbgmp/$snap_dir_name/boot"
 	[[ "$root_uuid" != "$boot_uuid" ]] && boot_dir="/boot"
 	echo "$boot_dir"
+	boot_dir_real_path="$(make_system_path_relative_to_its_root "$boot_dir")"
 }
 
 
@@ -193,7 +194,6 @@ list_kernels_initramfs()
 		IFS=$oldIFS
 		item=($item)
 		snap_dir_name=${item[@]:2:${#item[@]}}
-		boot_dir_real_path="$(make_system_path_relative_to_its_root "$(boot_dir)")"
 		if [ -f $(boot_dir)/grub/grub.cfg ]; then
 			snap_date_time=${item[@]:0:2}
 			gettext_printf $"# Found Snapshot: %s\n" "$snap_dir_name $snap_date_time" >&2 ;
@@ -204,10 +204,10 @@ list_kernels_initramfs()
 			unset list_initramfs
 			detect_initramfs
 			name_initramfs=("${list_initramfs[@]##*"/"}")
-			# echo "initramfs = ${name_initramfs[*]}"
+			echo "initramfs = ${name_initramfs[*]}"
 		fi
 		# Create menu entries
-		snapshots_entry "${prefixentry}" "${snap_dir_name}" "${snap_date_time}"
+		# snapshots_entry "${prefixentry}" "${snap_dir_name}" "${snap_date_time}"
 	done
 	IFS=$oldIFS
 	if [ $root_uuid = $boot_uuid ] ; then umount $gbgmp ; fi
