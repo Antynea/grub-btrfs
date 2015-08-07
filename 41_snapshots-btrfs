@@ -83,7 +83,7 @@ gbgmp="/tmp/gbgmp"
 CLASS="--class snapshots --class gnu-linux --class gnu --class os"
 ## save IFS
 oldIFS=$IFS
-## grub path (auto-detect if /boot is separate partition or not)
+## boot_dir (auto-detect if /boot is separate partition or not)
 boot_dir()
 {
 	boot_dir="$gbgmp/$snap_dir_name/boot"
