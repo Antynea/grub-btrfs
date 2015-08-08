@@ -35,4 +35,4 @@ You will see it appear differents entries (e.g : Snapshot: my snapshot name over
 
 #### TO DO
 
-* verify compatibility with manjaro and snapper (but I don't use them, so it will take some time)
+* verify compatibility with UEFI,manjaro and snapper (but I don't use them, so it will take some time)
