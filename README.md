@@ -3,7 +3,8 @@
 
 This is a version 0.xx of grub-btrfs
 
-#### Description
+Version 1.xx release 
+https://github.com/Antynea/grub-btrfs/tree/v1.xx?files=1#### Description
 
 grub-btrfs, add support for btrfs snapshots into grub menu
 
