@@ -3,7 +3,7 @@
 
 This is a version 0.xx of grub-btrfs
 
-Version 1.xx release 
+Version 1.xx release-candidate 
 https://github.com/Antynea/grub-btrfs/tree/v1.xx?files=1
 
 #### Description
