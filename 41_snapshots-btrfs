@@ -46,7 +46,7 @@ sysconfdir="/etc"
 . "${sysconfdir}/default/grub"
 
 ######################################
-### variables in /etc/default/grub ###
+### Variables in /etc/default/grub ###
 ######################################
 ## Choice of method
 choise_of_method=${GRUB_BTRFS_SUBMENUNAME:-"1"}
