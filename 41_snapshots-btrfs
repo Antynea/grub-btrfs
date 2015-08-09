@@ -30,7 +30,7 @@
 #	Script in progress																#
 #	to do :																		#
 #																			#													#
-#	* verify compatibility with manjaro and snapper (but I don't use them, so it will take some time)						#
+#	* verify compatibility with UEFI,manjaro and snapper (but I don't use them, so it will take some time)						#
 #																			#
 #########################################################################################################################################################
 
@@ -168,7 +168,7 @@ detect_kernel()
 
 detect_initramfs()
 {
-	## Arch original kernel (auto-detect)
+	## Arch original initramfs (auto-detect)
 	for ainitramfs in $(boot_dir)/initramfs-* ; do 
 		list_initramfs+=("$ainitramfs")
 	done
@@ -194,20 +194,19 @@ list_kernels_initramfs()
 		IFS=$oldIFS
 		item=($item)
 		snap_dir_name=${item[@]:2:${#item[@]}}
-		if [ -f $(boot_dir)/grub/grub.cfg ]; then
-			snap_date_time=${item[@]:0:2}
-			gettext_printf $"# Found Snapshot: %s\n" "$snap_dir_name $snap_date_time" >&2 ;
-			unset list_kernel
-			detect_kernel
-			name_kernel=("${list_kernel[@]##*"/"}")
-			# echo "kernel = ${name_kernel[*]}"
-			unset list_initramfs
-			detect_initramfs
-			name_initramfs=("${list_initramfs[@]##*"/"}")
-			echo "initramfs = ${name_initramfs[*]}"
-		fi
+		[[ ! -d $(boot_dir) ]] && continue;
+		snap_date_time=${item[@]:0:2}
+		gettext_printf $"# Found Snapshot: %s\n" "$snap_dir_name $snap_date_time" >&2 ;
+		unset list_kernel
+		detect_kernel
+		name_kernel=("${list_kernel[@]##*"/"}")
+		# echo "kernel = ${name_kernel[*]}"
+		unset list_initramfs
+		detect_initramfs
+		name_initramfs=("${list_initramfs[@]##*"/"}")
+		# echo "initramfs = ${name_initramfs[*]}"
 		# Create menu entries
-		# snapshots_entry "${prefixentry}" "${snap_dir_name}" "${snap_date_time}"
+		 snapshots_entry "${prefixentry}" "${snap_dir_name}" "${snap_date_time}"
 	done
 	IFS=$oldIFS
 	if [ $root_uuid = $boot_uuid ] ; then umount $gbgmp ; fi
