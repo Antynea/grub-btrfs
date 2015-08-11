@@ -30,7 +30,8 @@
 #	Script in progress																#
 #	to do :																		#
 #																			#													#
-#	* verify compatibility with UEFI,manjaro and snapper (but I don't use them, so it will take some time)						#
+#	* verify compatibility with manjaro and snapper (but I don't use them, so it will take some time)						#
+#	* don't create menu if snapshot is not bootable with /boot partition separate									#
 #																			#
 #########################################################################################################################################################
 
@@ -206,7 +207,7 @@ list_kernels_initramfs()
 		name_initramfs=("${list_initramfs[@]##*"/"}")
 		# echo "initramfs = ${name_initramfs[*]}"
 		# Create menu entries
-		# snapshots_entry "${prefixentry}" "${snap_dir_name}" "${snap_date_time}"
+		snapshots_entry "${prefixentry}" "${snap_dir_name}" "${snap_date_time}"
 	done
 	IFS=$oldIFS
 	if [ $root_uuid = $boot_uuid ] ; then umount $gbgmp ; fi
