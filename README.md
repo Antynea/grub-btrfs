@@ -35,9 +35,9 @@ You will see it appear differents entries (e.g : Snapshot: my snapshot name over
 
 #### TO DO
 
-* verify compatibility with UEFI,manjaro and snapper (but I don't use them, so it will take some time)
+* verify compatibility with manjaro and snapper (but I don't use them, so it will take some time)
 
-don't create menu if snapshot is not bootable with /boot partition separate
+* don't create menu if snapshot is not bootable with /boot partition separate
 
 
 ## discussion
