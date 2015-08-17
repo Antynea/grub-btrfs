@@ -31,7 +31,7 @@
 #	to do :																		#
 #																			#													#
 #	* verify compatibility with manjaro and snapper (but I don't use them, so it will take some time)						#
-#	* don't create menu if snapshot is not bootable with /boot partition separate									#
+#																			#
 #																			#
 #########################################################################################################################################################
 
@@ -186,16 +186,12 @@ detect_initramfs()
 ## List of kernels and initramfs in snapshots
 list_kernels_initramfs()
 {
-	if [ $root_uuid = $boot_uuid ] ; then
-		[[ ! -d $gbgmp ]] && mkdir -p $gbgmp
-		mount -o subvolid=0 /dev/disk/by-uuid/$root_uuid $gbgmp/
-	fi
 	IFS=$'\n'
 	for item in $(snapshot_list); do
 		IFS=$oldIFS
 		item=($item)
 		snap_dir_name=${item[@]:2:${#item[@]}}
-		[[ ! -d $(boot_dir) ]] && continue;
+		[[ ! -d "$gbgmp/$snap_dir_name/boot" ]] && continue;
 		snap_date_time=${item[@]:0:2}
 		gettext_printf $"# Found Snapshot: %s\n" "$snap_dir_name $snap_date_time" >&2 ;
 		unset list_kernel
@@ -210,16 +206,18 @@ list_kernels_initramfs()
 		snapshots_entry "${prefixentry}" "${snap_dir_name}" "${snap_date_time}"
 	done
 	IFS=$oldIFS
-	if [ $root_uuid = $boot_uuid ] ; then umount $gbgmp ; fi
 }
 ### END auto detect ###
 
 ### Choice of method ###
 if [ ${choise_of_method} = "1" ] ; then 
 	gettext_printf "###### - Grub-btrfs: Auto-detect - ######\n" >&2 ;
+	[[ ! -d $gbgmp ]] && mkdir -p $gbgmp
+	mount -o subvolid=0 /dev/disk/by-uuid/$root_uuid $gbgmp/
 	echo "submenu '${submenuname}' {"
 	list_kernels_initramfs ;
 	echo "}"
+	umount $gbgmp
 	gettext_printf "###### - Grub-btrfs: Auto-detect - ######\n" >&2 ;
 fi
 ### End choice of method ###
