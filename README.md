@@ -1,3 +1,5 @@
+[![GitHub release](https://img.shields.io/github/release/Antynea/grub-btrfs.svg)](https://github.com/Antynea/grub-btrfs)
+  
 ### grub-btrfs
 
 
