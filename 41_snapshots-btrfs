@@ -123,7 +123,7 @@ snapshots_entry()
 			echo 'Loading Kernel: "${k}" ...'
 			linux \"${boot_dir_real_path}/"${k}"\" root=UUID=${root_uuid} rw rootflags=subvol=\""${snap_dir_name}"\" ${kernel_parameters}
 			echo 'Loading Initramfs: "${i}" ...'"
-				if [ -f "/${boot_dir_real_path}/"${microcode}"" ] ; then
+				if [ -f "$(boot_dir)/${microcode}" ] ; then
 		echo "\
 			initrd	\"${boot_dir_real_path}/"${microcode}"\" initrd \"/${snap_dir_name}/boot/"${i}"\""
 				else
