@@ -90,7 +90,6 @@ boot_dir()
 	boot_dir="$gbgmp/$snap_dir_name/boot"
 	[[ "$root_uuid" != "$boot_uuid" ]] && boot_dir="/boot"
 	echo "$boot_dir"
-	if [ -d ${boot_dir} ]; then boot_dir_real_path="$(make_system_path_relative_to_its_root "$boot_dir")"; fi
 }
 
 
@@ -202,6 +201,7 @@ list_kernels_initramfs()
 		detect_initramfs
 		name_initramfs=("${list_initramfs[@]##*"/"}")
 		# echo "initramfs = ${name_initramfs[*]}"
+		if [ -d ${boot_dir} ]; then boot_dir_real_path="$(make_system_path_relative_to_its_root "$(boot_dir)")"; fi
 		# Create menu entries
 		snapshots_entry "${prefixentry}" "${snap_dir_name}" "${snap_date_time}"
 	done
