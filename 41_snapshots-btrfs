@@ -90,7 +90,6 @@ boot_dir()
 	boot_dir="$gbgmp/$snap_dir_name/boot"
 	[[ "$root_uuid" != "$boot_uuid" ]] && boot_dir="/boot"
 	echo "$boot_dir"
-	if [ -d ${boot_dir} ]; then boot_dir_real_path="$(make_system_path_relative_to_its_root "$boot_dir")"; fi
 }
 
 
@@ -120,13 +119,13 @@ snapshots_entry()
 			else
 				search --no-floppy --fs-uuid  --set=root ${boot_uuid}
 			fi
-			echo 'Loading Snapshot: "${snap_dir_name}" "${snap_date_time}"'
+			echo 'Loading Snapshot: "${2}" "${3}"'
 			echo 'Loading Kernel: "${k}" ...'
 			linux \"${boot_dir_real_path}/"${k}"\" root=UUID=${root_uuid} rw rootflags=subvol=\""${snap_dir_name}"\" ${kernel_parameters}
 			echo 'Loading Initramfs: "${i}" ...'"
-				if [ -f "/${boot_dir_real_path}/"${microcode}"" ] ; then
+				if [ -f "$(boot_dir)/${microcode}" ] ; then
 		echo "\
-			initrd	\"${boot_dir_real_path}/"${microcode}"\" initrd \"/${snap_dir_name}/boot/"${i}"\""
+			initrd	\"${boot_dir_real_path}/"${microcode}"\" initrd \"/"${snap_dir_name}"/boot/"${i}"\""
 				else
 		echo "\
 			initrd \"${boot_dir_real_path}/"${i}"\""
@@ -145,7 +144,7 @@ snapshot_list()
 		snap=($snap)
 		local snap_path_name=${snap[@]:13:${#snap[@]}}
 		# Discard deleted snapshots
-		if [ $snap_path_name = "DELETED" ]; then continue; fi
+		if [ "$snap_path_name" = "DELETED" ]; then continue; fi
 		[[ ${snap_path_name%%"/"*} == "<FS_TREE>" ]] && snap_path_name=${snap_path_name#*"/"}
 		echo ${snap[@]:10:2} ${snap_path_name}
 	done
@@ -154,14 +153,14 @@ snapshot_list()
 detect_kernel()
 {
 	## Arch original kernel (auto-detect)
-	for akernel in $(boot_dir)/vmlinuz-* ; do 
+	for akernel in "$(boot_dir)"/vmlinuz-* ; do 
 		list_kernel+=("$akernel")
 	done
 
 	## Custom name kernel in GRUB_BTRFS_NKERNEL
-	if [ ! -z ${nkernel} ] ; then
+	if [ ! -z "${nkernel}" ] ; then
 		for ckernel in "${nkernel[@]}" ; do
-			[[ ! -f /$(boot_dir)/${ckernel} ]] && continue;
+			[[ ! -f /"$(boot_dir)"/"${ckernel}" ]] && continue;
 			list_kernel+=("$ckernel")
 		done
 	fi
@@ -170,15 +169,15 @@ detect_kernel()
 detect_initramfs()
 {
 	## Arch original initramfs (auto-detect)
-	for ainitramfs in $(boot_dir)/initramfs-* ; do 
+	for ainitramfs in "$(boot_dir)"/initramfs-* ; do 
 		list_initramfs+=("$ainitramfs")
 	done
 	
 	## Custom name initramfs in GRUB_BTRFS_NINIT
-	if [ ! -z ${ninit} ] ; then
+	if [ ! -z "$ninit" ] ; then
 		for cinitramfs in "${ninit[@]}" ; do
-			[[ ! -f /$(boot_dir)/${ninit} ]] && continue;
-			list_initramfs+=("$ninit")
+			[[ ! -f /"$(boot_dir)"/"${cinitramfs}" ]] && continue;
+			list_initramfs+=("$cinitramfs")
 		done
 	fi
 }
@@ -202,6 +201,7 @@ list_kernels_initramfs()
 		detect_initramfs
 		name_initramfs=("${list_initramfs[@]##*"/"}")
 		# echo "initramfs = ${name_initramfs[*]}"
+		boot_dir_real_path="$(make_system_path_relative_to_its_root "$(boot_dir)")"
 		# Create menu entries
 		snapshots_entry "${prefixentry}" "${snap_dir_name}" "${snap_date_time}"
 	done
