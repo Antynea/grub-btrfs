@@ -8,6 +8,7 @@
 #																			#
 # What this script does:																#
 # - Automatically List snapshots existing on root partition (btrfs).											#
+# - Automatically Detect if "/boot" is in separate partition.												#
 # - Automatically Detect kernel, initramfs and intel microcode in "/boot" directory on snapshots. (For custon name, see below.)				#
 # - Automatically Create corresponding "menuentry" in grub.cfg , which ensures a very easy rollback.							#
 #																			#
@@ -20,15 +21,13 @@
 # * GRUB_BTRFS_NINIT=("initramfs-linux.img" "initramfs-linux-fallback.img")	(Use only if you have custom initramfs name or auto-detect failed.)	#
 # * GRUB_BTRFS_INTEL_UCODE=("intel-ucode.img") 					(Use only if you have custom intel-ucode or auto-detect failed.)	#
 #																			#
-# - Generate grub.cfg (on Archlinux use grub-mkconfig -o /boot/grub/grub.cfg )										#
+# - Generate grub.cfg (on Archlinux use grub-mkconfig -o /boot/grub/grub.cfg)										#
 #																			#
 # - grub-btrfs automatically generates snapshots entries.												#
 # - You will see it appear different entries (e.g : Snapshot: my snapshot name overkill [2014-02-12 11:24:37])						#
 #																			#
-# Warning:																		#
 #																			#
-#	Script in progress																#
-#	to do :																		#
+# To do:																		#
 #																			#													#
 #	* verify compatibility with manjaro and snapper (but I don't use them, so it will take some time)						#
 #																			#
@@ -152,6 +151,7 @@ snapshot_list()
 	done
 }
 
+## Detect kernels in "/boot"
 detect_kernel()
 {
 	## Arch original kernel (auto-detect)
@@ -168,6 +168,7 @@ detect_kernel()
 	fi
 }
 
+## Detect initramfs in "/boot"
 detect_initramfs()
 {
 	## Arch original initramfs (auto-detect)
@@ -184,6 +185,7 @@ detect_initramfs()
 	fi
 }
 
+## Detect microcode in "/boot"
 detect_microcode()
 {
 	## Arch original intel microcode
@@ -199,6 +201,7 @@ detect_microcode()
 		done
 	fi
 }
+
 ## List of kernels, initramfs and microcode in snapshots
 list_kernels_initramfs()
 {
