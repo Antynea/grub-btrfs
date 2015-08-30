@@ -158,9 +158,9 @@ detect_kernel()
 	done
 
 	## Custom name kernel in GRUB_BTRFS_NKERNEL
-	if [ ! -z ${nkernel} ] ; then
+	if [ ! -z "${nkernel}" ] ; then
 		for ckernel in "${nkernel[@]}" ; do
-			[[ ! -f /"$(boot_dir)/${ckernel}" ]] && continue;
+			[[ ! -f /"$(boot_dir)"/"${ckernel}" ]] && continue;
 			list_kernel+=("$ckernel")
 		done
 	fi
@@ -174,10 +174,10 @@ detect_initramfs()
 	done
 	
 	## Custom name initramfs in GRUB_BTRFS_NINIT
-	if [ ! -z ${ninit} ] ; then
+	if [ ! -z "$ninit" ] ; then
 		for cinitramfs in "${ninit[@]}" ; do
-			[[ ! -f "/$(boot_dir)/${ninit}" ]] && continue;
-			list_initramfs+=("$ninit")
+			[[ ! -f /"$(boot_dir)"/"${cinitramfs}" ]] && continue;
+			list_initramfs+=("$cinitramfs")
 		done
 	fi
 }
