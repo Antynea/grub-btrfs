@@ -59,7 +59,7 @@ nkernel=("${GRUB_BTRFS_NKERNEL[@]}")
 ## Initramfs name(s)
 ninit=("${GRUB_BTRFS_NINIT[@]}")
 ## Microcode(s) name(s)
-microcode=("${GRUB_BTRFS_INTEL_UCODE[@]:-intel-ucode.img}")
+microcode=("${GRUB_BTRFS_INTEL_UCODE[@]}")
 
 ########################
 ### variables script ###
