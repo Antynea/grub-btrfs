@@ -125,7 +125,7 @@ snapshots_entry()
 			echo 'Loading Initramfs: "${i}" ...'"
 				if [ -f "$(boot_dir)"/"${u}" ] ; then
 		echo "\
-			initrd	\"${boot_dir_real_path}/"${u}"\" initrd \"/"${snap_dir_name}"/boot/"${i}"\""
+			initrd \"${boot_dir_real_path}/"${u}"\" \"/"${snap_dir_name}"/boot/"${i}"\""
 				else
 		echo "\
 			initrd \"${boot_dir_real_path}/"${i}"\""
