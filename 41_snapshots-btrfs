@@ -30,7 +30,9 @@
 # To do:																		#
 #																			#													#
 #	* verify compatibility with manjaro and snapper (but I don't use them, so it will take some time)						#
-#																			#
+#	* afficher le chemin complet des snapshots ou simplement le nom											#
+#	* refaire le menu des snapshots, mettre en titre le nom du snap et en entrée seulement les kernels,init,microcode 				#
+#	* Peut-être afficher la date et l'heure en premier dans le menu de boot (grub-menu)								#
 #																			#
 #########################################################################################################################################################
 
@@ -54,6 +56,8 @@ choise_of_method=${GRUB_BTRFS_SUBMENUNAME:-"1"}
 submenuname=${GRUB_BTRFS_SUBMENUNAME:-"ArchLinux Snapshots"}
 ## Prefix entry
 prefixentry=${GRUB_BTRFS_PREFIXENTRY:-"Snapshot:"}
+## Show path snapshot
+path_snapshot=${GRUB_BTRFS_DISPLAY_PATH_SNAPSHOT:-"true"}
 ## Kernel(s) name(s)
 nkernel=("${GRUB_BTRFS_NKERNEL[@]}")
 ## Initramfs name(s)
