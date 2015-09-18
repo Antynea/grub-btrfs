@@ -1,4 +1,4 @@
-#! /usr/bin/bash
+#! /usr/bin/env bash
 #
 #
 #########################################################################################################################################################
@@ -17,6 +17,7 @@
 #																			#
 # * GRUB_BTRFS_SUBMENUNAME="ArchLinux Snapshots" 				(Name menu appearing in grub.)	 					#
 # * GRUB_BTRFS_PREFIXENTRY="Snapshot:"        		   			(Add a name ahead your snapshots entries.)				#
+# * GRUB_BTRFS_TITLE_FORMAT="p;d;n"						(Custom title, shows/hides p"prefix";d"date";n"name" in grub-grubmenu)	#
 # * GRUB_BTRFS_NKERNEL=("vmlinuz-linux") 		 			(Use only if you have custom kernel name or auto-detect failed.)	#
 # * GRUB_BTRFS_NINIT=("initramfs-linux.img" "initramfs-linux-fallback.img")	(Use only if you have custom initramfs name or auto-detect failed.)	#
 # * GRUB_BTRFS_INTEL_UCODE=("intel-ucode.img") 					(Use only if you have custom intel-ucode or auto-detect failed.)	#
@@ -29,10 +30,9 @@
 #																			#
 # To do:																		#
 #																			#													#
-#	* verify compatibility with manjaro and snapper (but I don't use them, so it will take some time)						#
 #	* afficher le chemin complet des snapshots ou simplement le nom											#
-#	* refaire le menu des snapshots, mettre en titre le nom du snap et en entrée seulement les kernels,init,microcode 				#
-#	* Peut-être afficher la date et l'heure en premier dans le menu de boot (grub-menu)								#
+#	* (in progress) refaire le menu des snapshots, mettre en titre le nom du snap et en entrée seulement les kernels,init,microcode 		#
+#	* (in progress) Peut-être afficher la date et l'heure en premier dans le menu de boot (grub-menu)						#
 #																			#
 #########################################################################################################################################################
 
@@ -57,7 +57,9 @@ submenuname=${GRUB_BTRFS_SUBMENUNAME:-"ArchLinux Snapshots"}
 ## Prefix entry
 prefixentry=${GRUB_BTRFS_PREFIXENTRY:-"Snapshot:"}
 ## Show path snapshot
-path_snapshot=${GRUB_BTRFS_DISPLAY_PATH_SNAPSHOT:-"true"}
+#path_snapshot=${GRUB_BTRFS_DISPLAY_PATH_SNAPSHOT:-"true"}
+## Title format
+title_format=${GRUB_BTRFS_TITLE_FORMAT:-"p;d;n"}
 ## Kernel(s) name(s)
 nkernel=("${GRUB_BTRFS_NKERNEL[@]}")
 ## Initramfs name(s)
@@ -106,12 +108,14 @@ boot_dir()
 snapshots_entry()
 {
 ## \" required for snap,kernels,init,microcode with space in their name
-	echo "	submenu '${1} ${2} ${3}' {"
+	echo "	submenu '"${title_menu[*]}"' {
+		submenu '---> "${title_menu[*]}" <---' { echo }
+		"
 		for k in "${name_kernel[@]}"; do
 			for i in "${name_initramfs[@]}"; do
 				for u in "${name_microcode[@]}"; do
 				echo "\
-		menuentry '${2} with "${k}" & "${i}"' ${CLASS} "\$menuentry_id_option" 'gnulinux-snapshots-$boot_uuid'{
+		menuentry '"${k}" & "${i}"' ${CLASS} "\$menuentry_id_option" 'gnulinux-snapshots-$boot_uuid'{
 			$(save_default_entry)
 			if [ x\$feature_all_video_module = xy ]; then
 				insmod all_video
@@ -123,15 +127,16 @@ snapshots_entry()
 			else
 				search --no-floppy --fs-uuid  --set=root ${boot_uuid}
 			fi
-			echo 'Loading Snapshot: "${2}" "${3}"'
+			echo 'Loading Snapshot: "${snap_date_time}" "${snap_dir_name}"'
 			echo 'Loading Kernel: "${k}" ...'
-			linux \"${boot_dir_real_path}/"${k}"\" root=UUID=${root_uuid} rw rootflags=subvol=\""${snap_dir_name}"\" ${kernel_parameters}
-			echo 'Loading Initramfs: "${i}" ...'"
+			linux \"${boot_dir_real_path}/"${k}"\" root=UUID=${root_uuid} rw rootflags=subvol=\""${snap_dir_name}"\" ${kernel_parameters}"
 				if [ -f "$(boot_dir)"/"${u}" ] ; then
 		echo "\
+			echo 'Loading Microcode & Initramfs: "${u}" "${i}" ...'
 			initrd \"${boot_dir_real_path}/"${u}"\" \"/"${snap_dir_name}"/boot/"${i}"\""
 				else
 		echo "\
+			echo 'Loading Initramfs: "${i}" ...'
 			initrd \"${boot_dir_real_path}/"${i}"\""
 				fi
 		echo "		}"
@@ -206,6 +211,30 @@ detect_microcode()
 	fi
 }
 
+## Title format in grub-menu
+title_format()
+{
+	if [[ "${title_format}" == "p;d;n" ]]; then
+		title_menu=("${prefixentry}" "${snap_date_time}" "${snap_dir_name}")
+	elif [[ "${title_format}" == "p;n;d" ]]; then
+		title_menu=("${prefixentry}" "${snap_dir_name}" "${snap_date_time}")
+	elif [[ "${title_format}" == "p;d" ]]; then
+		title_menu=("${prefixentry}" "${snap_date_time}")
+	elif [[ "${title_format}" == "p;n" ]]; then
+		title_menu=("${prefixentry}" "${snap_dir_name}")
+	elif [[ "${title_format}" == "d;n" ]]; then
+		title_menu=("${snap_date_time}" "${snap_dir_name}")
+	elif [[ "${title_format}" == "n;d" ]]; then
+		title_menu=("${snap_dir_name}" "${snap_date_time}")
+	elif [[ "${title_format}" == "p" ]]; then
+		title_menu=("${prefixentry}")
+	elif [[ "${title_format}" == "d" ]]; then
+		title_menu=("${snap_date_time}")
+	elif [[ "${title_format}" == "n" ]]; then
+		title_menu=("${snap_dir_name}")
+	fi
+}
+
 ## List of kernels, initramfs and microcode in snapshots
 list_kernels_initramfs()
 {
@@ -216,7 +245,7 @@ list_kernels_initramfs()
 		snap_dir_name=${item[@]:2:${#item[@]}}
 		[[ ! -d "$gbgmp/$snap_dir_name/boot" ]] && continue;
 		snap_date_time=${item[@]:0:2}
-		gettext_printf $"# Found Snapshot: %s\n" "$snap_dir_name $snap_date_time" >&2 ;
+		gettext_printf $"# Found Snapshot: %s\n" "${snap_date_time} ${snap_dir_name}" >&2 ;
 		unset list_kernel
 		detect_kernel
 		name_kernel=("${list_kernel[@]##*"/"}")
@@ -230,8 +259,11 @@ list_kernels_initramfs()
 		name_microcode=("${list_ucode[@]##*"/"}")
 		# echo "ucode = ${name_microcode[*]}"
 		boot_dir_real_path="$(make_system_path_relative_to_its_root "$(boot_dir)")"
-		# Create menu entries
-		snapshots_entry "${prefixentry}" "${snap_dir_name}" "${snap_date_time}"
+		## Create menu entries
+		# title menu custom
+		title_format
+		# echo "${title_menu[*]}"
+		snapshots_entry
 	done
 	IFS=$oldIFS
 }
