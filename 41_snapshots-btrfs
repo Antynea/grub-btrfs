@@ -16,17 +16,17 @@
 # - Add this lines to /etc/default/grub:													#
 #																		#
 # * GRUB_BTRFS_SUBMENUNAME="ArchLinux Snapshots" 												#
-	(Name menu appearing in grub.)	 													#
+#	(Name menu appearing in grub.)	 													#
 # * GRUB_BTRFS_PREFIXENTRY="Snapshot:"        		   											#
-	(Add a name ahead your snapshots entries.)												#
-# * GRUB_BTRFS_TITLE_FORMAT="p;d;n"														#
-	(Custom title, shows/hides p"prefix";d"date";n"name" in grub-grubmenu)									#
+#	(Add a name ahead your snapshots entries.)												#
+# * GRUB_BTRFS_TITLE_FORMAT="p/d/n"														#
+#	(Custom title, shows/hides p"prefix" d"date" n"name" in grub-menu, separator "/")							#
 # * GRUB_BTRFS_NKERNEL=("vmlinuz-linux") 		 											#
-	(Use only if you have custom kernel name or auto-detect failed.)									#
+#	(Use only if you have custom kernel name or auto-detect failed.)									#
 # * GRUB_BTRFS_NINIT=("initramfs-linux.img" "initramfs-linux-fallback.img")									#
-	(Use only if you have custom initramfs name or auto-detect failed.)									#
+#	(Use only if you have custom initramfs name or auto-detect failed.)									#
 # * GRUB_BTRFS_INTEL_UCODE=("intel-ucode.img") 													#
-	(Use only if you have custom intel-ucode or auto-detect failed.)									#
+#	(Use only if you have custom intel-ucode or auto-detect failed.)									#
 #																		#
 # - Generate grub.cfg (on Archlinux use grub-mkconfig -o /boot/grub/grub.cfg)									#
 #																		#
@@ -220,26 +220,6 @@ detect_microcode()
 ## Title format in grub-menu
 title_format()
 {
-	# if [[ "${title_format}" == "p;d;n" ]]; then
-	# 	title_menu=("${prefixentry}" "${snap_date_time}" "${snap_dir_name}")
-	# elif [[ "${title_format}" == "p;n;d" ]]; then
-	# 	title_menu=("${prefixentry}" "${snap_dir_name}" "${snap_date_time}")
-	# elif [[ "${title_format}" == "p;d" ]]; then
-	# 	title_menu=("${prefixentry}" "${snap_date_time}")
-	# elif [[ "${title_format}" == "p;n" ]]; then
-	# 	title_menu=("${prefixentry}" "${snap_dir_name}")
-	# elif [[ "${title_format}" == "d;n" ]]; then
-	# 	title_menu=("${snap_date_time}" "${snap_dir_name}")
-	# elif [[ "${title_format}" == "n;d" ]]; then
-	# 	title_menu=("${snap_dir_name}" "${snap_date_time}")
-	# elif [[ "${title_format}" == "p" ]]; then
-	# 	title_menu=("${prefixentry}")
-	# elif [[ "${title_format}" == "d" ]]; then
-	# 	title_menu=("${snap_date_time}")
-	# elif [[ "${title_format}" == "n" ]]; then
-	# 	title_menu=("${snap_dir_name}")
-	# fi
-
 	case "${title_format}" in
 		p/d/n) 	title_menu=("${prefixentry}" "${snap_date_time}" "${snap_dir_name}");;
 		p/n/d) 	title_menu=("${prefixentry}" "${snap_dir_name}" "${snap_date_time}");;
