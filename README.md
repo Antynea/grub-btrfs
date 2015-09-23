@@ -52,7 +52,7 @@ Generate grub.cfg (on Archlinux use grub-mkconfig -o /boot/grub/grub.cfg )
 
 grub-btrfs automatically generates snapshots entries.
 
-You will see it appear differents entries (e.g : Snapshot: my snapshot name overkill [2014-02-12 11:24:37])
+You will see it appear differents entries (e.g : Snapshot: [2014-02-12 11:24:37] my snapshot name overkill )
 
 
 #### TO DO
