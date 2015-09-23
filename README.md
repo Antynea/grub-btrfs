@@ -22,12 +22,20 @@ Simple rollback using snapshots you made previously.
 
 Add this lines to /etc/default/grub:
 
-* GRUB_BTRFS_SUBMENUNAME="ArchLinux Snapshots" 					(Name menu appearing in grub.)
-* GRUB_BTRFS_PREFIXENTRY="Snapshot:"        		   			(Add a name ahead your snapshots entries.)
-* GRUB_BTRFS_NKERNEL=("vmlinuz-linux") 		 				(Use only if you have custom kernel name or auto-detect failed.)
-* GRUB_BTRFS_NINIT=("initramfs-linux.img" "initramfs-linux-fallback.img")	(Use only if you have custom initramfs name or auto-detect failed.)
-* GRUB_BTRFS_INTEL_UCODE=("intel-ucode.img") 					(Use only if you have custom intel-ucode or auto-detect failed.)
+* GRUB_BTRFS_SUBMENUNAME="ArchLinux Snapshots"
+	(Name menu appearing in grub.)
+* GRUB_BTRFS_PREFIXENTRY="Snapshot:"
+	(Add a name ahead your snapshots entries.)
+* GRUB_BTRFS_TITLE_FORMAT="p/d/n"
+	(Custom title, shows/hides p"prefix" d"date" n"name" in grub-menu, separator "/", custom order available)	
+* GRUB_BTRFS_NKERNEL=("vmlinuz-linux")
+	(Use only if you have custom kernel name or auto-detect failed.)
+* GRUB_BTRFS_NINIT=("initramfs-linux.img" "initramfs-linux-fallback.img")
+	(Use only if you have custom initramfs name or auto-detect failed.)
+* GRUB_BTRFS_INTEL_UCODE=("intel-ucode.img")
+	(Use only if you have custom intel-ucode or auto-detect failed.)
 
+	
 Generate grub.cfg (on Archlinux use grub-mkconfig -o /boot/grub/grub.cfg )
 
 grub-btrfs automatically generates snapshots entries.
@@ -37,7 +45,7 @@ You will see it appear differents entries (e.g : Snapshot: my snapshot name over
 
 #### TO DO
 
-* verify compatibility with manjaro and snapper (but I don't use them, so it will take some time)
+* Show full path or only name of snapshots in grub-menu
 
 
 
