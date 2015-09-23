@@ -20,7 +20,7 @@
 # * GRUB_BTRFS_PREFIXENTRY="Snapshot:"        		   											#
 #	(Add a name ahead your snapshots entries.)												#
 # * GRUB_BTRFS_TITLE_FORMAT="p/d/n"														#
-#	(Custom title, shows/hides p"prefix" d"date" n"name" in grub-menu, separator "/")							#
+#	(Custom title, shows/hides p"prefix" d"date" n"name" in grub-menu, separator "/", custom order available)				#
 # * GRUB_BTRFS_NKERNEL=("vmlinuz-linux") 		 											#
 #	(Use only if you have custom kernel name or auto-detect failed.)									#
 # * GRUB_BTRFS_NINIT=("initramfs-linux.img" "initramfs-linux-fallback.img")									#
@@ -37,8 +37,6 @@
 # To do:																	#
 #																		#													#
 #	* afficher le chemin complet des snapshots ou simplement le nom										#
-#	* (in progress) refaire le menu des snapshots, mettre en titre le nom du snap et en entrée seulement les kernels,init,microcode 	#
-#	* (in progress) Peut-être afficher la date et l'heure en premier dans le menu de boot (grub-menu)					#
 #																		#
 #################################################################################################################################################
 
@@ -116,11 +114,11 @@ snapshots_entry()
 ## \" required for snap,kernels,init,microcode with space in their name
 	echo "	submenu '"${title_menu[*]}"' {
 		submenu '---> "${title_menu[*]}" <---' { echo }
-		"
-		for k in "${name_kernel[@]}"; do
-			for i in "${name_initramfs[@]}"; do
-				for u in "${name_microcode[@]}"; do
-				echo "\
+	"
+	for k in "${name_kernel[@]}"; do
+		for i in "${name_initramfs[@]}"; do
+			for u in "${name_microcode[@]}"; do
+			echo "\
 		menuentry '"${k}" & "${i}"' ${CLASS} "\$menuentry_id_option" 'gnulinux-snapshots-$boot_uuid'{
 			$(save_default_entry)
 			if [ x\$feature_all_video_module = xy ]; then
@@ -135,20 +133,21 @@ snapshots_entry()
 			fi
 			echo 'Loading Snapshot: "${snap_date_time}" "${snap_dir_name}"'
 			echo 'Loading Kernel: "${k}" ...'
-			linux \"${boot_dir_real_path}/"${k}"\" root=UUID=${root_uuid} rw rootflags=subvol=\""${snap_dir_name}"\" ${kernel_parameters}"
-				if [ -f "$(boot_dir)"/"${u}" ] ; then
-		echo "\
+			linux \"${boot_dir_real_path}/"${k}"\" root=UUID=${root_uuid} rw rootflags=subvol=\""${snap_dir_name}"\" ${kernel_parameters}\
+			"
+			if [ -f "$(boot_dir)"/"${u}" ] ; then
+				echo "\
 			echo 'Loading Microcode & Initramfs: "${u}" "${i}" ...'
 			initrd \"${boot_dir_real_path}/"${u}"\" \"/"${snap_dir_name}"/boot/"${i}"\""
-				else
-		echo "\
+			else
+				echo "\
 			echo 'Loading Initramfs: "${i}" ...'
 			initrd \"${boot_dir_real_path}/"${i}"\""
-				fi
+			fi
 		echo "		}"
-				done
 			done
 		done
+	done
 	echo "	}"
 }
 
@@ -229,7 +228,8 @@ title_format()
 		n/d) 	title_menu=("${snap_dir_name}" "${snap_date_time}");;
 		p) 	title_menu=("${prefixentry}");;
 		d)	title_menu=("${snap_date_time}");;
-		n)	title_menu=("${snap_dir_name}")
+		n)	title_menu=("${snap_dir_name}");;
+		*)	gettext_printf $"# Warning: GRUB_BTRFS_TITLE_FORMAT=${title_format}, syntax error \n" >&2
 	esac
 }
 
