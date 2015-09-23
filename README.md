@@ -46,7 +46,8 @@ Add this lines to /etc/default/grub:
 
 	(Use only if you have custom intel-ucode or auto-detect failed.)
 
-	
+
+
 Generate grub.cfg (on Archlinux use grub-mkconfig -o /boot/grub/grub.cfg )
 
 grub-btrfs automatically generates snapshots entries.
