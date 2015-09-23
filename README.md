@@ -13,9 +13,13 @@ grub-btrfs, Include btrfs snapshots at boot options. (grub menu)
 
 Simple rollback using snapshots you made previously.
 
-- Automatically List snapshots existing on root partition (btrfs).
-- Automatically Detect kernel, initramfs and intel microcode in "/boot" directory on snapshots. (For custon name, see below.)
-- Automatically Create corresponding menuentry in grub.cfg , which ensures a very easy rollback.
+* Automatically List snapshots existing on root partition (btrfs).
+
+* Automatically Detect if "/boot" is in separate partition.
+
+* Automatically Detect kernel, initramfs and intel microcode in "/boot" directory on snapshots. (For custon name, see below.)
+
+* Automatically Create corresponding "menuentry" in grub.cfg , which ensures a very easy rollback.
 
 
 #### How to use it:
