@@ -34,6 +34,10 @@ Add this lines to /etc/default/grub:
 
 	(Add a name ahead your snapshots entries.)
 	
+* GRUB_BTRFS_DISPLAY_PATH_SNAPSHOT="true"
+	
+	(Show full path snapshot or only name)
+	
 * GRUB_BTRFS_TITLE_FORMAT="p/d/n"
 
  	(Custom title, shows/hides p"prefix" d"date" n"name" in grub-menu, separator "/", custom order available)
@@ -61,7 +65,7 @@ You will see it appear differents entries (e.g : Snapshot: [2014-02-12 11:24:37]
 
 #### TO DO
 
-* Show full path or only name of snapshots in grub-menu
+* Display name of microcode in menuentry when available
 
 
 

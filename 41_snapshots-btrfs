@@ -18,7 +18,9 @@
 # * GRUB_BTRFS_SUBMENUNAME="ArchLinux Snapshots" 												#
 #	(Name menu appearing in grub.)	 													#
 # * GRUB_BTRFS_PREFIXENTRY="Snapshot:"        		   											#
-#	(Add a name ahead your snapshots entries.)												#
+#	(Add a name ahead your snapshots entries.) 												#
+# * GRUB_BTRFS_DISPLAY_PATH_SNAPSHOT="true"													#
+#	(Show full path snapshot or only name)													#
 # * GRUB_BTRFS_TITLE_FORMAT="p/d/n"														#
 #	(Custom title, shows/hides p"prefix" d"date" n"name" in grub-menu, separator "/", custom order available)				#
 # * GRUB_BTRFS_NKERNEL=("vmlinuz-linux") 		 											#
@@ -36,7 +38,7 @@
 #																		#
 # To do:																	#
 #																		#													#
-#	* afficher le chemin complet des snapshots ou simplement le nom										#
+#	* Display name of microcode in menuentry when available											#
 #																		#
 #################################################################################################################################################
 
@@ -60,8 +62,8 @@ choise_of_method=${GRUB_BTRFS_SUBMENUNAME:-"1"}
 submenuname=${GRUB_BTRFS_SUBMENUNAME:-"ArchLinux Snapshots"}
 ## Prefix entry
 prefixentry=${GRUB_BTRFS_PREFIXENTRY:-"Snapshot:"}
-## Show path snapshot
-#path_snapshot=${GRUB_BTRFS_DISPLAY_PATH_SNAPSHOT:-"true"}
+## Show full path snapshot or only name
+path_snapshot=${GRUB_BTRFS_DISPLAY_PATH_SNAPSHOT:-"true"}
 ## Title format
 title_format=${GRUB_BTRFS_TITLE_FORMAT:-"p/d/n"}
 ## Kernel(s) name(s)
@@ -216,11 +218,21 @@ detect_microcode()
 	fi
 }
 
+## Show full path snapshot or only name
+path_snapshot()
+{
+	case "${path_snapshot}" in
+		true) name_snapshot=("${snap_dir_name}");;
+		*) name_snapshot=("${snap_dir_name#*"/"}")
+	esac
+}
+
+
 ## Title format in grub-menu
 title_format()
 {
 	case "${title_format}" in
-		p/d/n) 	title_menu=("${prefixentry}" "${snap_date_time}" "${snap_dir_name}");;
+		p/d/n) 	title_menu=("${prefixentry}" "${snap_date_time}" "${name_snapshot}");;
 		p/n/d) 	title_menu=("${prefixentry}" "${snap_dir_name}" "${snap_date_time}");;
 		p/d) 	title_menu=("${prefixentry}" "${snap_date_time}");;
 		p/n) 	title_menu=("${prefixentry}" "${snap_dir_name}");;
@@ -258,6 +270,8 @@ list_kernels_initramfs()
 		# echo "ucode = ${name_microcode[*]}"
 		boot_dir_real_path="$(make_system_path_relative_to_its_root "$(boot_dir)")"
 		## Create menu entries
+		# name snpashot
+		path_snapshot
 		# title menu custom
 		title_format
 		# echo "${title_menu[*]}"
