@@ -33,7 +33,7 @@
 # - Generate grub.cfg (on Archlinux use grub-mkconfig -o /boot/grub/grub.cfg)									#
 #																		#
 # - grub-btrfs automatically generates snapshots entries.											#
-# - You will see it appear different entries (e.g : Snapshot: my snapshot name overkill [2014-02-12 11:24:37])					#
+# - You will see it appear different entries (e.g : Snapshot: [2014-02-12 11:24:37] my snapshot name overkill)					#
 #																		#
 #																		#
 # To do:																	#
@@ -57,7 +57,7 @@ sysconfdir="/etc"
 ### Variables in /etc/default/grub ###
 ######################################
 ## Choice of method
-choise_of_method=${GRUB_BTRFS_SUBMENUNAME:-"1"}
+choise_of_method=${GRUB_BTRFS_METHOD:-"1"}
 ## Submenu name
 submenuname=${GRUB_BTRFS_SUBMENUNAME:-"ArchLinux Snapshots"}
 ## Prefix entry
