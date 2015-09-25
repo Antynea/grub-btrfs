@@ -1,38 +1,46 @@
-#! /usr/bin/bash
+#! /usr/bin/env bash
 #
 #
-#########################################################################################################################################################
-# Written by: Antynea																	#
-#																			#
-# Purpose: Include btrfs snapshots at boot options.													#
-#																			#
-# What this script does:																#
-# - Automatically List snapshots existing on root partition (btrfs).											#
-# - Automatically Detect if "/boot" is in separate partition.												#
-# - Automatically Detect kernel, initramfs and intel microcode in "/boot" directory on snapshots. (For custon name, see below.)				#
-# - Automatically Create corresponding "menuentry" in grub.cfg , which ensures a very easy rollback.							#
-#																			#
-# How to use it:																	#
-# - Add this lines to /etc/default/grub:														#
-#																			#
-# * GRUB_BTRFS_SUBMENUNAME="ArchLinux Snapshots" 				(Name menu appearing in grub.)	 					#
-# * GRUB_BTRFS_PREFIXENTRY="Snapshot:"        		   			(Add a name ahead your snapshots entries.)				#
-# * GRUB_BTRFS_NKERNEL=("vmlinuz-linux") 		 			(Use only if you have custom kernel name or auto-detect failed.)	#
-# * GRUB_BTRFS_NINIT=("initramfs-linux.img" "initramfs-linux-fallback.img")	(Use only if you have custom initramfs name or auto-detect failed.)	#
-# * GRUB_BTRFS_INTEL_UCODE=("intel-ucode.img") 					(Use only if you have custom intel-ucode or auto-detect failed.)	#
-#																			#
-# - Generate grub.cfg (on Archlinux use grub-mkconfig -o /boot/grub/grub.cfg)										#
-#																			#
-# - grub-btrfs automatically generates snapshots entries.												#
-# - You will see it appear different entries (e.g : Snapshot: my snapshot name overkill [2014-02-12 11:24:37])						#
-#																			#
-#																			#
-# To do:																		#
-#																			#													#
-#	* verify compatibility with manjaro and snapper (but I don't use them, so it will take some time)						#
-#																			#
-#																			#
-#########################################################################################################################################################
+#################################################################################################################################################
+# Written by: Antynea																#
+#																		#
+# Purpose: Include btrfs snapshots at boot options.												#
+#																		#
+# What this script does:															#
+# - Automatically List snapshots existing on root partition (btrfs).										#
+# - Automatically Detect if "/boot" is in separate partition.											#
+# - Automatically Detect kernel, initramfs and intel microcode in "/boot" directory on snapshots. (For custon name, see below.)			#
+# - Automatically Create corresponding "menuentry" in grub.cfg , which ensures a very easy rollback.						#
+#																		#
+# How to use it:																#
+# - Add this lines to /etc/default/grub:													#
+#																		#
+# * GRUB_BTRFS_SUBMENUNAME="ArchLinux Snapshots" 												#
+#	(Name menu appearing in grub.)	 													#
+# * GRUB_BTRFS_PREFIXENTRY="Snapshot:"        		   											#
+#	(Add a name ahead your snapshots entries.) 												#
+# * GRUB_BTRFS_DISPLAY_PATH_SNAPSHOT="true"													#
+#	(Show full path snapshot or only name)													#
+# * GRUB_BTRFS_TITLE_FORMAT="p/d/n"														#
+#	(Custom title, shows/hides p"prefix" d"date" n"name" in grub-menu, separator "/", custom order available)				#
+# * GRUB_BTRFS_NKERNEL=("vmlinuz-linux") 		 											#
+#	(Use only if you have custom kernel name or auto-detect failed.)									#
+# * GRUB_BTRFS_NINIT=("initramfs-linux.img" "initramfs-linux-fallback.img")									#
+#	(Use only if you have custom initramfs name or auto-detect failed.)									#
+# * GRUB_BTRFS_INTEL_UCODE=("intel-ucode.img") 													#
+#	(Use only if you have custom intel-ucode or auto-detect failed.)									#
+#																		#
+# - Generate grub.cfg (on Archlinux use grub-mkconfig -o /boot/grub/grub.cfg)									#
+#																		#
+# - grub-btrfs automatically generates snapshots entries.											#
+# - You will see it appear different entries (e.g : Snapshot: [2014-02-12 11:24:37] my snapshot name overkill)					#
+#																		#
+#																		#
+# To do:																	#
+#																		#													#
+#	* Display name of microcode in menuentry when available											#
+#																		#
+#################################################################################################################################################
 
 set -e
 
@@ -49,11 +57,15 @@ sysconfdir="/etc"
 ### Variables in /etc/default/grub ###
 ######################################
 ## Choice of method
-choise_of_method=${GRUB_BTRFS_SUBMENUNAME:-"1"}
+choise_of_method=${GRUB_BTRFS_METHOD:-"1"}
 ## Submenu name
 submenuname=${GRUB_BTRFS_SUBMENUNAME:-"ArchLinux Snapshots"}
 ## Prefix entry
 prefixentry=${GRUB_BTRFS_PREFIXENTRY:-"Snapshot:"}
+## Show full path snapshot or only name
+path_snapshot=${GRUB_BTRFS_DISPLAY_PATH_SNAPSHOT:-"true"}
+## Title format
+title_format=${GRUB_BTRFS_TITLE_FORMAT:-"p/d/n"}
 ## Kernel(s) name(s)
 nkernel=("${GRUB_BTRFS_NKERNEL[@]}")
 ## Initramfs name(s)
@@ -102,12 +114,14 @@ boot_dir()
 snapshots_entry()
 {
 ## \" required for snap,kernels,init,microcode with space in their name
-	echo "	submenu '${1} ${2} ${3}' {"
-		for k in "${name_kernel[@]}"; do
-			for i in "${name_initramfs[@]}"; do
-				for u in "${name_microcode[@]}"; do
-				echo "\
-		menuentry '${2} with "${k}" & "${i}"' ${CLASS} "\$menuentry_id_option" 'gnulinux-snapshots-$boot_uuid'{
+	echo "	submenu '"${title_menu[*]}"' {
+		submenu '---> "${title_menu[*]}" <---' { echo }
+	"
+	for k in "${name_kernel[@]}"; do
+		for i in "${name_initramfs[@]}"; do
+			for u in "${name_microcode[@]}"; do
+			echo "\
+		menuentry '"${k}" & "${i}"' ${CLASS} "\$menuentry_id_option" 'gnulinux-snapshots-$boot_uuid'{
 			$(save_default_entry)
 			if [ x\$feature_all_video_module = xy ]; then
 				insmod all_video
@@ -119,21 +133,23 @@ snapshots_entry()
 			else
 				search --no-floppy --fs-uuid  --set=root ${boot_uuid}
 			fi
-			echo 'Loading Snapshot: "${2}" "${3}"'
+			echo 'Loading Snapshot: "${snap_date_time}" "${snap_dir_name}"'
 			echo 'Loading Kernel: "${k}" ...'
-			linux \"${boot_dir_real_path}/"${k}"\" root=UUID=${root_uuid} rw rootflags=subvol=\""${snap_dir_name}"\" ${kernel_parameters}
-			echo 'Loading Initramfs: "${i}" ...'"
-				if [ -f "$(boot_dir)"/"${u}" ] ; then
-		echo "\
+			linux \"${boot_dir_real_path}/"${k}"\" root=UUID=${root_uuid} rw rootflags=subvol=\""${snap_dir_name}"\" ${kernel_parameters}\
+			"
+			if [ -f "$(boot_dir)"/"${u}" ] ; then
+				echo "\
+			echo 'Loading Microcode & Initramfs: "${u}" "${i}" ...'
 			initrd \"${boot_dir_real_path}/"${u}"\" \"/"${snap_dir_name}"/boot/"${i}"\""
-				else
-		echo "\
+			else
+				echo "\
+			echo 'Loading Initramfs: "${i}" ...'
 			initrd \"${boot_dir_real_path}/"${i}"\""
-				fi
+			fi
 		echo "		}"
-				done
 			done
 		done
+	done
 	echo "	}"
 }
 
@@ -202,6 +218,33 @@ detect_microcode()
 	fi
 }
 
+## Show full path snapshot or only name
+path_snapshot()
+{
+	case "${path_snapshot}" in
+		true) name_snapshot=("${snap_dir_name}");;
+		*) name_snapshot=("${snap_dir_name#*"/"}")
+	esac
+}
+
+
+## Title format in grub-menu
+title_format()
+{
+	case "${title_format}" in
+		p/d/n) 	title_menu=("${prefixentry}" "${snap_date_time}" "${name_snapshot}");;
+		p/n/d) 	title_menu=("${prefixentry}" "${snap_dir_name}" "${snap_date_time}");;
+		p/d) 	title_menu=("${prefixentry}" "${snap_date_time}");;
+		p/n) 	title_menu=("${prefixentry}" "${snap_dir_name}");;
+		d/n) 	title_menu=("${snap_date_time}" "${snap_dir_name}");;
+		n/d) 	title_menu=("${snap_dir_name}" "${snap_date_time}");;
+		p) 	title_menu=("${prefixentry}");;
+		d)	title_menu=("${snap_date_time}");;
+		n)	title_menu=("${snap_dir_name}");;
+		*)	gettext_printf $"# Warning: GRUB_BTRFS_TITLE_FORMAT=${title_format}, syntax error \n" >&2
+	esac
+}
+
 ## List of kernels, initramfs and microcode in snapshots
 list_kernels_initramfs()
 {
@@ -212,7 +255,7 @@ list_kernels_initramfs()
 		snap_dir_name=${item[@]:2:${#item[@]}}
 		[[ ! -d "$gbgmp/$snap_dir_name/boot" ]] && continue;
 		snap_date_time=${item[@]:0:2}
-		gettext_printf $"# Found Snapshot: %s\n" "$snap_dir_name $snap_date_time" >&2 ;
+		gettext_printf $"# Found Snapshot: %s\n" "${snap_date_time} ${snap_dir_name}" >&2 ;
 		unset list_kernel
 		detect_kernel
 		name_kernel=("${list_kernel[@]##*"/"}")
@@ -226,8 +269,13 @@ list_kernels_initramfs()
 		name_microcode=("${list_ucode[@]##*"/"}")
 		# echo "ucode = ${name_microcode[*]}"
 		boot_dir_real_path="$(make_system_path_relative_to_its_root "$(boot_dir)")"
-		# Create menu entries
-		snapshots_entry "${prefixentry}" "${snap_dir_name}" "${snap_date_time}"
+		## Create menu entries
+		# name snpashot
+		path_snapshot
+		# title menu custom
+		title_format
+		# echo "${title_menu[*]}"
+		snapshots_entry
 	done
 	IFS=$oldIFS
 }
