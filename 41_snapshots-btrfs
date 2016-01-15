@@ -4,7 +4,7 @@
 #################################################################################################################################################
 # Written by: Antynea																#
 #																		#
-# Purpose: Include btrfs snapshots at boot options.												#
+# Purpose: Include btrfs snapshots at boot options (grub-menu).												#
 #																		#
 # What this script does:															#
 # - Automatically List snapshots existing on root partition (btrfs).										#
