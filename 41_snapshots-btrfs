@@ -4,7 +4,7 @@
 #################################################################################################################################################
 # Written by: Antynea																#
 #																		#
-# Purpose: Include btrfs snapshots at boot options (grub-menu).												#
+# Purpose: Include btrfs snapshots at boot options (grub-menu).											#
 #																		#
 # What this script does:															#
 # - Automatically List snapshots existing on root partition (btrfs).										#
@@ -140,7 +140,7 @@ snapshots_entry()
 			if [ -f "$(boot_dir)"/"${u}" ] ; then
 				echo "\
 			echo 'Loading Microcode & Initramfs: "${u}" "${i}" ...'
-			initrd \"${boot_dir_real_path}/"${u}"\" \"/"${snap_dir_name}"/boot/"${i}"\""
+			initrd \"${boot_dir_real_path}/"${u}"\" \"${boot_dir_real_path}/"${i}"\""
 			else
 				echo "\
 			echo 'Loading Initramfs: "${i}" ...'
