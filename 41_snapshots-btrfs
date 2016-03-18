@@ -72,6 +72,11 @@ nkernel=("${GRUB_BTRFS_NKERNEL[@]}")
 ninit=("${GRUB_BTRFS_NINIT[@]}")
 ## Microcode(s) name(s)
 microcode=("${GRUB_BTRFS_INTEL_UCODE[@]}")
+## Limit to show in menu
+limit=("${GRUB_BTRFS_LIMIT[@]}")
+if [ -z "$limit" ]; then
+    limit=100
+fi
 
 ########################
 ### variables script ###
@@ -156,7 +161,7 @@ snapshots_entry()
 ## List of snapshots on filesystem
 snapshot_list()
 {
-	for snap in $(btrfs subvolume list -sa /); do
+	for snap in $(btrfs subvolume list -sa / | tac); do
 		IFS=$oldIFS
 		snap=($snap)
 		local snap_path_name=${snap[@]:13:${#snap[@]}}
@@ -249,6 +254,7 @@ title_format()
 list_kernels_initramfs()
 {
 	IFS=$'\n'
+    c=0
 	for item in $(snapshot_list); do
 		IFS=$oldIFS
 		item=($item)
@@ -276,6 +282,10 @@ list_kernels_initramfs()
 		title_format
 		# echo "${title_menu[*]}"
 		snapshots_entry
+        c=$((1+$c))
+        if [[ $c -gt $limit ]]; then
+            break;
+        fi
 	done
 	IFS=$oldIFS
 }
