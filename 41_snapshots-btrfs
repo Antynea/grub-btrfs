@@ -74,6 +74,12 @@ ninit=("${GRUB_BTRFS_NINIT[@]}")
 microcode=("${GRUB_BTRFS_INTEL_UCODE[@]}")
 ## Limit to show in menu
 limit=("${GRUB_BTRFS_LIMIT[@]:-100}")
+## How to sort
+subvolsort=${GRUB_BTRFS_SUBVOLUME_SORT:-"descending"}
+case "${subvolsort}" in
+    ascending)          btrfssubvolsort=("--sort=+rootid");;
+    *)                  btrfssubvolsort=("--sort=-rootid")
+esac
 
 ########################
 ### variables script ###
@@ -158,7 +164,7 @@ snapshots_entry()
 ## List of snapshots on filesystem
 snapshot_list()
 {
-	for snap in $(btrfs subvolume list -sa --sort=-rootid /); do
+	for snap in $(btrfs subvolume list -sa "${btrfssubvolsort}" /); do
 		IFS=$oldIFS
 		snap=($snap)
 		local snap_path_name=${snap[@]:13:${#snap[@]}}
