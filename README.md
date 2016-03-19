@@ -54,7 +54,15 @@ Add this lines to /etc/default/grub:
 
 	(Use only if you have custom intel-ucode or auto-detect failed.)
 
+* GRUB_BTRFS_LIMIT=("100")
 
+    (Limit the number of snapshots populated in the GRUB menu.)
+
+* GRUB_BTRFS_SUBVOLUME_SORT=("descending")
+
+    (Sort the found subvolumes by newest first ("descending") or oldest first
+("ascending"). If "ascending" is chosen then the $GRUB_BTRFS_LIMIT oldest
+subvolumes will populate the menu.)
 
 Generate grub.cfg (on Archlinux use grub-mkconfig -o /boot/grub/grub.cfg )
 
