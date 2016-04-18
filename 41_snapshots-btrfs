@@ -277,7 +277,6 @@ list_kernels_initramfs()
 {
 	IFS=$'\n'
 	count_limit_snap=0
-	# echo "tt = ${count_limit_snap}"
 	for item in $(snapshot_list); do
 		IFS=$oldIFS
 		item=($item)
@@ -312,7 +311,6 @@ list_kernels_initramfs()
             break;
         fi
 	done
-	# echo "ttt = ${count_limit_snap}"
 	IFS=$oldIFS
 }
 ### END auto detect ###
