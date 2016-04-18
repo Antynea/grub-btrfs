@@ -23,6 +23,15 @@
 #	(Show full path snapshot or only name)													#
 # * GRUB_BTRFS_TITLE_FORMAT="p/d/n"														#
 #	(Custom title, shows/hides p"prefix" d"date" n"name" in grub-menu, separator "/", custom order available)				#
+# * GRUB_BTRFS_LIMIT="100"															#
+#	(Limit the number of snapshots populated in the GRUB menu.)										#
+# * GRUB_BTRFS_SUBVOLUME_SORT="descending"													#
+#	(Sort the found subvolumes by newest first ("descending") or oldest first ("ascending").						#
+#	If "ascending" is chosen then the $GRUB_BTRFS_LIMIT oldest subvolumes will populate the menu.)						#
+# * GRUB_BTRFS_SHOW_SNAPSHOTS_FOUND="true"													#
+#	(Show snapshots found during run "grub-mkconfig")											#
+# * GRUB_BTRFS_SHOW_TOTAL_SNAPSHOTS_FOUND="true"												#
+#	(Show Total of snapshots found during run "grub-mkconfig")										#
 # * GRUB_BTRFS_NKERNEL=("vmlinuz-linux") 		 											#
 #	(Use only if you have custom kernel name or auto-detect failed.)									#
 # * GRUB_BTRFS_NINIT=("initramfs-linux.img" "initramfs-linux-fallback.img")									#
@@ -37,8 +46,9 @@
 #																		#
 #																		#
 # To do:																	#
-#																		#													#
+#																		#
 #	* Display name of microcode in menuentry when available											#
+#	* ignore specific path 															#
 #																		#
 #################################################################################################################################################
 
@@ -56,8 +66,6 @@ sysconfdir="/etc"
 ######################################
 ### Variables in /etc/default/grub ###
 ######################################
-## Choice of method
-choise_of_method=${GRUB_BTRFS_METHOD:-"1"}
 ## Submenu name
 submenuname=${GRUB_BTRFS_SUBMENUNAME:-"ArchLinux Snapshots"}
 ## Prefix entry
@@ -73,13 +81,17 @@ ninit=("${GRUB_BTRFS_NINIT[@]}")
 ## Microcode(s) name(s)
 microcode=("${GRUB_BTRFS_INTEL_UCODE[@]}")
 ## Limit to show in menu
-limit=("${GRUB_BTRFS_LIMIT[@]:-100}")
+limit_snap_show="${GRUB_BTRFS_LIMIT:-100}"
 ## How to sort
-subvolsort=${GRUB_BTRFS_SUBVOLUME_SORT:-"descending"}
-case "${subvolsort}" in
+snap_list_sort=${GRUB_BTRFS_SUBVOLUME_SORT:-"descending"}
+case "${snap_list_sort}" in
     ascending)          btrfssubvolsort=("--sort=+rootid");;
     *)                  btrfssubvolsort=("--sort=-rootid")
 esac
+## Show snapshots found during run "grub-mkconfig"
+show_snap_found=${GRUB_BTRFS_SHOW_SNAPSHOTS_FOUND:-"true"}
+## Show Total of snapshots found during run "grub-mkconfig"
+show_total_snap_found=${GRUB_BTRFS_SHOW_TOTAL_SNAPSHOTS_FOUND:-"true"}
 
 ########################
 ### variables script ###
@@ -235,6 +247,13 @@ path_snapshot()
 	esac
 }
 
+# ## Show Total of snapshots found during run "grub-mkconfig"
+# show_total_snap_found()
+# {
+# 	case "${show_total_snap_found}" in
+# 		true)
+# 		*)
+# }
 
 ## Title format in grub-menu
 title_format()
@@ -257,14 +276,17 @@ title_format()
 list_kernels_initramfs()
 {
 	IFS=$'\n'
-    c=0
+	count_limit_snap=0
+	# echo "tt = ${count_limit_snap}"
 	for item in $(snapshot_list); do
 		IFS=$oldIFS
 		item=($item)
 		snap_dir_name=${item[@]:2:${#item[@]}}
 		[[ ! -d "$gbgmp/$snap_dir_name/boot" ]] && continue;
 		snap_date_time=${item[@]:0:2}
+		if [[ "${show_snap_found}" = "true" ]]; then
 		gettext_printf $"# Found Snapshot: %s\n" "${snap_date_time} ${snap_dir_name}" >&2 ;
+		fi
 		unset list_kernel
 		detect_kernel
 		name_kernel=("${list_kernel[@]##*"/"}")
@@ -285,24 +307,30 @@ list_kernels_initramfs()
 		title_format
 		# echo "${title_menu[*]}"
 		snapshots_entry
-        c=$((1+$c))
-        if [[ $c -gt $limit ]]; then
+        count_limit_snap=$((1+$count_limit_snap))
+        if [[ $count_limit_snap -gt $limit_snap_show ]]; then
             break;
         fi
 	done
+	# echo "ttt = ${count_limit_snap}"
 	IFS=$oldIFS
 }
 ### END auto detect ###
 
-### Choice of method ###
-if [ ${choise_of_method} = "1" ] ; then 
-	gettext_printf "###### - Grub-btrfs: Auto-detect - ######\n" >&2 ;
+### Start ###
+	gettext_printf "###### - Grub-btrfs: Auto-detect Start - ######\n" >&2 ;
 	[[ ! -d $gbgmp ]] && mkdir -p $gbgmp
 	mount -o subvolid=0 /dev/disk/by-uuid/$root_uuid $gbgmp/
 	echo "submenu '${submenuname}' {"
 	list_kernels_initramfs ;
+	if [[ "${show_total_snap_found}" = "true" ]]; then
+	gettext_printf "# found ${count_limit_snap} snapshot(s)\n" >&2 ;
+	fi
+	if [[ "${count_limit_snap}" = "0" ]]; then
+		echo " submenu '---> "No snapshot found : Press ESC to return previous menu" <---' { echo } ";
+		gettext_printf "# No snapshot found \n# make sure you have at least one snapshot \n# or please file a bug report at \"https://github.com/Antynea/grub-btrfs\"\n" >&2 ;
+	fi
 	echo "}"
 	umount $gbgmp
-	gettext_printf "###### - Grub-btrfs: Auto-detect - ######\n" >&2 ;
-fi
-### End choice of method ###
+	gettext_printf "###### - Grub-btrfs: Auto-detect End   - ######\n" >&2 ;
+### End ###
