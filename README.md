@@ -54,15 +54,25 @@ Add this lines to /etc/default/grub:
 
 	(Use only if you have custom intel-ucode or auto-detect failed.)
 
-* GRUB_BTRFS_LIMIT=("100")
+* GRUB_BTRFS_LIMIT="100"
 
-    (Limit the number of snapshots populated in the GRUB menu.)
+	(Limit the number of snapshots populated in the GRUB menu.)
 
-* GRUB_BTRFS_SUBVOLUME_SORT=("descending")
+* GRUB_BTRFS_SUBVOLUME_SORT="descending"
 
-    (Sort the found subvolumes by newest first ("descending") or oldest first
-("ascending"). If "ascending" is chosen then the $GRUB_BTRFS_LIMIT oldest
-subvolumes will populate the menu.)
+	(Sort the found subvolumes by newest first ("descending") or oldest first ("ascending"). 
+	If "ascending" is chosen then the $GRUB_BTRFS_LIMIT oldest
+	subvolumes will populate the menu.)
+
+* GRUB_BTRFS_SHOW_SNAPSHOTS_FOUND="true"
+	
+	(Show snapshots found during run "grub-mkconfig") 
+	
+* GRUB_BTRFS_SHOW_TOTAL_SNAPSHOTS_FOUND="true"
+	
+	(Show Total of snapshots found during run "grub-mkconfig")
+
+
 
 Generate grub.cfg (on Archlinux use grub-mkconfig -o /boot/grub/grub.cfg )
 
@@ -74,7 +84,7 @@ You will see it appear differents entries (e.g : Snapshot: [2014-02-12 11:24:37]
 #### TO DO
 
 * Display name of microcode in menuentry when available
-
+* ignore specific path
 
 
 ## discussion
