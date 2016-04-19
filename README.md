@@ -17,7 +17,7 @@ Simple rollback using snapshots you made previously.
 
 * Automatically Detect if "/boot" is in separate partition.
 
-* Automatically Detect kernel, initramfs and intel microcode in "/boot" directory on snapshots. (For custon name, see below.)
+* Automatically Detect kernel, initramfs and intel microcode in "/boot" directory on snapshots. (For custom name, see below.)
 
 * Automatically Create corresponding "menuentry" in grub.cfg , which ensures a very easy rollback.
 
@@ -44,11 +44,11 @@ Add this lines to /etc/default/grub:
 
 * GRUB_BTRFS_NKERNEL=("vmlinuz-linux")
 
-	(Use only if you have custom kernel name or auto-detect failed.)
+	(Use only if you have a custom kernel name or auto-detect failed.)
 
 * GRUB_BTRFS_NINIT=("initramfs-linux.img" "initramfs-linux-fallback.img")
 
-	(Use only if you have custom initramfs name or auto-detect failed.)
+	(Use only if you have a custom initramfs name or auto-detect failed.)
 
 * GRUB_BTRFS_INTEL_UCODE=("intel-ucode.img")
 
@@ -70,9 +70,9 @@ Add this lines to /etc/default/grub:
 	
 * GRUB_BTRFS_SHOW_TOTAL_SNAPSHOTS_FOUND="true"
 	
-	(Show Total of snapshots found during run "grub-mkconfig")
+	(Show Total number of snapshots found during run "grub-mkconfig")
 
-* GRUB_BTRFS_IGNORE_SPECIFIC_PATH=("var/lib/docker" "nosapshot")
+* GRUB_BTRFS_IGNORE_SPECIFIC_PATH=("var/lib/docker" "nosnapshot")
 
 	(Ignore specific path during run "grub-mkconfig")
 
