@@ -78,6 +78,7 @@ Add this lines to /etc/default/grub:
 
 
 
+
 Generate grub.cfg (on Archlinux use grub-mkconfig -o /boot/grub/grub.cfg )
 
 grub-btrfs automatically generates snapshots entries.
@@ -88,7 +89,6 @@ You will see it appear differents entries (e.g : Snapshot: [2014-02-12 11:24:37]
 #### TO DO
 
 * Display name of microcode in menuentry when available
-* ignore specific path
 
 
 ## discussion
