@@ -73,6 +73,7 @@ Add this lines to /etc/default/grub:
 	(Show Total of snapshots found during run "grub-mkconfig")
 
 * GRUB_BTRFS_IGNORE_SPECIFIC_PATH=("var/lib/docker" "nosapshot")
+
 	(Ignore specific path during run "grub-mkconfig")
 
 
