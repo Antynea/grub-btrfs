@@ -274,6 +274,8 @@ list_kernels_initramfs()
 	IFS=$'\n'
 	count_limit_snap=0
 	for item in $(snapshot_list); do
+		### fix: limit_snap_show=0
+		[[ ${limit_snap_show} -le 0 ]] && break;
 		IFS=$oldIFS
 		item=($item)
 		snap_dir_name=${item[@]:2:${#item[@]}}
@@ -314,11 +316,9 @@ list_kernels_initramfs()
 		title_format
 		# echo "${title_menu[*]}"
 		snapshots_entry
-	### Limit snapshots found during run "grub-mkconfig"
-        count_limit_snap=$((1+$count_limit_snap))
-        if [[ $count_limit_snap -gt $limit_snap_show ]]; then
-            break;
-        fi
+		### Limit snapshots found during run "grub-mkconfig"
+	        count_limit_snap=$((1+$count_limit_snap))
+	        [[ $count_limit_snap -ge $limit_snap_show ]] && break;
 	done
 	IFS=$oldIFS
 }
