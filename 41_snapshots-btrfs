@@ -114,7 +114,7 @@ root_uuid=$(${grub_probe} "/" --target="fs_uuid" 2>/dev/null)
 ## Parameters passed to the kernel
 kernel_parameters="$GRUB_CMDLINE_LINUX $GRUB_CMDLINE_LINUX_DEFAULT"
 ## Mount point location
-gbgmp="/tmp/gbgmp"
+gbgmp=$(mktemp -d)
 ## Class for theme
 CLASS="--class snapshots --class gnu-linux --class gnu --class os"
 ## save IFS
