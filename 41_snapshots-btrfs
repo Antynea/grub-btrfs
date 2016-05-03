@@ -40,6 +40,8 @@
 #	(Use only if you have custom intel-ucode or auto-detect failed.)		    							#
 # * GRUB_BTRFS_IGNORE_SPECIFIC_PATH=("var/lib/docker" "nosapshot")										#
 #	(Ignore specific path during run "grub-mkconfig")											#
+# * GRUB_BTRFS_CREATE_ONLY_HARMONIZED_ENTRIES="false"												#
+#	(Create entries with matching version number instead of all possible combinations of kernel and initramfs)				#
 #																		#
 # - Generate grub.cfg (on Archlinux use grub-mkconfig -o /boot/grub/grub.cfg)									#
 #																		#
@@ -95,6 +97,8 @@ show_snap_found=${GRUB_BTRFS_SHOW_SNAPSHOTS_FOUND:-"true"}
 show_total_snap_found=${GRUB_BTRFS_SHOW_TOTAL_SNAPSHOTS_FOUND:-"true"}
 ## Ignore specific path during run "grub-mkconfig"
 ignore_specific_path=("${GRUB_BTRFS_IGNORE_SPECIFIC_PATH[@]}")
+## create only entries with harmonized version numbers
+harmonized_entries=${GRUB_BTRFS_CREATE_ONLY_HARMONIZED_ENTRIES:-"false"}
 
 
 ########################
@@ -114,7 +118,7 @@ root_uuid=$(${grub_probe} "/" --target="fs_uuid" 2>/dev/null)
 ## Parameters passed to the kernel
 kernel_parameters="$GRUB_CMDLINE_LINUX $GRUB_CMDLINE_LINUX_DEFAULT"
 ## Mount point location
-gbgmp="/tmp/gbgmp"
+gbgmp=$(mktemp -d)
 ## Class for theme
 CLASS="--class snapshots --class gnu-linux --class gnu --class os"
 ## save IFS
@@ -173,6 +177,63 @@ snapshots_entry()
 		echo "		}"
 			done
 		done
+	done
+	echo "	}"
+}
+
+harmonized_snapshots_entry()
+{
+## \" required for snap,kernels,init,microcode with space in their name
+	echo "	submenu '"${title_menu[*]}"' {
+		submenu '---> "${title_menu[*]}" <---' { echo }
+	"
+	for k in "${name_kernel[@]}"; do
+		version=${k#vmlinuz-}
+		
+		i=""
+		if [[ -e "$(boot_dir)"/initramfs-${version} ]]; then
+			i=initramfs-${version}
+		else
+			if [[ -e "$(boot_dir)"/initrd.img-${version} ]]; then
+				i=initrd.img-${version}
+			fi
+		fi
+		
+		u=""
+		if [ -f "$(boot_dir)"/intel-ucode.img ]; then
+			u=intel-ucode.img
+		fi
+		
+		
+		echo "\
+		menuentry '"${k}"' ${CLASS} "\$menuentry_id_option" 'gnulinux-snapshots-$boot_uuid'{
+			$(save_default_entry)
+			if [ x\$feature_all_video_module = xy ]; then
+				insmod all_video
+			fi
+			set gfxpayload=keep
+			insmod ${boot_fs}
+			if [ x\$feature_platform_search_hint = xy ]; then
+				search --no-floppy --fs-uuid  --set=root ${hs_boot} ${boot_uuid}
+			else
+				search --no-floppy --fs-uuid  --set=root ${boot_uuid}
+			fi
+			echo 'Loading Snapshot: "${snap_date_time}" "${snap_dir_name}"'
+			echo 'Loading Kernel: "${k}" ...'
+			linux \"${boot_dir_real_path}/"${k}"\" root=UUID=${root_uuid} rw rootflags=subvol=\""${snap_dir_name}"\" ${kernel_parameters}\
+			"
+			if [[ ! -z ${i} ]]; then
+				if [ ! -z ${u} ] ; then
+					echo "\
+			echo 'Loading Microcode & Initramfs: "${u}" "${i}" ...'
+			initrd \"${boot_dir_real_path}/"${u}"\" \"${boot_dir_real_path}/"${i}"\""
+				else
+					echo "\
+			echo 'Loading Initramfs: "${i}" ...'
+			initrd \"${boot_dir_real_path}/"${i}"\""
+				fi
+			fi
+		echo "		}"
 	done
 	echo "	}"
 }
@@ -297,16 +358,19 @@ list_kernels_initramfs()
 		detect_kernel
 		name_kernel=("${list_kernel[@]##*"/"}")
 		# echo "kernel = ${name_kernel[*]}"
-		### Initramfs (autodetect + custom initramfs)
-		unset list_initramfs
-		detect_initramfs
-		name_initramfs=("${list_initramfs[@]##*"/"}")
-		# echo "initramfs = ${name_initramfs[*]}"
-		### microcode (auto-detect + custom microcode)
-		unset list_ucode
-		detect_microcode
-		name_microcode=("${list_ucode[@]##*"/"}")
-		# echo "ucode = ${name_microcode[*]}"
+		
+		if [[ "${harmonized_entries}" = "false" ]]; then
+			### Initramfs (autodetect + custom initramfs)
+			unset list_initramfs
+			detect_initramfs
+			name_initramfs=("${list_initramfs[@]##*"/"}")
+			# echo "initramfs = ${name_initramfs[*]}"
+			### microcode (auto-detect + custom microcode)
+			unset list_ucode
+			detect_microcode
+			name_microcode=("${list_ucode[@]##*"/"}")
+			# echo "ucode = ${name_microcode[*]}"
+		fi
 		### real path to boot
 		boot_dir_real_path="$(make_system_path_relative_to_its_root "$(boot_dir)")"
 		### Create menu entries
@@ -315,7 +379,11 @@ list_kernels_initramfs()
 		## title menu custom
 		title_format
 		# echo "${title_menu[*]}"
-		snapshots_entry
+		if [[ "${harmonized_entries}" = "false" ]]; then
+			snapshots_entry
+		else
+			harmonized_snapshots_entry
+		fi
 		### Limit snapshots found during run "grub-mkconfig"
 	        count_limit_snap=$((1+$count_limit_snap))
 	        [[ $count_limit_snap -ge $limit_snap_show ]] && break;
