@@ -76,6 +76,8 @@ Add this lines to /etc/default/grub:
 
 	(Ignore specific path during run "grub-mkconfig")
 
+* GRUB_BTRFS_CREATE_ONLY_HARMONIZED_ENTRIES="false"
+	(Create entries with matching version number instead of all possible combinations of kernel and initramfs)
 
 
 
