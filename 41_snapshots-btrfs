@@ -69,8 +69,10 @@ sysconfdir="/etc"
 ######################################
 ### Variables in /etc/default/grub ###
 ######################################
+## current distro string
+distro_string="Arch Linux"
 ## Submenu name
-submenuname=${GRUB_BTRFS_SUBMENUNAME:-"ArchLinux Snapshots"}
+submenuname=${GRUB_BTRFS_SUBMENUNAME:-"${distro_string}"}
 ## Prefix entry
 prefixentry=${GRUB_BTRFS_PREFIXENTRY:-"Snapshot:"}
 ## Show full path snapshot or only name
@@ -107,6 +109,7 @@ harmonized_entries=${GRUB_BTRFS_CREATE_ONLY_HARMONIZED_ENTRIES:-"false"}
 ## Internationalization (default : english)
 export TEXTDOMAIN=grub-btrfs-git
 export TEXTDOMAINDIR="/usr/share/locale"
+
 ## hints string
 hs_boot=$(${grub_probe} --target="hints_string" "/boot" 2>/dev/null)
 ## UUID of the boot partition
@@ -275,7 +278,7 @@ detect_kernel()
 	done
 
 	## Custom name kernel in GRUB_BTRFS_NKERNEL
-	if [ ! -z "${nkernel}" ] ; then
+	if [ ! -z "${nkernel}" ] && [ "$1" == "${distro_string}" ] ; then
 		for ckernel in "${nkernel[@]}" ; do
 			[[ ! -f /"$(boot_dir)"/"${ckernel}" ]] && continue;
 			list_kernel+=("$ckernel")
@@ -293,7 +296,7 @@ detect_initramfs()
 	done
 	
 	## Custom name initramfs in GRUB_BTRFS_NINIT
-	if [ ! -z "$ninit" ] ; then
+	if [ ! -z "$ninit" ] && [ "$1" == "${distro_string}" ] ; then
 		for cinitramfs in "${ninit[@]}" ; do
 			[[ ! -f /"$(boot_dir)"/"${cinitramfs}" ]] && continue;
 			list_initramfs+=("$cinitramfs")
@@ -360,18 +363,27 @@ list_kernels_initramfs()
 		item=($item)
 		snap_dir_name=${item[@]:2:${#item[@]}}
 		
-		CURR_DISTRO="$(get_distro "${gbgmp}"/"${snap_dir_name}")"
+		distro="$(get_distro "${gbgmp}"/"${snap_dir_name}")"
+			
+		if [ "${distro}" == "${distro_string}" ]; then
+			CURR_DISTRO="${submenuname}"
+		else
+			CURR_DISTRO="${distro}"
+		fi
+		
+		#unset the variable
+		unset distro
 		
 		#### Create a menu in grub
 		
 		if [ "${PREV_DISTRO}" == "none" ]; then
-			echo "submenu '$(get_distro "${gbgmp}"/"${snap_dir_name}") Snapshots' {"
+			echo "submenu '${CURR_DISTRO} Snapshots' {"
 			PREV_DISTRO=$CURR_DISTRO
 		fi
 		
 		if [ "${PREV_DISTRO}" != "${CURR_DISTRO}" ]; then
 			echo "}"
-			echo "submenu '$(get_distro "${gbgmp}"/"${snap_dir_name}") Snapshots' {"
+			echo "submenu '${CURR_DISTRO} Snapshots' {"
 		fi
 		
 		### ignore specific path during run "grub-mkconfig"
@@ -389,14 +401,14 @@ list_kernels_initramfs()
 		fi
 		### Kernel (auto-detect + custom kernel)
 		unset list_kernel
-		detect_kernel
+		detect_kernel CURR_DISTRO
 		name_kernel=("${list_kernel[@]##*"/"}")
 		# echo "kernel = ${name_kernel[*]}"
 		
 		if [[ "${harmonized_entries}" = "false" ]]; then
 			### Initramfs (autodetect + custom initramfs)
 			unset list_initramfs
-			detect_initramfs
+			detect_initramfs CURR_DISTRO
 			name_initramfs=("${list_initramfs[@]##*"/"}")
 			# echo "initramfs = ${name_initramfs[*]}"
 			### microcode (auto-detect + custom microcode)
@@ -416,7 +428,7 @@ list_kernels_initramfs()
 		if [[ "${harmonized_entries}" = "false" ]]; then
 		
 			#check if the distro running isn't arch so we disable multi-initrd entries.
-			if [ "${CURR_DISTRO}" == "Arch Linux" ]; then
+			if [ "${CURR_DISTRO}" == "${distro_string}" ]; then
 				snapshots_entry
 			else
 				harmonized_snapshots_entry
