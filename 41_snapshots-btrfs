@@ -69,8 +69,10 @@ sysconfdir="/etc"
 ######################################
 ### Variables in /etc/default/grub ###
 ######################################
+## current distro string
+distro_string="Arch Linux"
 ## Submenu name
-submenuname=${GRUB_BTRFS_SUBMENUNAME:-"ArchLinux Snapshots"}
+submenuname=${GRUB_BTRFS_SUBMENUNAME:-"${distro_string}"}
 ## Prefix entry
 prefixentry=${GRUB_BTRFS_PREFIXENTRY:-"Snapshot:"}
 ## Show full path snapshot or only name
@@ -107,6 +109,7 @@ harmonized_entries=${GRUB_BTRFS_CREATE_ONLY_HARMONIZED_ENTRIES:-"false"}
 ## Internationalization (default : english)
 export TEXTDOMAIN=grub-btrfs-git
 export TEXTDOMAINDIR="/usr/share/locale"
+
 ## hints string
 hs_boot=$(${grub_probe} --target="hints_string" "/boot" 2>/dev/null)
 ## UUID of the boot partition
@@ -252,16 +255,30 @@ snapshot_list()
 	done
 }
 
+# Get the distro name on filesystem
+get_distro()
+{
+	
+	if [ -e $1/etc/issue ]; then
+		#Remove unnecessary trailing chars.
+		DIST=$(cat $1/etc/issue | sed s'/\\.//'g | sed s'/[()]//'g)
+	    
+	   fi
+	   
+	echo $DIST
+
+}
+
 ## Detect kernels in "/boot"
 detect_kernel()
 {
 	## Arch original kernel (auto-detect)
-	for akernel in "$(boot_dir)"/vmlinuz-* ; do 
+	for akernel in `ls "$(boot_dir)"/{vmlinuz,vmlinux,linux}-* 2>/dev/null` ; do 
 		list_kernel+=("$akernel")
 	done
 
 	## Custom name kernel in GRUB_BTRFS_NKERNEL
-	if [ ! -z "${nkernel}" ] ; then
+	if [ ! -z "${nkernel}" ] && [ "$1" == "${distro_string}" ] ; then
 		for ckernel in "${nkernel[@]}" ; do
 			[[ ! -f /"$(boot_dir)"/"${ckernel}" ]] && continue;
 			list_kernel+=("$ckernel")
@@ -273,12 +290,13 @@ detect_kernel()
 detect_initramfs()
 {
 	## Arch original initramfs (auto-detect)
-	for ainitramfs in "$(boot_dir)"/initramfs-* ; do 
+	for ainitramfs in `ls "$(boot_dir)"/{initrd.img,initramfs}-* 2>/dev/null` ; do 
+	     
 		list_initramfs+=("$ainitramfs")
 	done
 	
 	## Custom name initramfs in GRUB_BTRFS_NINIT
-	if [ ! -z "$ninit" ] ; then
+	if [ ! -z "$ninit" ] && [ "$1" == "${distro_string}" ] ; then
 		for cinitramfs in "${ninit[@]}" ; do
 			[[ ! -f /"$(boot_dir)"/"${cinitramfs}" ]] && continue;
 			list_initramfs+=("$cinitramfs")
@@ -332,14 +350,42 @@ title_format()
 ## List of kernels, initramfs and microcode in snapshots
 list_kernels_initramfs()
 {
+	#Keep track of the previous distro visited in the loop.
+	PREV_DISTRO="none"
+
 	IFS=$'\n'
 	count_limit_snap=0
 	for item in $(snapshot_list); do
+	
 		### fix: limit_snap_show=0
 		[[ ${limit_snap_show} -le 0 ]] && break;
 		IFS=$oldIFS
 		item=($item)
 		snap_dir_name=${item[@]:2:${#item[@]}}
+		
+		distro="$(get_distro "${gbgmp}"/"${snap_dir_name}")"
+			
+		if [ "${distro}" == "${distro_string}" ]; then
+			CURR_DISTRO="${submenuname}"
+		else
+			CURR_DISTRO="${distro}"
+		fi
+		
+		#unset the variable
+		unset distro
+		
+		#### Create a menu in grub
+		
+		if [ "${PREV_DISTRO}" == "none" ]; then
+			echo "submenu '${CURR_DISTRO} Snapshots' {"
+			PREV_DISTRO=$CURR_DISTRO
+		fi
+		
+		if [ "${PREV_DISTRO}" != "${CURR_DISTRO}" ]; then
+			echo "}"
+			echo "submenu '${CURR_DISTRO} Snapshots' {"
+		fi
+		
 		### ignore specific path during run "grub-mkconfig"
 		if [ ! -z "${ignore_specific_path}" ] ; then
 			for isp in ${ignore_specific_path[@]} ; do
@@ -355,14 +401,14 @@ list_kernels_initramfs()
 		fi
 		### Kernel (auto-detect + custom kernel)
 		unset list_kernel
-		detect_kernel
+		detect_kernel CURR_DISTRO
 		name_kernel=("${list_kernel[@]##*"/"}")
 		# echo "kernel = ${name_kernel[*]}"
 		
 		if [[ "${harmonized_entries}" = "false" ]]; then
 			### Initramfs (autodetect + custom initramfs)
 			unset list_initramfs
-			detect_initramfs
+			detect_initramfs CURR_DISTRO
 			name_initramfs=("${list_initramfs[@]##*"/"}")
 			# echo "initramfs = ${name_initramfs[*]}"
 			### microcode (auto-detect + custom microcode)
@@ -380,14 +426,27 @@ list_kernels_initramfs()
 		title_format
 		# echo "${title_menu[*]}"
 		if [[ "${harmonized_entries}" = "false" ]]; then
-			snapshots_entry
+		
+			#check if the distro running isn't arch so we disable multi-initrd entries.
+			if [ "${CURR_DISTRO}" == "${distro_string}" ]; then
+				snapshots_entry
+			else
+				harmonized_snapshots_entry
+			fi
+			
 		else
 			harmonized_snapshots_entry
 		fi
 		### Limit snapshots found during run "grub-mkconfig"
 	        count_limit_snap=$((1+$count_limit_snap))
 	        [[ $count_limit_snap -ge $limit_snap_show ]] && break;
+	    
+	    PREV_DISTRO=$CURR_DISTRO
 	done
+	
+	#terminate the last submenu entry
+	echo "}"
+	
 	IFS=$oldIFS
 }
 ### END auto detect ###
@@ -397,9 +456,10 @@ list_kernels_initramfs()
 	### create mount point and mounts
 	[[ ! -d $gbgmp ]] && mkdir -p $gbgmp
 	mount -o subvolid=0 /dev/disk/by-uuid/$root_uuid $gbgmp/
+
 	### Create a menu in grub
-	echo "submenu '${submenuname}' {"
 	list_kernels_initramfs ;
+
 	## show total found snapshots
 	if [[ "${show_total_snap_found}" = "true" ]]; then
 	gettext_printf "# found ${count_limit_snap} snapshot(s)\n" >&2 ;
@@ -409,7 +469,7 @@ list_kernels_initramfs()
 		echo " submenu '---> "No snapshot found : Press ESC to return previous menu" <---' { echo } ";
 		gettext_printf "# No snapshot found \n# make sure you have at least one snapshot \n# or please file a bug report at \"https://github.com/Antynea/grub-btrfs\"\n" >&2 ;
 	fi
-	echo "}"
+	
 	## unmount mount point
 	umount $gbgmp
 	gettext_printf "###### - Grub-btrfs: Auto-detect End   - ######\n" >&2 ;
