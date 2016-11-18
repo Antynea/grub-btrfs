@@ -346,7 +346,7 @@ list_kernels_initramfs()
 				[[ "${gbgmp}"/"${snap_dir_name}" == "${gbgmp}"/"${isp}"/* ]] && continue 2;
 			done
 		fi
-		### detect if /boot directory exist
+		### detect if /boot directory exists
 		[[ ! -d "$gbgmp/$snap_dir_name/boot" ]] && continue;
 		### show snapshot found during run "grub-mkconfig"
 		snap_date_time=${item[@]:0:2}
