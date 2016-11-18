@@ -38,7 +38,7 @@
 #	(Use only if you have custom initramfs name or auto-detect failed.)									#
 # * GRUB_BTRFS_INTEL_UCODE=("intel-ucode.img") 													#
 #	(Use only if you have custom intel-ucode or auto-detect failed.)		    							#
-# * GRUB_BTRFS_IGNORE_SPECIFIC_PATH=("var/lib/docker" "nosapshot")										#
+# * GRUB_BTRFS_IGNORE_SPECIFIC_PATH=("var/lib/docker" "nosnapshot")										#
 #	(Ignore specific path during run "grub-mkconfig")											#
 # * GRUB_BTRFS_CREATE_ONLY_HARMONIZED_ENTRIES="false"												#
 #	(Create entries with matching version number instead of all possible combinations of kernel and initramfs)				#
@@ -346,7 +346,7 @@ list_kernels_initramfs()
 				[[ "${gbgmp}"/"${snap_dir_name}" == "${gbgmp}"/"${isp}"/* ]] && continue 2;
 			done
 		fi
-		### detect if /boot directory exist
+		### detect if /boot directory exists
 		[[ ! -d "$gbgmp/$snap_dir_name/boot" ]] && continue;
 		### show snapshot found during run "grub-mkconfig"
 		snap_date_time=${item[@]:0:2}
@@ -374,7 +374,7 @@ list_kernels_initramfs()
 		### real path to boot
 		boot_dir_real_path="$(make_system_path_relative_to_its_root "$(boot_dir)")"
 		### Create menu entries
-		## name snpashot
+		## name snapshot
 		path_snapshot
 		## title menu custom
 		title_format
@@ -396,7 +396,7 @@ list_kernels_initramfs()
 	gettext_printf "###### - Grub-btrfs: Auto-detect Start - ######\n" >&2 ;
 	### create mount point and mounts
 	[[ ! -d $gbgmp ]] && mkdir -p $gbgmp
-	mount -o subvolid=0 /dev/disk/by-uuid/$root_uuid $gbgmp/
+	mount -o subvolid=5 /dev/disk/by-uuid/$root_uuid $gbgmp/
 	### Create a menu in grub
 	echo "submenu '${submenuname}' {"
 	list_kernels_initramfs ;
