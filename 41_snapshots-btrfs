@@ -43,9 +43,9 @@
 # * GRUB_BTRFS_CREATE_ONLY_HARMONIZED_ENTRIES="false"												#
 #	(Create entries with matching version number instead of all possible combinations of kernel and initramfs)				#
 # * GRUB_BTRFS_SNAPPER_SUPPORT="false"														#
-#	(Enables the support for Snapper )													#
-# * GRUB_BTRFS_SNAPPER_CONFIG="root"					  										#
-#	(Use only if you enable the support for Snapper )											#
+#	(Enables the support for Snapper)													#
+# * GRUB_BTRFS_SNAPPER_CONFIG="root"				  										#
+#	(Use only if you enable the support for Snapper)											#
 #																		#
 # - Generate grub.cfg (on Archlinux use grub-mkconfig -o /boot/grub/grub.cfg)									#
 #																		#
@@ -262,8 +262,10 @@ snapshot_list()
 			# Discard deleted snapshots
 			if [ "$snap_path_name" = "DELETED" ]; then continue; fi
 			[[ ${snap_path_name%%"/"*} == "<FS_TREE>" ]] && snap_path_name=${snap_path_name#*"/"}
+			#get the id from the snapshot path name (remove anything non-numeric)
+			snap_id="${snap_path_name//[!0-9]}"
 			for id in "${snapper_snapshots_ids[@]}"; do
-				if echo $snap_path_name | grep $id; then
+				if [ $snap_id = $id ]; then
 					echo ${snap[@]:10:2} ${snap_path_name}
 				fi
 			done
