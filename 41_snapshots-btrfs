@@ -42,6 +42,10 @@
 #	(Ignore specific path during run "grub-mkconfig")											#
 # * GRUB_BTRFS_CREATE_ONLY_HARMONIZED_ENTRIES="false"												#
 #	(Create entries with matching version number instead of all possible combinations of kernel and initramfs)				#
+# * GRUB_BTRFS_SNAPPER_SUPPORT="false"														#
+#	(Enables the support for Snapper)													#
+# * GRUB_BTRFS_SNAPPER_CONFIG="root"				  										#
+#	(Use only if you enable the support for Snapper)											#
 #																		#
 # - Generate grub.cfg (on Archlinux use grub-mkconfig -o /boot/grub/grub.cfg)									#
 #																		#
@@ -99,6 +103,10 @@ show_total_snap_found=${GRUB_BTRFS_SHOW_TOTAL_SNAPSHOTS_FOUND:-"true"}
 ignore_specific_path=("${GRUB_BTRFS_IGNORE_SPECIFIC_PATH[@]}")
 ## create only entries with harmonized version numbers
 harmonized_entries=${GRUB_BTRFS_CREATE_ONLY_HARMONIZED_ENTRIES:-"false"}
+## enable the support for Snapper
+snapper_support=${GRUB_BTRFS_SNAPPER_SUPPORT:-"false"}
+## Snapper config name for the root partition
+snapper_config=${GRUB_BTRFS_SNAPPER_CONFIG:-"root"}
 
 
 ########################
@@ -245,15 +253,39 @@ harmonized_snapshots_entry()
 ## List of snapshots on filesystem
 snapshot_list()
 {
-	for snap in $(btrfs subvolume list -sa "${btrfssubvolsort}" /); do
-		IFS=$oldIFS
-		snap=($snap)
-		local snap_path_name=${snap[@]:13:${#snap[@]}}
-		# Discard deleted snapshots
-		if [ "$snap_path_name" = "DELETED" ]; then continue; fi
-		[[ ${snap_path_name%%"/"*} == "<FS_TREE>" ]] && snap_path_name=${snap_path_name#*"/"}
-		echo ${snap[@]:10:2} ${snap_path_name}
-	done
+
+	if [ "$snapper_support" = true ]; then
+		local snapper_snapshots_ids=($(snapper -t 0 -c "$snapper_config" list -t single | tail -n +3 | cut -d'|' -f 1))
+		local snapper_subvol=$(grep SUBVOLUME /etc/snapper/configs/$snapper_config) 
+		snapper_subvol=${snapper_subvol#*"\""}
+		snapper_subvol=${snapper_subvol%*"\""}
+		for snap in $(btrfs subvolume list -sa "${btrfssubvolsort}" "$snapper_subvol"); do
+			IFS=$oldIFS
+			snap=($snap)
+			local snap_path_name=${snap[@]:13:${#snap[@]}}
+			# Discard deleted snapshots
+			if [ "$snap_path_name" = "DELETED" ]; then continue; fi
+			[[ ${snap_path_name%%"/"*} == "<FS_TREE>" ]] && snap_path_name=${snap_path_name#*"/"}
+			#get the id from the snapshot path name (remove anything non-numeric)
+			snap_id="${snap_path_name//[!0-9]}"
+			for id in "${snapper_snapshots_ids[@]}"; do
+				if [ $snap_id = $id ]; then
+					echo ${snap[@]:10:2} ${snap_path_name}
+				fi
+			done
+		done
+	else
+		for snap in $(btrfs subvolume list -sa "${btrfssubvolsort}" /); do
+			IFS=$oldIFS
+			snap=($snap)
+			local snap_path_name=${snap[@]:13:${#snap[@]}}
+			# Discard deleted snapshots
+			if [ "$snap_path_name" = "DELETED" ]; then continue; fi
+			[[ ${snap_path_name%%"/"*} == "<FS_TREE>" ]] && snap_path_name=${snap_path_name#*"/"}
+			echo ${snap[@]:10:2} ${snap_path_name}
+		done
+
+	fi
 }
 
 ## Detect kernels in "/boot"

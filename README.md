@@ -79,7 +79,13 @@ Add this lines to /etc/default/grub:
 
 	(Create entries with matching version number instead of all possible combinations of kernel and initramfs)
 
+* GRUB_BTRFS_SNAPPER_SUPPORT="false"
 
+	(Enables the support for Snapper)
+
+* GRUB_BTRFS_SNAPPER_CONFIG="root"
+
+	(Use only if you enable the support for Snapper)
 
 Generate grub.cfg (on Archlinux use grub-mkconfig -o /boot/grub/grub.cfg )
 
@@ -94,4 +100,4 @@ You will see it appear differents entries (e.g : Snapshot: [2014-02-12 11:24:37]
 
 
 ## discussion
-Pour les francophones : https://forums.archlinux.fr/viewtopic.php?f=18&t=17177
+our les francophones : https://forums.archlinux.fr/viewtopic.php?f=18&t=17177
