@@ -90,7 +90,7 @@ You will see it appear differents entries (e.g : Snapshot: [2014-02-12 11:24:37]
 
 #### TO DO
 
-* Display name of microcode in menuentry when available
+* Snapper support
 
 
 ## discussion

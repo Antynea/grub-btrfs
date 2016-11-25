@@ -51,7 +51,7 @@
 #																		#
 # To do:																	#
 #																		#
-#	* Display name of microcode in menuentry when available											#
+#	* Snapper support ....															#
 #																		#
 #################################################################################################################################################
 
@@ -148,8 +148,14 @@ snapshots_entry()
 	for k in "${name_kernel[@]}"; do
 		for i in "${name_initramfs[@]}"; do
 			for u in "${name_microcode[@]}"; do
+			if [ -f "$(boot_dir)"/"${u}" ] ; then
+				echo "\
+		menuentry '"${k}" & "${i}" & "${u}"' ${CLASS} "\$menuentry_id_option" 'gnulinux-snapshots-$boot_uuid'{"
+			else 
+				echo "\
+		menuentry '"${k}" & "${i}"' ${CLASS} "\$menuentry_id_option" 'gnulinux-snapshots-$boot_uuid'{"
+			fi
 			echo "\
-		menuentry '"${k}" & "${i}"' ${CLASS} "\$menuentry_id_option" 'gnulinux-snapshots-$boot_uuid'{
 			$(save_default_entry)
 			if [ x\$feature_all_video_module = xy ]; then
 				insmod all_video
@@ -163,8 +169,7 @@ snapshots_entry()
 			fi
 			echo 'Loading Snapshot: "${snap_date_time}" "${snap_dir_name}"'
 			echo 'Loading Kernel: "${k}" ...'
-			linux \"${boot_dir_real_path}/"${k}"\" root=UUID=${root_uuid} rw rootflags=subvol=\""${snap_dir_name}"\" ${kernel_parameters}\
-			"
+			linux \"${boot_dir_real_path}/"${k}"\" root=UUID=${root_uuid} rw rootflags=subvol=\""${snap_dir_name}"\" ${kernel_parameters}"
 			if [ -f "$(boot_dir)"/"${u}" ] ; then
 				echo "\
 			echo 'Loading Microcode & Initramfs: "${u}" "${i}" ...'
@@ -189,24 +194,23 @@ harmonized_snapshots_entry()
 	"
 	for k in "${name_kernel[@]}"; do
 		version=${k#vmlinuz-}
-		
 		i=""
-		if [[ -e "$(boot_dir)"/initramfs-${version} ]]; then
-			i=initramfs-${version}
+		if [ -f "$(boot_dir)"/initramfs-"${version}".img ]; then
+			i=initramfs-${version}.img
 		else
-			if [[ -e "$(boot_dir)"/initrd.img-${version} ]]; then
+			if [ -f "$(boot_dir)"/initrd.img-"${version}" ]; then
 				i=initrd.img-${version}
 			fi
 		fi
-		
-		u=""
-		if [ -f "$(boot_dir)"/intel-ucode.img ]; then
-			u=intel-ucode.img
-		fi
-		
-		
-		echo "\
-		menuentry '"${k}"' ${CLASS} "\$menuentry_id_option" 'gnulinux-snapshots-$boot_uuid'{
+		for u in "${name_microcode[@]}"; do
+			if [ -f "$(boot_dir)"/"${u}" ] ; then
+				echo "\
+		menuentry '"${k}" & "${i}" & "${u}"' ${CLASS} "\$menuentry_id_option" 'gnulinux-snapshots-$boot_uuid'{"
+			else 
+				echo "\
+		menuentry '"${k}" & "${i}"' ${CLASS} "\$menuentry_id_option" 'gnulinux-snapshots-$boot_uuid'{"
+			fi
+			echo "\
 			$(save_default_entry)
 			if [ x\$feature_all_video_module = xy ]; then
 				insmod all_video
@@ -220,10 +224,9 @@ harmonized_snapshots_entry()
 			fi
 			echo 'Loading Snapshot: "${snap_date_time}" "${snap_dir_name}"'
 			echo 'Loading Kernel: "${k}" ...'
-			linux \"${boot_dir_real_path}/"${k}"\" root=UUID=${root_uuid} rw rootflags=subvol=\""${snap_dir_name}"\" ${kernel_parameters}\
-			"
-			if [[ ! -z ${i} ]]; then
-				if [ ! -z ${u} ] ; then
+			linux \"${boot_dir_real_path}/"${k}"\" root=UUID=${root_uuid} rw rootflags=subvol=\""${snap_dir_name}"\" ${kernel_parameters}"
+			if [ -f "$(boot_dir)"/"${i}" ] ; then
+				if [ -f "$(boot_dir)"/"${u}" ] ; then
 					echo "\
 			echo 'Loading Microcode & Initramfs: "${u}" "${i}" ...'
 			initrd \"${boot_dir_real_path}/"${u}"\" \"${boot_dir_real_path}/"${i}"\""
@@ -233,7 +236,8 @@ harmonized_snapshots_entry()
 			initrd \"${boot_dir_real_path}/"${i}"\""
 				fi
 			fi
-		echo "		}"
+			echo "		}"
+		done
 	done
 	echo "	}"
 }
@@ -358,19 +362,18 @@ list_kernels_initramfs()
 		detect_kernel
 		name_kernel=("${list_kernel[@]##*"/"}")
 		# echo "kernel = ${name_kernel[*]}"
-		
-		if [[ "${harmonized_entries}" = "false" ]]; then
+		if [[ "${harmonized_entries}" != "true" ]]; then
 			### Initramfs (autodetect + custom initramfs)
 			unset list_initramfs
 			detect_initramfs
 			name_initramfs=("${list_initramfs[@]##*"/"}")
 			# echo "initramfs = ${name_initramfs[*]}"
-			### microcode (auto-detect + custom microcode)
-			unset list_ucode
-			detect_microcode
-			name_microcode=("${list_ucode[@]##*"/"}")
-			# echo "ucode = ${name_microcode[*]}"
 		fi
+		### microcode (auto-detect + custom microcode)
+		unset list_ucode
+		detect_microcode
+		name_microcode=("${list_ucode[@]##*"/"}")
+		# echo "ucode = ${name_microcode[*]}"
 		### real path to boot
 		boot_dir_real_path="$(make_system_path_relative_to_its_root "$(boot_dir)")"
 		### Create menu entries
