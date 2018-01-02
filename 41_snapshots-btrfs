@@ -256,11 +256,11 @@ snapshot_list()
 	# Query info from snapper if it is installed
 	type snapper >/dev/null 2>&1
 	if [[ $? -eq 0 ]]; then
-		local snapper_ids=($(snapper -t 0 list | tail -n +3 | cut -d'|' -f 2))
-		local snapper_types=($(snapper -t 0 list | tail -n +3 | cut -d'|' -f 1))
+		local snapper_ids=($(snapper -t 0 list -a | tail -n +3 | cut -d'|' -f 2))
+		local snapper_types=($(snapper -t 0 list -a | tail -n +3 | cut -d'|' -f 1))
 
 		IFS=$'\n'
-		local snapper_descriptions=($(snapper -t 0 list | tail -n +3 | cut -d'|' -f 7))
+		local snapper_descriptions=($(snapper -t 0 list -a | tail -n +3 | cut -d'|' -f 7))
 	fi
 
 	IFS=$'\n'
