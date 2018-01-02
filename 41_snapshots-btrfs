@@ -15,7 +15,7 @@
 # How to use it:																#
 # - Add this lines to /etc/default/grub:													#
 #																		#
-# * GRUB_BTRFS_SUBMENUNAME="ArchLinux Snapshots" 												#
+# * GRUB_BTRFS_SUBMENUNAME="Arch Linux snapshots" 												#
 #	(Name appearing in the Grub menu.)													#
 # * GRUB_BTRFS_PREFIXENTRY="Snapshot:"        		   											#
 #	(Add a name ahead your snapshots entries in the Grub menu.) 										#
@@ -43,7 +43,7 @@
 # * GRUB_BTRFS_CREATE_ONLY_HARMONIZED_ENTRIES="false"												#
 #	(Create entries with matching version number instead of all possible combinations of kernel and initramfs)				#
 #																		#
-# - Generate grub.cfg (on Archlinux use grub-mkconfig -o /boot/grub/grub.cfg)									#
+# - Generate grub.cfg (on Arch Linux use grub-mkconfig -o /boot/grub/grub.cfg)									#
 #																		#
 # - grub-btrfs automatically generates snapshots entries.											#
 # - You will see it appear different entries (e.g : Snapshot: [2014-02-12 11:24:37] my snapshot name overkill)					#
@@ -70,7 +70,7 @@ sysconfdir="/etc"
 ### Variables in /etc/default/grub ###
 ######################################
 ## Submenu name
-submenuname=${GRUB_BTRFS_SUBMENUNAME:-"ArchLinux Snapshots"}
+submenuname=${GRUB_BTRFS_SUBMENUNAME:-"Arch Linux snapshots"}
 ## Prefix entry
 prefixentry=${GRUB_BTRFS_PREFIXENTRY:-"Snapshot:"}
 ## Show full path snapshot or only name
@@ -142,8 +142,8 @@ boot_dir()
 snapshots_entry()
 {
 ## \" required for snap,kernels,init,microcode with space in their name
-	echo "	submenu '"${title_menu[*]}"' {
-		submenu '---> "${title_menu[*]}" <---' { echo }
+	echo "	submenu '$title_menu' {
+		submenu '---> $title_menu <---' { echo }
 	"
 	for k in "${name_kernel[@]}"; do
 		for i in "${name_initramfs[@]}"; do
@@ -189,8 +189,8 @@ snapshots_entry()
 harmonized_snapshots_entry()
 {
 ## \" required for snap,kernels,init,microcode with space in their name
-	echo "	submenu '"${title_menu[*]}"' {
-		submenu '---> "${title_menu[*]}" <---' { echo }
+	echo "	submenu '$title_menu' {
+		submenu '---> $title_menu <---' { echo }
 	"
 	for k in "${name_kernel[@]}"; do
 		version=${k#vmlinuz-}
@@ -242,9 +242,33 @@ harmonized_snapshots_entry()
 	echo "	}"
 }
 
+## Trim a string from leading and trailing whitespaces
+trim() {
+	local var="$*"
+	var="${var#"${var%%[![:space:]]*}"}"
+	var="${var%"${var##*[![:space:]]}"}"
+	echo -n "$var"
+}
+
 ## List of snapshots on filesystem
 snapshot_list()
 {
+	# Query info from snapper if it is installed
+	type snapper >/dev/null 2>&1
+	if [[ $? -eq 0 ]]; then
+		local snapper_ids=($(snapper -t 0 list | tail -n +3 | cut -d'|' -f 2))
+		local snapper_types=($(snapper -t 0 list | tail -n +3 | cut -d'|' -f 1))
+
+		IFS=$'\n'
+		local snapper_descriptions=($(snapper -t 0 list | tail -n +3 | cut -d'|' -f 7))
+	fi
+
+	IFS=$'\n'
+
+	# Parse btrfs snapshots
+	local entries=()
+	local ids=()
+	local max_entry_length=0
 	for snap in $(btrfs subvolume list -sa "${btrfssubvolsort}" /); do
 		IFS=$oldIFS
 		snap=($snap)
@@ -252,8 +276,47 @@ snapshot_list()
 		# Discard deleted snapshots
 		if [ "$snap_path_name" = "DELETED" ]; then continue; fi
 		[[ ${snap_path_name%%"/"*} == "<FS_TREE>" ]] && snap_path_name=${snap_path_name#*"/"}
-		echo ${snap[@]:10:2} ${snap_path_name}
+
+		local id="${snap_path_name//[!0-9]}" # brutal way to get id: remove everything non-numeric
+		ids+=("$id")
+
+		local entry="${snap[@]:10:2} | ${snap_path_name}"
+		entries+=("$entry")
+
+		# Find max length of a snapshot entry, needed for pretty formatting
+		local length="${#entry}"
+		[[ "$length" -gt "$max_entry_length" ]] && max_entry_length=$length
 	done
+
+	# Find max length of a snapshot type, needed for pretty formatting
+	local max_type_length=0
+	for id in "${ids[@]}"; do
+		for j in "${!snapper_ids[@]}"; do
+			local snapper_id="${snapper_ids[$j]//[[:space:]]/}"
+			if [[ "$snapper_id" -eq "$id" ]]; then
+				local snapper_type=$(trim "${snapper_types[$j]}")
+				local length="${#snapper_type}"
+				[[ "$length" -gt "$max_type_length" ]] && max_type_length=$length
+			fi
+		done
+	done
+
+	for i in "${!entries[@]}"; do
+		local id="${ids[$i]}"
+		local entry="${entries[$i]}"
+		for j in "${!snapper_ids[@]}"; do
+			local snapper_id="${snapper_ids[$j]//[[:space:]]/}"
+			if [[ "$snapper_id" -eq "$id" ]]; then
+				local snapper_type=$(trim "${snapper_types[$j]}")
+				local snapper_description=$(trim "${snapper_descriptions[$j]}")
+				printf -v entry "%-${max_entry_length}s | %-${max_type_length}s | %s" "$entry" "$snapper_type" "$snapper_description"
+				break
+			fi
+		done
+		echo "$entry"
+	done
+
+	IFS=$oldIFS
 }
 
 ## Detect kernels in "/boot"
@@ -311,8 +374,8 @@ detect_microcode()
 path_snapshot()
 {
 	case "${path_snapshot}" in
-		true) name_snapshot=("${snap_dir_name}");;
-		*) name_snapshot=("${snap_dir_name#*"/"}")
+		true) name_snapshot=("${snap_full_name}");;
+		*) name_snapshot=("${snap_full_name#*"/"}")
 	esac
 }
 
@@ -320,15 +383,15 @@ path_snapshot()
 title_format()
 {
 	case "${title_format}" in
-		p/d/n) 	title_menu=("${prefixentry}" "${snap_date_time}" "${name_snapshot}");;
-		p/n/d) 	title_menu=("${prefixentry}" "${snap_dir_name}" "${snap_date_time}");;
-		p/d) 	title_menu=("${prefixentry}" "${snap_date_time}");;
-		p/n) 	title_menu=("${prefixentry}" "${snap_dir_name}");;
-		d/n) 	title_menu=("${snap_date_time}" "${snap_dir_name}");;
-		n/d) 	title_menu=("${snap_dir_name}" "${snap_date_time}");;
-		p) 	title_menu=("${prefixentry}");;
-		d)	title_menu=("${snap_date_time}");;
-		n)	title_menu=("${snap_dir_name}");;
+		p/d/n) 	title_menu="${prefixentry} ${snap_date_time} ${name_snapshot}";;
+		p/n/d) 	title_menu="${prefixentry} ${name_snapshot} ${snap_date_time}";;
+		p/d) 	title_menu="${prefixentry} ${snap_date_time}";;
+		p/n) 	title_menu="${prefixentry} ${name_snapshot}";;
+		d/n) 	title_menu="${snap_date_time} ${name_snapshot}";;
+		n/d) 	title_menu="${name_snapshot} ${snap_date_time}";;
+		p) 	title_menu="${prefixentry}";;
+		d)	title_menu="${snap_date_time}";;
+		n)	title_menu="${name_snapshot}";;
 		*)	gettext_printf $"# Warning: GRUB_BTRFS_TITLE_FORMAT=${title_format}, syntax error \n" >&2
 	esac
 }
@@ -342,8 +405,10 @@ list_kernels_initramfs()
 		### fix: limit_snap_show=0
 		[[ ${limit_snap_show} -le 0 ]] && break;
 		IFS=$oldIFS
-		item=($item)
-		snap_dir_name=${item[@]:2:${#item[@]}}
+		snap_full_name="$(echo "$item" | cut -d'|' -f2-)" # do not trim it to keep nice formatting
+		snap_dir_name="$(echo "$item" | cut -d'|' -f2)"
+		snap_dir_name="$(trim "$snap_dir_name")"
+
 		### ignore specific path during run "grub-mkconfig"
 		if [ ! -z "${ignore_specific_path}" ] ; then
 			for isp in ${ignore_specific_path[@]} ; do
@@ -353,9 +418,10 @@ list_kernels_initramfs()
 		### detect if /boot directory exists
 		[[ ! -d "$gbgmp/$snap_dir_name/boot" ]] && continue;
 		### show snapshot found during run "grub-mkconfig"
-		snap_date_time=${item[@]:0:2}
+		snap_date_time="$(echo "$item" | cut -d' ' -f1-2)"
+		snap_date_time="$(trim "$snap_date_time")"
 		if [[ "${show_snap_found}" = "true" ]]; then
-		gettext_printf $"# Found Snapshot: %s\n" "${snap_date_time} ${snap_dir_name}" >&2 ;
+		gettext_printf $"# Found snapshot: %s\n" "$item" >&2 ;
 		fi
 		### Kernel (auto-detect + custom kernel)
 		unset list_kernel
@@ -381,7 +447,7 @@ list_kernels_initramfs()
 		path_snapshot
 		## title menu custom
 		title_format
-		# echo "${title_menu[*]}"
+		# echo "${title_menu}"
 		if [[ "${harmonized_entries}" = "false" ]]; then
 			snapshots_entry
 		else
@@ -405,7 +471,7 @@ list_kernels_initramfs()
 	list_kernels_initramfs ;
 	## show total found snapshots
 	if [[ "${show_total_snap_found}" = "true" ]]; then
-	gettext_printf "# found ${count_limit_snap} snapshot(s)\n" >&2 ;
+	gettext_printf "# Found ${count_limit_snap} snapshot(s)\n" >&2 ;
 	fi
 	## if no snapshot found, show a warning 
 	if [[ "${count_limit_snap}" = "0" ]]; then
