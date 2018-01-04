@@ -2,13 +2,13 @@
   
 ### grub-btrfs
 
-This is a version 1.xx of grub-btrfs
+This is a version 2.xx of grub-btrfs
 
 #### Description
 
 grub-btrfs, Include btrfs snapshots at boot options. (grub menu)
 
-#### What does grub-btrfs v1.xx do :
+#### What does grub-btrfs v2.xx do :
 
 Simple rollback using snapshots you made previously.
 
@@ -20,12 +20,14 @@ Simple rollback using snapshots you made previously.
 
 * Automatically Create corresponding "menuentry" in grub.cfg , which ensures a very easy rollback.
 
+* Automatically detect snapper and use snapper's snapshot description if available.
+
 
 #### How to use it:
 
 Add this lines to /etc/default/grub:
 
-* GRUB_BTRFS_SUBMENUNAME="ArchLinux Snapshots"
+* GRUB_BTRFS_SUBMENUNAME="Arch Linux Snapshots"
 
 	(Name menu appearing in grub.)
 
@@ -35,7 +37,7 @@ Add this lines to /etc/default/grub:
 	
 * GRUB_BTRFS_DISPLAY_PATH_SNAPSHOT="true"
 	
-	(Show full path snapshot or only name)
+	(Show full path snapshot or only name, weird reaction with snapper)
 	
 * GRUB_BTRFS_TITLE_FORMAT="p/d/n"
 
@@ -77,20 +79,20 @@ Add this lines to /etc/default/grub:
 
 * GRUB_BTRFS_CREATE_ONLY_HARMONIZED_ENTRIES="false"
 
-	(Create entries with matching version number instead of all possible combinations of kernel and initramfs)
+	(Create entries with matching version number instead of all possible combinations of kernel and initramfs, very useful with debian-like distributions)
 
 
 
-Generate grub.cfg (on Archlinux use grub-mkconfig -o /boot/grub/grub.cfg )
+Generate grub.cfg (on Arch linux use grub-mkconfig -o /boot/grub/grub.cfg )
 
 grub-btrfs automatically generates snapshots entries.
 
-You will see it appear differents entries (e.g : Snapshot: [2014-02-12 11:24:37] my snapshot name overkill )
+You will see it appear differents entries (e.g : Snapshot: 2018-01-03 15:08:41  @test1 )
 
 
 #### TO DO
 
-* Snapper support
+* don't hesitate to ask for improvements
 
 
 ## discussion
