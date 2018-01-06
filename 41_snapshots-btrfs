@@ -293,7 +293,7 @@ snapshot_list()
 	for id in "${ids[@]}"; do
 		for j in "${!snapper_ids[@]}"; do
 			local snapper_id="${snapper_ids[$j]//[[:space:]]/}"
-			if [[ "$snapper_id" -eq "$id" ]]; then
+			if [[ "${snapper_id#0}" -eq "${id#0}" ]]; then
 				local snapper_type=$(trim "${snapper_types[$j]}")
 				local length="${#snapper_type}"
 				[[ "$length" -gt "$max_type_length" ]] && max_type_length=$length
@@ -306,7 +306,7 @@ snapshot_list()
 		local entry="${entries[$i]}"
 		for j in "${!snapper_ids[@]}"; do
 			local snapper_id="${snapper_ids[$j]//[[:space:]]/}"
-			if [[ "$snapper_id" -eq "$id" ]]; then
+			if [[ "${snapper_id#0}" -eq "${id#0}" ]]; then
 				local snapper_type=$(trim "${snapper_types[$j]}")
 				local snapper_description=$(trim "${snapper_descriptions[$j]}")
 				printf -v entry "%-${max_entry_length}s | %-${max_type_length}s | %s" "$entry" "$snapper_type" "$snapper_description"
