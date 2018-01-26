@@ -4,11 +4,11 @@
 
 This is a version 2.xx of grub-btrfs
 ##### BTC donation address: 1Lbvz244WA8xbpHek9W2Y12cakM6rDe5Rt
-
+##
 ### Description
 
 grub-btrfs, Include btrfs snapshots at boot options. (grub menu)
-
+##
 ### What does grub-btrfs v2.xx do :
 
 Simple rollback using snapshots you made previously.
@@ -22,8 +22,7 @@ Simple rollback using snapshots you made previously.
 * Automatically Create corresponding "menuentry" in grub.cfg , which ensures a very easy rollback.
 
 * Automatically detect snapper and use snapper's snapshot description if available.
-
-
+##
 ### How to use it:
 
 Add this lines to /etc/default/grub:
@@ -90,11 +89,11 @@ grub-btrfs automatically generates snapshots entries.
 
 You will see it appear differents entries (e.g : Snapshot: 2018-01-03 15:08:41  @test1 )
 
-
-## discussion
+##
+### Discussion
 Pour les francophones : https://forums.archlinux.fr/viewtopic.php?f=18&t=17177
-
-## Special thanks for assistance and contributions
+##
+### Special thanks for assistance and contributions
 
 * [maximbaz](https://github.com/maximbaz)
 * [crossroads1112](https://github.com/crossroads1112)
@@ -103,3 +102,4 @@ Pour les francophones : https://forums.archlinux.fr/viewtopic.php?f=18&t=17177
 * [Psykar](https://github.com/Psykar)
 * [anyc](https://github.com/anyc)
 * [daftaupe](https://github.com/daftaupe)
+##
