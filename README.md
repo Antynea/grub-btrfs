@@ -1,15 +1,15 @@
 [![GitHub release](https://img.shields.io/github/release/Antynea/grub-btrfs.svg)](https://github.com/Antynea/grub-btrfs)
   
-### grub-btrfs
+## grub-btrfs
 
 This is a version 2.xx of grub-btrfs
 ##### BTC donation address: 1Lbvz244WA8xbpHek9W2Y12cakM6rDe5Rt
 
-#### Description
+### Description
 
 grub-btrfs, Include btrfs snapshots at boot options. (grub menu)
 
-#### What does grub-btrfs v2.xx do :
+### What does grub-btrfs v2.xx do :
 
 Simple rollback using snapshots you made previously.
 
@@ -24,7 +24,7 @@ Simple rollback using snapshots you made previously.
 * Automatically detect snapper and use snapper's snapshot description if available.
 
 
-#### How to use it:
+### How to use it:
 
 Add this lines to /etc/default/grub:
 
@@ -89,11 +89,6 @@ Generate grub.cfg (on Arch linux use grub-mkconfig -o /boot/grub/grub.cfg )
 grub-btrfs automatically generates snapshots entries.
 
 You will see it appear differents entries (e.g : Snapshot: 2018-01-03 15:08:41  @test1 )
-
-
-#### TO DO
-
-* don't hesitate to ask for improvements
 
 
 ## discussion
