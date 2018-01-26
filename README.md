@@ -102,9 +102,15 @@ Pour les francophones : https://forums.archlinux.fr/viewtopic.php?f=18&t=17177
 ## Special thanks for assistance and contributions
 
 [maximbaz](https://github.com/maximbaz)
+
 [crossroads1112](https://github.com/crossroads1112)
+
 [penetal](https://github.com/penetal)
+
 [wesbarnett](https://github.com/wesbarnett)
+
 [Psykar](https://github.com/Psykar)
+
 [anyc](https://github.com/anyc)
+
 [daftaupe](https://github.com/daftaupe)
