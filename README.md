@@ -3,6 +3,7 @@
 ### grub-btrfs
 
 This is a version 2.xx of grub-btrfs
+##### BTC donation address: 1Lbvz244WA8xbpHek9W2Y12cakM6rDe5Rt
 
 #### Description
 
