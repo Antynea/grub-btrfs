@@ -96,6 +96,8 @@ If you would like grub to automatically update when Snapper timeline snapshots a
 - `/etc/systemd/system/snapper-timeline.service.d/`
 - `/etc/systemd/system/snapper-cleanup.service.d/`
 
+Once the configuration files are in place, `systemctl daemon-reload` should be run to reload the units and make the changes active.
+
 ##
 ### Discussion
 Pour les francophones : https://forums.archlinux.fr/viewtopic.php?f=18&t=17177
