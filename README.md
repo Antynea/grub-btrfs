@@ -88,6 +88,15 @@ Generate grub.cfg (on Arch linux use grub-mkconfig -o /boot/grub/grub.cfg )
 grub-btrfs automatically generates snapshots entries.
 
 You will see it appear differents entries (e.g : Snapshot: 2018-01-03 15:08:41  @test1 )
+##
+### Automatically update grub
+
+If you would like grub to automatically update when Snapper timeline snapshots and cleanups occur, simply install `10-update_grub.conf` in the following locations:
+
+- `/etc/systemd/system/snapper-timeline.service.d/`
+- `/etc/systemd/system/snapper-cleanup.service.d/`
+
+Once the configuration files are in place, `systemctl daemon-reload` should be run to reload the units and make the changes active.
 
 ##
 ### Discussion
