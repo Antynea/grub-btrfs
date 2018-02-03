@@ -55,7 +55,7 @@
 #  If you would like grub to automatically update when Snapper timeline snapshots and cleanups occur, simply install 10-update_grub.conf in the following locations:	#
 # - /etc/systemd/system/snapper-timeline.service.d/															#
 # - /etc/systemd/system/snapper-cleanup.service.d/															#
-# Once the configuration files are in place, systemctl daemon-reload should be run to reload the units and make the changes active.					#													#
+# Once the configuration files are in place, systemctl daemon-reload should be run to reload the units and make the changes active.					#
 #																					#
 #########################################################################################################################################################################
 
