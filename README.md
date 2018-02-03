@@ -111,4 +111,5 @@ Pour les francophones : https://forums.archlinux.fr/viewtopic.php?f=18&t=17177
 * [Psykar](https://github.com/Psykar)
 * [anyc](https://github.com/anyc)
 * [daftaupe](https://github.com/daftaupe)
+* [N-Parsons](https://github.com/N-Parsons)
 ##
