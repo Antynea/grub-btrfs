@@ -45,6 +45,8 @@
 #	(Ignore specific path during run "grub-mkconfig")														#
 # * GRUB_BTRFS_CREATE_ONLY_HARMONIZED_ENTRIES="false"															#
 #	(Create entries with matching version number instead of all possible combinations of kernel and initramfs)							#
+# * GRUB_BTRFS_SNAPPER_CONFIG="root"															#
+#	(Snapper's config name to use)							#
 #																					#
 # - Generate grub.cfg (on Arch Linux use grub-mkconfig -o /boot/grub/grub.cfg)												#
 #																					#
@@ -103,6 +105,8 @@ show_total_snap_found=${GRUB_BTRFS_SHOW_TOTAL_SNAPSHOTS_FOUND:-"true"}
 ignore_specific_path=("${GRUB_BTRFS_IGNORE_SPECIFIC_PATH[@]}")
 ## create only entries with harmonized version numbers
 harmonized_entries=${GRUB_BTRFS_CREATE_ONLY_HARMONIZED_ENTRIES:-"false"}
+## snapper's config name
+snapper_config=${GRUB_BTRFS_SNAPPER_CONFIG:-"root"}
 
 
 ########################
@@ -260,11 +264,11 @@ snapshot_list()
 	# Query info from snapper if it is installed
 	type snapper >/dev/null 2>&1
 	if [[ $? -eq 0 ]]; then
-		local snapper_ids=($(snapper -t 0 list -a | tail -n +3 | cut -d'|' -f 2))
-		local snapper_types=($(snapper -t 0 list -a | tail -n +3 | cut -d'|' -f 1))
+		local snapper_ids=($(snapper -t 0 -c "$snapper_config" list | tail -n +3 | cut -d'|' -f 2))
+		local snapper_types=($(snapper -t 0 -c "$snapper_config" list | tail -n +3 | cut -d'|' -f 1))
 
 		IFS=$'\n'
-		local snapper_descriptions=($(snapper -t 0 list -a | tail -n +3 | cut -d'|' -f 7))
+		local snapper_descriptions=($(snapper -t 0 -c "$snapper_config" list | tail -n +3 | cut -d'|' -f 7))
 	fi
 
 	IFS=$'\n'
