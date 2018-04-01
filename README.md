@@ -81,6 +81,9 @@ Add this lines to /etc/default/grub:
 
 	(Create entries with matching version number instead of all possible combinations of kernel and initramfs, very useful with debian-like distributions)
 
+* GRUB_BTRFS_SNAPPER_CONFIG="root"													
+
+	(Snapper's config name to use)
 
 
 Generate grub.cfg (on Arch linux use grub-mkconfig -o /boot/grub/grub.cfg )
