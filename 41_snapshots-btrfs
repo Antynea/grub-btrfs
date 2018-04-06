@@ -43,7 +43,7 @@
 #	(Use only if you have custom intel-ucode or auto-detect failed.)		    										#
 # * GRUB_BTRFS_IGNORE_SPECIFIC_PATH=("var/lib/docker" "nosnapshot")													#
 #	(Ignore specific path during run "grub-mkconfig")														#
-# * GRUB_BTRFS_CREATE_ONLY_HARMONIZED_ENTRIES="false"															#
+# * GRUB_BTRFS_CREATE_ONLY_HARMONIZED_ENTRIES="true"															#
 #	(Create entries with matching version number instead of all possible combinations of kernel and initramfs)							#
 # * GRUB_BTRFS_SNAPPER_CONFIG="root"															#
 #	(Snapper's config name to use)							#
@@ -104,7 +104,7 @@ show_total_snap_found=${GRUB_BTRFS_SHOW_TOTAL_SNAPSHOTS_FOUND:-"true"}
 ## Ignore specific path during run "grub-mkconfig"
 ignore_specific_path=("${GRUB_BTRFS_IGNORE_SPECIFIC_PATH[@]}")
 ## create only entries with harmonized version numbers
-harmonized_entries=${GRUB_BTRFS_CREATE_ONLY_HARMONIZED_ENTRIES:-"false"}
+harmonized_entries=${GRUB_BTRFS_CREATE_ONLY_HARMONIZED_ENTRIES:-"true"}
 ## snapper's config name
 snapper_config=${GRUB_BTRFS_SNAPPER_CONFIG:-"root"}
 
