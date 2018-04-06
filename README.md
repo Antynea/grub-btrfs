@@ -55,7 +55,7 @@ Add this lines to /etc/default/grub:
 
 	(Use only if you have custom intel-ucode or auto-detect failed.)
 
-* GRUB_BTRFS_LIMIT="100"
+* GRUB_BTRFS_LIMIT="50"
 
 	(Limit the number of snapshots populated in the GRUB menu.)
 
