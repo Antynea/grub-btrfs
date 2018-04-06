@@ -281,9 +281,20 @@ snapshot_list()
 		IFS=$oldIFS
 		snap=($snap)
 		local snap_path_name=${snap[@]:13:${#snap[@]}}
+
 		# Discard deleted snapshots
 		if [ "$snap_path_name" = "DELETED" ]; then continue; fi
 		[[ ${snap_path_name%%"/"*} == "<FS_TREE>" ]] && snap_path_name=${snap_path_name#*"/"}
+
+		### ignore specific path during run "grub-mkconfig"
+		if [ ! -z "${ignore_specific_path}" ] ; then
+			for isp in ${ignore_specific_path[@]} ; do
+				[[ "${snap_path_name}" == "${isp}"/* ]] && continue 2;
+			done
+		fi
+
+		### detect if /boot directory exists
+		[[ ! -d "$gbgmp/$snap_path_name/boot" ]] && continue;
 
 		local id="${snap_path_name//[!0-9]}" # brutal way to get id: remove everything non-numeric
 		ids+=("$id")
@@ -417,14 +428,6 @@ list_kernels_initramfs()
 		snap_dir_name="$(echo "$item" | cut -d'|' -f2)"
 		snap_dir_name="$(trim "$snap_dir_name")"
 
-		### ignore specific path during run "grub-mkconfig"
-		if [ ! -z "${ignore_specific_path}" ] ; then
-			for isp in ${ignore_specific_path[@]} ; do
-				[[ "${gbgmp}"/"${snap_dir_name}" == "${gbgmp}"/"${isp}"/* ]] && continue 2;
-			done
-		fi
-		### detect if /boot directory exists
-		[[ ! -d "$gbgmp/$snap_dir_name/boot" ]] && continue;
 		### show snapshot found during run "grub-mkconfig"
 		snap_date_time="$(echo "$item" | cut -d' ' -f1-2)"
 		snap_date_time="$(trim "$snap_date_time")"
