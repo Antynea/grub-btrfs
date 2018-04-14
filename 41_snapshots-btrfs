@@ -188,21 +188,21 @@ make_menu_entries()
 		for i in "${name_initramfs[@]}"; do
 			prefix_i=${i[@]%%"-"*}
 			suffix_i=${i[@]##*"-"}
-			if 	[ -f "${boot_dir}"/"${prefix_i}-${kversion}-${suffix_i}" ];	then i="${i}";
-			elif 	[ -f "${boot_dir}"/"${prefix_i}-${kversion}" ]; 		then i="${i}";
+			if 		[ -f "${boot_dir}"/"${prefix_i}-${kversion}-${suffix_i}" ];	then i="${i}";
+			elif 	[ -f "${boot_dir}"/"${prefix_i}-${kversion}" ]; 			then i="${i}";
 			elif 	[ -f "${boot_dir}"/"${prefix_i}-${kversion}.img" ]; 		then i="${i}";
-			elif 	[ -f "${boot_dir}"/"${prefix_i}-${kversion}.gz" ]; 		then i="${i}";
+			elif 	[ -f "${boot_dir}"/"${prefix_i}-${kversion}.gz" ]; 			then i="${i}";
 			else 	continue ;
 			fi
 			for u in "${name_microcode[@]}"; do
-			if [[ -f "${boot_dir}"/"${u}" && "${i}" != initramfs-linux-fallback.img ]] ; then
+				if [[ -f "${boot_dir}"/"${u}" && "${i}" != initramfs-linux-fallback.img ]] ; then
 				entry "
 	menuentry '"${k}" & "${i}" & "${u}"' ${CLASS} "\$menuentry_id_option" 'gnulinux-snapshots-$boot_uuid'{"
-		else
-			entry "
+				else
+				entry "
 	menuentry '"${k}" & "${i}"' ${CLASS} "\$menuentry_id_option" 'gnulinux-snapshots-$boot_uuid'{"
-		fi
-		entry "\
+				fi
+				entry "\
 		if [ x\$feature_all_video_module = xy ]; then
 		insmod all_video
 		fi
@@ -216,17 +216,17 @@ make_menu_entries()
 		echo 'Loading Snapshot: "${snap_date_time}" "${snap_dir_name}"'
 		echo 'Loading Kernel: "${k}" ...'
 		linux \"${boot_dir_root_grub}/"${k}"\" root=UUID=${root_uuid} rw rootflags=subvol=\""${snap_dir_name}"\" ${kernel_parameters}"
-		if [[ -f "${boot_dir}"/"${u}" && "${i}" != initramfs-linux-fallback.img ]] ; then
-			entry "\
+				if [[ -f "${boot_dir}"/"${u}" && "${i}" != initramfs-linux-fallback.img ]] ; then
+					entry "\
 		echo 'Loading Microcode & Initramfs: "${u}" "${i}" ...'
 		initrd \"${boot_dir_root_grub}/"${u}"\" \"${boot_dir_root_grub}/"${i}"\""
-		else
-			entry "\
+				else
+					entry "\
 		echo 'Loading Initramfs: "${i}" ...'
 		initrd \"${boot_dir_root_grub}/"${i}"\""
-		fi
+				fi
 	entry "	}"
-			count_warning_menuentries=$((1+$count_warning_menuentries))
+				count_warning_menuentries=$((1+$count_warning_menuentries))
 			done
 		done
 	done
@@ -453,6 +453,8 @@ boot_bounded()
 		### Limit snapshots found during run "grub-mkconfig"
 	        count_limit_snap=$((1+$count_limit_snap))
 	        [[ $count_limit_snap -ge $limit_snap_show ]] && break;
+		# Limit generation of menuentries if exceeds 250
+		# [[ $count_warning_menuentries -ge 250 ]] && break;
 	done
 	IFS=$oldIFS
 }
@@ -531,7 +533,8 @@ fi
 # unmounting mount point
 umount $gbgmp
 # Show warn, menuentries exceeds 250 entries
-[[ $count_warning_menuentries -ge 250 ]] && printf "# Generated ${count_warning_menuentries} total GRUB entries. You might experience issues loading snapshots menu in GRUB."
+[[ $count_warning_menuentries -ge 250 ]] && printf "# Generated ${count_warning_menuentries} total GRUB entries. You might experience issues loading snapshots menu in GRUB.\n" >&2 ;
+# printf "# menuentries = $count_warning_menuentries \n" >&2 ;
 # Show total found snapshots
 if [[ "${show_total_snap_found}" = "true" && ! -z "${count_limit_snap}" && "${count_limit_snap}" != "0" ]]; then
 	printf "# Found ${count_limit_snap} snapshot(s)\n" >&2 ;
