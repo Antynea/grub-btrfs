@@ -2,79 +2,86 @@
 #
 #
 #########################################################################################################################################################################
-# Written by: Antynea																			#
-# BTC donation address: 1Lbvz244WA8xbpHek9W2Y12cakM6rDe5Rt														#
-#																					#
-# Purpose: Include btrfs snapshots at boot options (grub-menu).														#
-#																					#
-# What this script does:																		#
-# Simple rollback using snapshots you made previously.															#
-# - Automatically List snapshots existing on root partition (btrfs).													#
-# - Automatically Detect if "/boot" is in separate partition.														#
-# - Automatically Detect kernel, initramfs and intel microcode in "/boot" directory on snapshots. (For custon name, see below.)						#
-# - Automatically Create corresponding "menuentry" in grub.cfg , which ensures a very easy rollback.									#
-# - Automatically detect snapper and use snapper's snapshot description if available.											#
-#																					#
-# How to use it:																			#
-# - Add this lines to /etc/default/grub:																#
-#																					#
-# * GRUB_BTRFS_SUBMENUNAME="Arch Linux snapshots" 															#
-#	(Name appearing in the Grub menu.)																#
-# * GRUB_BTRFS_PREFIXENTRY="Snapshot:"        		   														#
-#	(Add a name ahead your snapshots entries in the Grub menu.) 													#
-# * GRUB_BTRFS_DISPLAY_PATH_SNAPSHOT="true"																#
-#	(Show full path snapshot or only name in the Grub menu)														#
-# * GRUB_BTRFS_TITLE_FORMAT="p/d/n"																	#
-#	(Custom title, shows/hides p"prefix" d"date" n"name" in the Grub menu, separator "/", custom order available)							#
-# * GRUB_BTRFS_LIMIT="50"																		#
-#	(Limit the number of snapshots populated in the GRUB menu.)													#
-# * GRUB_BTRFS_SUBVOLUME_SORT="descending"																#
-#	(Sort the found subvolumes by newest first ("descending") or oldest first ("ascending").									#
-#	If "ascending" is chosen then the $GRUB_BTRFS_LIMIT oldest subvolumes will populate the menu.)									#
-# * GRUB_BTRFS_SHOW_SNAPSHOTS_FOUND="true"																#
-#	(Show snapshots found during run "grub-mkconfig")														#
-# * GRUB_BTRFS_SHOW_TOTAL_SNAPSHOTS_FOUND="true"															#
-#	(Show Total of snapshots found during run "grub-mkconfig")													#
-# * GRUB_BTRFS_NKERNEL=("vmlinuz-linux") 		 														#
-#	(Use only if you have custom kernel name or auto-detect failed.)												#
-# * GRUB_BTRFS_NINIT=("initramfs-linux.img" "initramfs-linux-fallback.img")												#
-#	(Use only if you have custom initramfs name or auto-detect failed.)												#
-# * GRUB_BTRFS_INTEL_UCODE=("intel-ucode.img") 																#
-#	(Use only if you have custom intel-ucode or auto-detect failed.)		    										#
-# * GRUB_BTRFS_IGNORE_SPECIFIC_PATH=("var/lib/docker" "nosnapshot")													#
-#	(Ignore specific path during run "grub-mkconfig")														#
-# * GRUB_BTRFS_CREATE_ONLY_HARMONIZED_ENTRIES="true"															#
-#	(Create entries with matching version number instead of all possible combinations of kernel and initramfs)							#
-# * GRUB_BTRFS_SNAPPER_CONFIG="root"															#
-#	(Snapper's config name to use)							#
-#																					#
-# - Generate grub.cfg (on Arch Linux use grub-mkconfig -o /boot/grub/grub.cfg)												#
-#																					#
-# - grub-btrfs automatically generates snapshots entries.														#
-# - You will see it appear different entries (e.g : Snapshot: [2014-02-12 11:24:37] my snapshot name overkill)								#
-#																					#
-# Automatically update grub																		#
+# Written by: Antynea																																					#
+# BTC donation address: 1Lbvz244WA8xbpHek9W2Y12cakM6rDe5Rt																												#
+#																																										#
+# Purpose: Include btrfs snapshots at boot options (grub-menu).																											#
+#																																										#
+# What this script does:																																				#
+# Simple rollback using snapshots you made previously.																													#
+# - Automatically List snapshots existing on root partition (btrfs).																									#
+# - Automatically Detect if "/boot" is in separate partition.																											#
+# - Automatically Detect kernel, initramfs and intel microcode in "/boot" directory on snapshots. (For custon name, see below.)											#
+# - Automatically Create corresponding "menuentry" in grub.cfg , which ensures a very easy rollback.																	#
+# - Automatically detect snapper and use snapper's snapshot description if available.																					#
+#																																										#
+# How to use it:																																						#
+# - Add this lines to /etc/default/grub:																																#
+#																																										#
+# * GRUB_BTRFS_SUBMENUNAME="Arch Linux snapshots" 																														#
+#		(Name appearing in the Grub menu.)																																#
+# * GRUB_BTRFS_PREFIXENTRY="Snapshot:"        		   																													#
+#		(Add a name ahead your snapshots entries in the Grub menu.) 																									#
+# * GRUB_BTRFS_DISPLAY_PATH_SNAPSHOT="true"																																#
+#		(Show full path snapshot or only name in the Grub menu)																											#
+# * GRUB_BTRFS_TITLE_FORMAT="p/d/n"																																		#
+#		(Custom title, shows/hides p"prefix" d"date" n"name" in the Grub menu, separator "/", custom order available)													#
+# * GRUB_BTRFS_LIMIT="50"																																				#
+#		(Limit the number of snapshots populated in the GRUB menu.)																										#
+# * GRUB_BTRFS_SUBVOLUME_SORT="descending"																																#
+#		(Sort the found subvolumes by newest first ("descending") or oldest first ("ascending").																		#
+#		If "ascending" is chosen then the $GRUB_BTRFS_LIMIT oldest subvolumes will populate the menu.)																	#
+# * GRUB_BTRFS_SHOW_SNAPSHOTS_FOUND="true"																																#
+#		(Show snapshots found during run "grub-mkconfig")																												#
+# * GRUB_BTRFS_SHOW_TOTAL_SNAPSHOTS_FOUND="true"																														#
+#		(Show Total of snapshots found during run "grub-mkconfig")																										#
+# * GRUB_BTRFS_NKERNEL=("vmlinuz-linux") 		 																														#
+#		(Use only if you have custom kernel name or auto-detect failed.)																								#
+# * GRUB_BTRFS_NINIT=("initramfs-linux.img" "initramfs-linux-fallback.img")																								#
+#		(Use only if you have custom initramfs name or auto-detect failed.)																								#
+# * GRUB_BTRFS_INTEL_UCODE=("intel-ucode.img") 																															#
+#		(Use only if you have custom intel-ucode or auto-detect failed.)		    																					#
+# * GRUB_BTRFS_IGNORE_SPECIFIC_PATH=("var/lib/docker" "nosnapshot")																										#
+#		(Ignore specific path during run "grub-mkconfig")																												#
+# * GRUB_BTRFS_SNAPPER_CONFIG="root"																																	#
+#		(Snapper's config name to use)																																	#
+# * GRUB_BTRFS_DISABLE="false"																																			#
+#		Disable Grub-btrfs (default=active)																																#
+#																																										#
+# - Generate grub.cfg (on Arch Linux use grub-mkconfig -o /boot/grub/grub.cfg)																							#
+#																																										#
+# - grub-btrfs automatically generates snapshots entries.																												#
+# - You will see it appear different entries (e.g : Snapshot: [2014-02-12 11:24:37] my snapshot name overkill)															#
+#																																										#
+# Automatically update grub																																				#
 #  If you would like grub to automatically update when Snapper timeline snapshots and cleanups occur, simply install 10-update_grub.conf in the following locations:	#
-# - /etc/systemd/system/snapper-timeline.service.d/															#
-# - /etc/systemd/system/snapper-cleanup.service.d/															#
-# Once the configuration files are in place, systemctl daemon-reload should be run to reload the units and make the changes active.					#
-#																					#
+# - /etc/systemd/system/snapper-timeline.service.d/																														#
+# - /etc/systemd/system/snapper-cleanup.service.d/																														#
+# Once the configuration files are in place, systemctl daemon-reload should be run to reload the units and make the changes active.										#
+#																																										#
+# Special thanks for assistance and contributions:																														#
+# - My friends																																							#
+# - All contributors on Github																																			#
+#																																										#
 #########################################################################################################################################################################
 
 set -e
 
-#prefix="/usr"
-#exec_prefix="${prefix}"
+prefix="/usr"
+exec_prefix="/usr"
 datarootdir="/usr/share"
-#datadir="${datarootdir}"
 sysconfdir="/etc"
 
-. "${datarootdir}/grub/grub-mkconfig_lib"
 . "${sysconfdir}/default/grub"
+. "$pkgdatadir/grub-mkconfig_lib"
+# . "$datarootdir/grub/grub-mkconfig_lib" # Uncomment if you run "bash -x"
 
 ######################################
 ### Variables in /etc/default/grub ###
 ######################################
+## Disable Grub-btrfs (default=active)
+grub_btrfs_disable=${GRUB_BTRFS_DISABLE:-"false"}
+[[ "${grub_btrfs_disable}" == "true" ]] && exit 0
 ## Submenu name
 submenuname=${GRUB_BTRFS_SUBMENUNAME:-"Arch Linux snapshots"}
 ## Prefix entry
@@ -89,7 +96,7 @@ nkernel=("${GRUB_BTRFS_NKERNEL[@]}")
 ninit=("${GRUB_BTRFS_NINIT[@]}")
 ## Microcode(s) name(s)
 microcode=("${GRUB_BTRFS_INTEL_UCODE[@]}")
-## Limit to show in the Grub menu
+## Limit snapshots to show in the Grub menu
 limit_snap_show="${GRUB_BTRFS_LIMIT:-50}"
 ## How to sort snapshots list
 snap_list_sort=${GRUB_BTRFS_SUBVOLUME_SORT:-"descending"}
@@ -103,11 +110,8 @@ show_snap_found=${GRUB_BTRFS_SHOW_SNAPSHOTS_FOUND:-"true"}
 show_total_snap_found=${GRUB_BTRFS_SHOW_TOTAL_SNAPSHOTS_FOUND:-"true"}
 ## Ignore specific path during run "grub-mkconfig"
 ignore_specific_path=("${GRUB_BTRFS_IGNORE_SPECIFIC_PATH[@]}")
-## create only entries with harmonized version numbers
-harmonized_entries=${GRUB_BTRFS_CREATE_ONLY_HARMONIZED_ENTRIES:-"true"}
 ## snapper's config name
 snapper_config=${GRUB_BTRFS_SNAPPER_CONFIG:-"root"}
-
 
 ########################
 ### variables script ###
@@ -131,123 +135,98 @@ gbgmp=$(mktemp -d)
 CLASS="--class snapshots --class gnu-linux --class gnu --class os"
 ## save IFS
 oldIFS=$IFS
-## boot_dir (auto-detect if /boot is separate partition or not)
-boot_dir()
+
+
+######################
+### Error Handling ###
+######################
+print_error()
 {
-	boot_dir="$gbgmp/$snap_dir_name/boot"
-	[[ "$root_uuid" != "$boot_uuid" ]] && boot_dir="/boot"
-	echo "$boot_dir"
+	local arg="$@"
+	local nothing_to_do="If you think an error has occurred , please file a bug report at \" https://github.com/Antynea/grub-btrfs \"\n# Nothing to do. Abort.\n###### - Grub-btrfs: Snapshot detection ended   - ######\n"
+	printf "# ${arg}\n# ${nothing_to_do}" >&2 ;
+	exit 0
 }
 
-
+test_btrfs()
+{
+	set +e
+	type btrfs >/dev/null 2>&1
+	if [[ $? -ne 0 ]]; then
+		print_error "This script only supports snapshots of the btrfs filesystem, make sure you have btrfs-progs on your system."
+	fi
+	set -e
+}
 ##############
 ### Script ###
 ##############
 
-### BEGIN auto detect ###
+
+## Create entry
+entry()	{
+echo "$@" >> "/boot/grub/grub-btrfs.cfg"
+# local arg="$@"
+# echo "${arg}" >> "/boot/grub/grub-btrfs.cfg"
+# cat << EOF >> "/boot/grub/grub-btrfs.cfg"
+# ${arg}
+# EOF
+}
 
 ## menu entries
-snapshots_entry()
+make_menu_entries()
 {
 ## \" required for snap,kernels,init,microcode with space in their name
-	echo "	submenu '$title_menu' {
-		submenu '---> $title_menu <---' { echo }
-	"
+	entry "submenu '$title_menu' {
+	submenu '---> $title_menu <---' { echo }"
 	for k in "${name_kernel[@]}"; do
+		[[ ! -f "${boot_dir}"/"${k}" ]] && continue;
+		kversion=${k#*"-"}
 		for i in "${name_initramfs[@]}"; do
+			prefix_i=${i[@]%%"-"*}
+			suffix_i=${i[@]##*"-"}
+			if 		[ -f "${boot_dir}"/"${prefix_i}-${kversion}-${suffix_i}" ];	then i="${i}";
+			elif 	[ -f "${boot_dir}"/"${prefix_i}-${kversion}" ]; 			then i="${i}";
+			elif 	[ -f "${boot_dir}"/"${prefix_i}-${kversion}.img" ]; 		then i="${i}";
+			elif 	[ -f "${boot_dir}"/"${prefix_i}-${kversion}.gz" ]; 			then i="${i}";
+			else 	continue ;
+			fi
 			for u in "${name_microcode[@]}"; do
-			if [ -f "$(boot_dir)"/"${u}" ] ; then
-				echo "\
-		menuentry '"${k}" & "${i}" & "${u}"' ${CLASS} "\$menuentry_id_option" 'gnulinux-snapshots-$boot_uuid'{"
-			else 
-				echo "\
-		menuentry '"${k}" & "${i}"' ${CLASS} "\$menuentry_id_option" 'gnulinux-snapshots-$boot_uuid'{"
-			fi
-			echo "\
-			$(save_default_entry)
-			if [ x\$feature_all_video_module = xy ]; then
-				insmod all_video
-			fi
-			set gfxpayload=keep
-			insmod ${boot_fs}
-			if [ x\$feature_platform_search_hint = xy ]; then
-				search --no-floppy --fs-uuid  --set=root ${hs_boot} ${boot_uuid}
-			else
-				search --no-floppy --fs-uuid  --set=root ${boot_uuid}
-			fi
-			echo 'Loading Snapshot: "${snap_date_time}" "${snap_dir_name}"'
-			echo 'Loading Kernel: "${k}" ...'
-			linux \"${boot_dir_real_path}/"${k}"\" root=UUID=${root_uuid} rw rootflags=subvol=\""${snap_dir_name}"\" ${kernel_parameters}"
-			if [ -f "$(boot_dir)"/"${u}" ] ; then
-				echo "\
-			echo 'Loading Microcode & Initramfs: "${u}" "${i}" ...'
-			initrd \"${boot_dir_real_path}/"${u}"\" \"${boot_dir_real_path}/"${i}"\""
-			else
-				echo "\
-			echo 'Loading Initramfs: "${i}" ...'
-			initrd \"${boot_dir_real_path}/"${i}"\""
-			fi
-		echo "		}"
+				if [[ -f "${boot_dir}"/"${u}" && "${i}" != initramfs-linux-fallback.img ]] ; then
+				entry "
+	menuentry '"${k}" & "${i}" & "${u}"' ${CLASS} "\$menuentry_id_option" 'gnulinux-snapshots-$boot_uuid'{"
+				else
+				entry "
+	menuentry '"${k}" & "${i}"' ${CLASS} "\$menuentry_id_option" 'gnulinux-snapshots-$boot_uuid'{"
+				fi
+				entry "\
+		if [ x\$feature_all_video_module = xy ]; then
+		insmod all_video
+		fi
+		set gfxpayload=keep
+		insmod ${boot_fs}
+		if [ x\$feature_platform_search_hint = xy ]; then
+			search --no-floppy --fs-uuid  --set=root ${hs_boot} ${boot_uuid}
+		else
+			search --no-floppy --fs-uuid  --set=root ${boot_uuid}
+		fi
+		echo 'Loading Snapshot: "${snap_date_time}" "${snap_dir_name}"'
+		echo 'Loading Kernel: "${k}" ...'
+		linux \"${boot_dir_root_grub}/"${k}"\" root=UUID=${root_uuid} rw rootflags=subvol=\""${snap_dir_name}"\" ${kernel_parameters}"
+				if [[ -f "${boot_dir}"/"${u}" && "${i}" != initramfs-linux-fallback.img ]] ; then
+					entry "\
+		echo 'Loading Microcode & Initramfs: "${u}" "${i}" ...'
+		initrd \"${boot_dir_root_grub}/"${u}"\" \"${boot_dir_root_grub}/"${i}"\""
+				else
+					entry "\
+		echo 'Loading Initramfs: "${i}" ...'
+		initrd \"${boot_dir_root_grub}/"${i}"\""
+				fi
+	entry "	}"
+				count_warning_menuentries=$((1+$count_warning_menuentries))
 			done
 		done
 	done
-	echo "	}"
-}
-
-harmonized_snapshots_entry()
-{
-## \" required for snap,kernels,init,microcode with space in their name
-	echo "	submenu '$title_menu' {
-		submenu '---> $title_menu <---' { echo }
-	"
-	for k in "${name_kernel[@]}"; do
-		version=${k#vmlinuz-}
-		i=""
-		if [ -f "$(boot_dir)"/initramfs-"${version}".img ]; then
-			i=initramfs-${version}.img
-		else
-			if [ -f "$(boot_dir)"/initrd.img-"${version}" ]; then
-				i=initrd.img-${version}
-			fi
-		fi
-		for u in "${name_microcode[@]}"; do
-			if [ -f "$(boot_dir)"/"${u}" ] ; then
-				echo "\
-		menuentry '"${k}" & "${i}" & "${u}"' ${CLASS} "\$menuentry_id_option" 'gnulinux-snapshots-$boot_uuid'{"
-			else 
-				echo "\
-		menuentry '"${k}" & "${i}"' ${CLASS} "\$menuentry_id_option" 'gnulinux-snapshots-$boot_uuid'{"
-			fi
-			echo "\
-			$(save_default_entry)
-			if [ x\$feature_all_video_module = xy ]; then
-				insmod all_video
-			fi
-			set gfxpayload=keep
-			insmod ${boot_fs}
-			if [ x\$feature_platform_search_hint = xy ]; then
-				search --no-floppy --fs-uuid  --set=root ${hs_boot} ${boot_uuid}
-			else
-				search --no-floppy --fs-uuid  --set=root ${boot_uuid}
-			fi
-			echo 'Loading Snapshot: "${snap_date_time}" "${snap_dir_name}"'
-			echo 'Loading Kernel: "${k}" ...'
-			linux \"${boot_dir_real_path}/"${k}"\" root=UUID=${root_uuid} rw rootflags=subvol=\""${snap_dir_name}"\" ${kernel_parameters}"
-			if [ -f "$(boot_dir)"/"${i}" ] ; then
-				if [ -f "$(boot_dir)"/"${u}" ] ; then
-					echo "\
-			echo 'Loading Microcode & Initramfs: "${u}" "${i}" ...'
-			initrd \"${boot_dir_real_path}/"${u}"\" \"${boot_dir_real_path}/"${i}"\""
-				else
-					echo "\
-			echo 'Loading Initramfs: "${i}" ...'
-			initrd \"${boot_dir_real_path}/"${i}"\""
-				fi
-			fi
-			echo "		}"
-		done
-	done
-	echo "	}"
+	entry  "}"
 }
 
 ## Trim a string from leading and trailing whitespaces
@@ -286,14 +265,14 @@ snapshot_list()
 		if [ "$snap_path_name" = "DELETED" ]; then continue; fi
 		[[ ${snap_path_name%%"/"*} == "<FS_TREE>" ]] && snap_path_name=${snap_path_name#*"/"}
 
-		### ignore specific path during run "grub-mkconfig"
+		# ignore specific path during run "grub-mkconfig"
 		if [ ! -z "${ignore_specific_path}" ] ; then
 			for isp in ${ignore_specific_path[@]} ; do
 				[[ "${snap_path_name}" == "${isp}"/* ]] && continue 2;
 			done
 		fi
 
-		### detect if /boot directory exists
+		# detect if /boot directory exists
 		[[ ! -d "$gbgmp/$snap_path_name/boot" ]] && continue;
 
 		local id="${snap_path_name//[!0-9]}" # brutal way to get id: remove everything non-numeric
@@ -341,15 +320,19 @@ snapshot_list()
 ## Detect kernels in "/boot"
 detect_kernel()
 {
-	## Arch original kernel (auto-detect)
-	for akernel in "$(boot_dir)"/vmlinuz-* ; do 
-		list_kernel+=("$akernel")
+	list_kernel=()
+	# Original kernel (auto-detect)
+	for okernel in	"${boot_dir}"/vmlinuz-* \
+			"${boot_dir}"/vmlinux-* \
+			"${boot_dir}"/kernel-* ; do
+		[[ ! -f "${okernel}" ]] && continue;
+		list_kernel+=("$okernel")
 	done
 
-	## Custom name kernel in GRUB_BTRFS_NKERNEL
+	# Custom name kernel in GRUB_BTRFS_NKERNEL
 	if [ ! -z "${nkernel}" ] ; then
-		for ckernel in "${nkernel[@]}" ; do
-			[[ ! -f /"$(boot_dir)"/"${ckernel}" ]] && continue;
+		for ckernel in "${boot_dir}/${nkernel[@]}" ; do
+			[[ ! -f "${ckernel}" ]] && continue;
 			list_kernel+=("$ckernel")
 		done
 	fi
@@ -358,15 +341,21 @@ detect_kernel()
 ## Detect initramfs in "/boot"
 detect_initramfs()
 {
-	## Arch original initramfs (auto-detect)
-	for ainitramfs in "$(boot_dir)"/initramfs-* ; do 
-		list_initramfs+=("$ainitramfs")
+	list_initramfs=()
+	# Original initramfs (auto-detect)
+	for oinitramfs in	"${boot_dir}"/initrd.img-* \
+				"${boot_dir}"/initrd-*.img \
+				"${boot_dir}"/initrd-*.gz \
+				"${boot_dir}"/initramfs-*.img \
+				"${boot_dir}"/initramfs-*.gz ; do
+		[[ ! -f "${oinitramfs}" ]] && continue;
+		list_initramfs+=("$oinitramfs")
 	done
-	
-	## Custom name initramfs in GRUB_BTRFS_NINIT
+
+	# Custom name initramfs in GRUB_BTRFS_NINIT
 	if [ ! -z "$ninit" ] ; then
-		for cinitramfs in "${ninit[@]}" ; do
-			[[ ! -f /"$(boot_dir)"/"${cinitramfs}" ]] && continue;
+		for cinitramfs in "${boot_dir}/${ninit[@]}" ; do
+			[[ ! -f "${cinitramfs}" ]] && continue;
 			list_initramfs+=("$cinitramfs")
 		done
 	fi
@@ -375,18 +364,21 @@ detect_initramfs()
 ## Detect microcode in "/boot"
 detect_microcode()
 {
-	## Arch original intel microcode
-	for aucode in "$(boot_dir)"/intel-ucode.img ; do
-		list_ucode+=("$aucode")
+	list_ucode=()
+	# Original intel microcode
+	for oiucode in "${boot_dir}"/intel-ucode.img ; do
+		[[ ! -f "${oiucode}" ]] && continue;
+		list_ucode+=("$oiucode")
 	done
 
-	## Custom name microcode in GRUB_BTRFS_INTEL_UCODE
+	# Custom name microcode in GRUB_BTRFS_INTEL_UCODE
 	if [ ! -z "$microcode" ] ; then
-		for cucode in "${microcode[@]}" ; do
-			[[ ! -f /"$(boot_dir)"/"${cucode}" ]] && continue
+		for cucode in "${boot_dir}/${microcode[@]}" ; do
+			[[ ! -f "${cucode}" ]] && continue
 			list_ucode+=("$cucode")
 		done
 	fi
+	if [ -z "${list_ucode}" ]; then list_ucode=(x); fi
 }
 
 ## Show full path snapshot or only name
@@ -411,86 +403,148 @@ title_format()
 		p) 	title_menu="${prefixentry}";;
 		d)	title_menu="${snap_date_time}";;
 		n)	title_menu="${name_snapshot}";;
-		*)	gettext_printf $"# Warning: GRUB_BTRFS_TITLE_FORMAT=${title_format}, syntax error \n" >&2
+		*)	printf $"# Warning: GRUB_BTRFS_TITLE_FORMAT=${title_format}, syntax error \n" >&2
 	esac
 }
 
 ## List of kernels, initramfs and microcode in snapshots
-list_kernels_initramfs()
+boot_bounded()
 {
+	# Initialize menu entries
 	IFS=$'\n'
-	count_limit_snap=0
 	for item in $(snapshot_list); do
-		### fix: limit_snap_show=0
+		# fix: limit_snap_show=0
 		[[ ${limit_snap_show} -le 0 ]] && break;
 		IFS=$oldIFS
 		snap_full_name="$(echo "$item" | cut -d'|' -f2-)" # do not trim it to keep nice formatting
 		snap_dir_name="$(echo "$item" | cut -d'|' -f2)"
 		snap_dir_name="$(trim "$snap_dir_name")"
-
-		### show snapshot found during run "grub-mkconfig"
 		snap_date_time="$(echo "$item" | cut -d' ' -f1-2)"
 		snap_date_time="$(trim "$snap_date_time")"
-		if [[ "${show_snap_found}" = "true" ]]; then
-		gettext_printf $"# Found snapshot: %s\n" "$item" >&2 ;
-		fi
-		### Kernel (auto-detect + custom kernel)
-		unset list_kernel
+		
+		boot_dir="$gbgmp/$snap_dir_name/boot"
+		# Kernel (Original + custom kernel)
 		detect_kernel
+		if [ -z "${list_kernel}" ]; then continue; fi
 		name_kernel=("${list_kernel[@]##*"/"}")
-		# echo "kernel = ${name_kernel[*]}"
-		if [[ "${harmonized_entries}" != "true" ]]; then
-			### Initramfs (autodetect + custom initramfs)
-			unset list_initramfs
-			detect_initramfs
-			name_initramfs=("${list_initramfs[@]##*"/"}")
-			# echo "initramfs = ${name_initramfs[*]}"
-		fi
-		### microcode (auto-detect + custom microcode)
-		unset list_ucode
+		# Initramfs (Original + custom initramfs)
+		detect_initramfs
+		if [ -z "${list_initramfs}" ]; then continue; fi
+		name_initramfs=("${list_initramfs[@]##*"/"}")
+		# microcode (intel-ucode + custom microcode)
 		detect_microcode
 		name_microcode=("${list_ucode[@]##*"/"}")
-		# echo "ucode = ${name_microcode[*]}"
-		### real path to boot
-		boot_dir_real_path="$(make_system_path_relative_to_its_root "$(boot_dir)")"
-		### Create menu entries
-		## name snapshot
-		path_snapshot
-		## title menu custom
-		title_format
-		# echo "${title_menu}"
-		if [[ "${harmonized_entries}" = "false" ]]; then
-			snapshots_entry
-		else
-			harmonized_snapshots_entry
+		# show snapshot found during run "grub-mkconfig"
+		if [[ "${show_snap_found}" = "true" ]]; then
+		printf $"# Found snapshot: %s\n" "$item" >&2 ;
 		fi
+		# Show full path snapshot or only name
+		path_snapshot
+		# Title format in grub-menu
+		title_format
+		# convert /boot directory to root of GRUB (e.g /boot become /)
+		boot_dir_root_grub="$(make_system_path_relative_to_its_root "${boot_dir}")"
+		# Make menuentries
+		make_menu_entries
 		### Limit snapshots found during run "grub-mkconfig"
 	        count_limit_snap=$((1+$count_limit_snap))
 	        [[ $count_limit_snap -ge $limit_snap_show ]] && break;
+		# Limit generation of menuentries if exceeds 250
+		# [[ $count_warning_menuentries -ge 250 ]] && break;
 	done
 	IFS=$oldIFS
 }
-### END auto detect ###
+boot_separate()
+{
+	boot_dir="/boot"
+	# convert /boot directory to root of GRUB (e.g /boot become /)
+	boot_dir_root_grub="$(make_system_path_relative_to_its_root "${boot_dir}")"
+
+	# Kernel (Original + custom kernel)
+	detect_kernel
+	if [ -z "${list_kernel}" ]; then print_error "Kernels not found."; fi
+	name_kernel=("${list_kernel[@]##*"/"}")
+	
+	# Initramfs (Original + custom initramfs)
+	detect_initramfs
+	if [ -z "${list_initramfs}" ]; then print_error "Initramfs not found."; fi
+	name_initramfs=("${list_initramfs[@]##*"/"}")
+	
+	# microcode (auto-detect + custom microcode)
+	detect_microcode
+	name_microcode=("${list_ucode[@]##*"/"}")
+
+	# Initialize menu entries
+	IFS=$'\n'
+	for item in $(snapshot_list); do
+		# fix: limit_snap_show=0
+		[[ ${limit_snap_show} -le 0 ]] && break;
+		IFS=$oldIFS
+		snap_full_name="$(echo "$item" | cut -d'|' -f2-)" # do not trim it to keep nice formatting
+		snap_dir_name="$(echo "$item" | cut -d'|' -f2)"
+		snap_dir_name="$(trim "$snap_dir_name")"
+		snap_date_time="$(echo "$item" | cut -d' ' -f1-2)"
+		snap_date_time="$(trim "$snap_date_time")"
+		# show snapshot found during run "grub-mkconfig"
+		if [[ "${show_snap_found}" = "true" ]]; then
+		printf $"# Found snapshot: %s\n" "$item" >&2 ;
+		fi
+		# Show full path snapshot or only name
+		path_snapshot
+		# Title format in grub-menu
+		title_format
+		# Make menuentries
+		make_menu_entries
+		# Limit snapshots found during run "grub-mkconfig"
+		count_limit_snap=$((1+$count_limit_snap))
+	        [[ $count_limit_snap -ge $limit_snap_show ]] && break;
+		# Limit generation of menuentries if exceeds 250
+		# [[ $count_warning_menuentries -ge 250 ]] && break;
+	done
+	IFS=$oldIFS
+}
 
 ### Start ###
-	gettext_printf "###### - Grub-btrfs: Auto-detect Start - ######\n" >&2 ;
-	### create mount point and mounts
-	[[ ! -d $gbgmp ]] && mkdir -p $gbgmp
-	mount -o subvolid=5 /dev/disk/by-uuid/$root_uuid $gbgmp/
-	### Create a menu in grub
-	echo "submenu '${submenuname}' {"
-	list_kernels_initramfs ;
-	## show total found snapshots
-	if [[ "${show_total_snap_found}" = "true" ]]; then
-	gettext_printf "# Found ${count_limit_snap} snapshot(s)\n" >&2 ;
-	fi
-	## if no snapshot found, show a warning 
-	if [[ "${count_limit_snap}" = "0" ]]; then
-		echo " submenu '---> "No snapshot found : Press ESC to return previous menu" <---' { echo } ";
-		gettext_printf "# No snapshot found \n# make sure you have at least one snapshot \n# or please file a bug report at \"https://github.com/Antynea/grub-btrfs\"\n" >&2 ;
-	fi
-	echo "}"
-	## unmount mount point
-	umount $gbgmp
-	gettext_printf "###### - Grub-btrfs: Auto-detect End   - ######\n" >&2 ;
+printf "###### - Grub-btrfs: Snapshot detection started - ######\n" >&2 ;
+# if btrfs prog isn't installed, exit
+test_btrfs
+# Delete existing config
+#rm -f --preserve-root "/boot/grub/grub-btrfs.cfg"
+> "/boot/grub/grub-btrfs.cfg"
+# Create mount point then mounting
+[[ ! -d $gbgmp ]] && mkdir -p $gbgmp
+mount -o subvolid=5 /dev/disk/by-uuid/$root_uuid $gbgmp/
+# Count menuentries
+count_warning_menuentries=0
+# Count snapshots
+count_limit_snap=0
+# Detects if /boot is a separate partition
+if [[ "$root_uuid" != "$boot_uuid" ]]; then
+	printf "# Info: Separate boot partition detected \n" >&2 ;
+	boot_separate
+	else
+	printf "# Info: Separate boot partition not detected \n" >&2 ;
+	boot_bounded
+fi
+# unmounting mount point
+umount $gbgmp
+# Show warn, menuentries exceeds 250 entries
+[[ $count_warning_menuentries -ge 250 ]] && printf "# Generated ${count_warning_menuentries} total GRUB entries. You might experience issues loading snapshots menu in GRUB.\n" >&2 ;
+# printf "# menuentries = $count_warning_menuentries \n" >&2 ;
+# Show total found snapshots
+if [[ "${show_total_snap_found}" = "true" && ! -z "${count_limit_snap}" && "${count_limit_snap}" != "0" ]]; then
+	printf "# Found ${count_limit_snap} snapshot(s)\n" >&2 ;
+fi
+# if no snapshot found, exit
+if [[ "${count_limit_snap}" = "0" || -z "${count_limit_snap}" ]]; then
+	print_error "No snapshots found."
+fi
+root_grub="$(make_system_path_relative_to_its_root /boot/grub)"
+# Make a submenu in GRUB (grub.cfg)
+cat << EOF
+submenu '${submenuname}' {
+	configfile "${root_grub}/grub-btrfs.cfg"
+}
+EOF
+printf "###### - Grub-btrfs: Snapshot detection ended   - ######\n" >&2 ;
 ### End ###
