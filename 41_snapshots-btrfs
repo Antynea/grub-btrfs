@@ -47,8 +47,6 @@
 #		(Snapper's config name to use)																																	#
 # * GRUB_BTRFS_DISABLE="false"																																			#
 #		Disable Grub-btrfs (default=active)																																#
-# *	GRUB_BTRFS_MENU="/boot/grub"																																		#
-#		folder to create the config menu (grub-btrfs.cfg																												#
 #																																										#
 # - Generate grub.cfg (on Arch Linux use grub-mkconfig -o /boot/grub/grub.cfg)																							#
 #																																										#
@@ -114,8 +112,6 @@ show_total_snap_found=${GRUB_BTRFS_SHOW_TOTAL_SNAPSHOTS_FOUND:-"true"}
 ignore_specific_path=("${GRUB_BTRFS_IGNORE_SPECIFIC_PATH[@]}")
 ## snapper's config name
 snapper_config=${GRUB_BTRFS_SNAPPER_CONFIG:-"root"}
-## folder to create the config menu (grub-btrfs.cfg)
-grub_btrfs_menu=${GRUB_BTRFS_MENU:-"/boot/grub"}
 
 ########################
 ### variables script ###
@@ -168,10 +164,10 @@ test_btrfs()
 
 ## Create entry
 entry()	{
-echo "$@" >> "${grub_btrfs_menu}/grub-btrfs.cfg"
+echo "$@" >> "/boot/grub/grub-btrfs.cfg"
 # local arg="$@"
-# echo "${arg}" >> "${grub_btrfs_menu}/grub-btrfs.cfg"
-# cat << EOF >> "${grub_btrfs_menu}/grub-btrfs.cfg"
+# echo "${arg}" >> "/boot/grub/grub-btrfs.cfg"
+# cat << EOF >> "/boot/grub/grub-btrfs.cfg"
 # ${arg}
 # EOF
 }
@@ -513,8 +509,8 @@ printf "###### - Grub-btrfs: Snapshot detection started - ######\n" >&2 ;
 # if btrfs prog isn't installed, exit
 test_btrfs
 # Delete existing config
-#rm -f --preserve-root "${grub_btrfs_menu}/grub-btrfs.cfg"
-> "${grub_btrfs_menu}/grub-btrfs.cfg"
+#rm -f --preserve-root "/boot/grub/grub-btrfs.cfg"
+> "/boot/grub/grub-btrfs.cfg"
 # Create mount point then mounting
 [[ ! -d $gbgmp ]] && mkdir -p $gbgmp
 mount -o subvolid=5 /dev/disk/by-uuid/$root_uuid $gbgmp/
@@ -543,10 +539,11 @@ fi
 if [[ "${count_limit_snap}" = "0" || -z "${count_limit_snap}" ]]; then
 	print_error "No snapshots found."
 fi
+root_grub="$(make_system_path_relative_to_its_root /boot/grub)"
 # Make a submenu in GRUB (grub.cfg)
 cat << EOF
 submenu '${submenuname}' {
-	configfile /grub/grub-btrfs.cfg
+	configfile "${root_grub}/grub-btrfs.cfg"
 }
 EOF
 printf "###### - Grub-btrfs: Snapshot detection ended   - ######\n" >&2 ;
