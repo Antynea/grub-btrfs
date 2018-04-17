@@ -4,18 +4,19 @@
 #########################################################################################################################################################################
 # Written by: Antynea																																					#
 # BTC donation address: 1Lbvz244WA8xbpHek9W2Y12cakM6rDe5Rt																												#
-#																																										#
+# Github: https://github.com/Antynea/grub-btrfs 																														#
+#                                                                                                                                                                       #
 # Purpose: Include btrfs snapshots at boot options (grub-menu).																											#
 #																																										#
 # What this script does:																																				#
 # Simple rollback using snapshots you made previously.																													#
 # - Automatically List snapshots existing on root partition (btrfs).																									#
 # - Automatically Detect if "/boot" is in separate partition.																											#
-# - Automatically Detect kernel, initramfs and intel microcode in "/boot" directory on snapshots. (For custon name, see below.)											#
+# - Automatically Detect kernel, initramfs and intel microcode in "/boot" directory on snapshots.                               										#
 # - Automatically Create corresponding "menuentry" in grub.cfg , which ensures a very easy rollback.																	#
 # - Automatically detect snapper and use snapper's snapshot description if available.																					#
 #																																										#
-# How to use it:																																						#
+# How to customize it:																																					#
 # - Add this lines to /etc/default/grub:																																#
 #																																										#
 # * GRUB_BTRFS_SUBMENUNAME="Arch Linux snapshots" 																														#
@@ -36,12 +37,12 @@
 # * GRUB_BTRFS_SHOW_TOTAL_SNAPSHOTS_FOUND="true"																														#
 #		(Show Total of snapshots found during run "grub-mkconfig")																										#
 # * GRUB_BTRFS_NKERNEL=("vmlinuz-linux") 		 																														#
-#		(Use only if you have custom kernel name or auto-detect failed.)																								#
+#		(Use only if you have custom kernel name.)			                        																					#
 # * GRUB_BTRFS_NINIT=("initramfs-linux.img" "initramfs-linux-fallback.img")																								#
-#		(Use only if you have custom initramfs name or auto-detect failed.)																								#
+#		(Use only if you have custom initramfs name.)						                      																		#
 # * GRUB_BTRFS_INTEL_UCODE=("intel-ucode.img") 																															#
-#		(Use only if you have custom intel-ucode or auto-detect failed.)		    																					#
-# * GRUB_BTRFS_IGNORE_SPECIFIC_PATH=("var/lib/docker" "nosnapshot")																										#
+#		(Use only if you have custom intel-ucode.)		    			                          																		#
+# * GRUB_BTRFS_IGNORE_SPECIFIC_PATH=("var/lib/docker")					             																					#
 #		(Ignore specific path during run "grub-mkconfig")																												#
 # * GRUB_BTRFS_SNAPPER_CONFIG="root"																																	#
 #		(Snapper's config name to use)																																	#
