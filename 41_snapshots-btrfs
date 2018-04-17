@@ -394,16 +394,15 @@ path_snapshot()
 title_format()
 {
 	case "${title_format}" in
-		p/d/n) 	title_menu="${prefixentry} ${snap_date_time} ${name_snapshot}";;
 		p/n/d) 	title_menu="${prefixentry} ${name_snapshot} ${snap_date_time}";;
 		p/d) 	title_menu="${prefixentry} ${snap_date_time}";;
 		p/n) 	title_menu="${prefixentry} ${name_snapshot}";;
 		d/n) 	title_menu="${snap_date_time} ${name_snapshot}";;
 		n/d) 	title_menu="${name_snapshot} ${snap_date_time}";;
-		p) 	title_menu="${prefixentry}";;
-		d)	title_menu="${snap_date_time}";;
-		n)	title_menu="${name_snapshot}";;
-		*)	printf $"# Warning: GRUB_BTRFS_TITLE_FORMAT=${title_format}, syntax error \n" >&2
+		p) 		title_menu="${prefixentry}";;
+		d)		title_menu="${snap_date_time}";;
+		n)		title_menu="${name_snapshot}";;
+		*)		title_menu="${prefixentry} ${snap_date_time} ${name_snapshot}"
 	esac
 }
 
