@@ -2,14 +2,14 @@
   
 ## grub-btrfs
 
-This is a version 2.xx of grub-btrfs
+This is a version 3.xx of grub-btrfs
 ##### BTC donation address: 1Lbvz244WA8xbpHek9W2Y12cakM6rDe5Rt
 ##
 ### Description
 
 grub-btrfs, Include btrfs snapshots at boot options. (grub menu)
 ##
-### What does grub-btrfs v2.xx do :
+### What does grub-btrfs v3.xx do :
 
 Simple rollback using snapshots you made previously.
 
@@ -17,14 +17,15 @@ Simple rollback using snapshots you made previously.
 
 * Automatically Detect if "/boot" is in separate partition.
 
-* Automatically Detect kernel, initramfs and intel microcode in "/boot" directory on snapshots. (For custom name, see below.)
+* Automatically Detect kernel, initramfs and intel microcode in "/boot" directory on snapshots.
 
 * Automatically Create corresponding "menuentry" in grub.cfg , which ensures a very easy rollback.
 
 * Automatically detect snapper and use snapper's snapshot description if available.
 ##
-### How to use it:
+### How to customize it:
 
+You have the possibility to modify many parameters.
 Add this lines to /etc/default/grub:
 
 * GRUB_BTRFS_SUBMENUNAME="Arch Linux Snapshots"
@@ -43,17 +44,17 @@ Add this lines to /etc/default/grub:
 
  	(Custom title, shows/hides p"prefix" d"date" n"name" in grub-menu, separator "/", custom order available)
 
-* GRUB_BTRFS_NKERNEL=("vmlinuz-linux")
+* GRUB_BTRFS_NKERNEL=("kernel-custom")
 
-	(Use only if you have a custom kernel name or auto-detect failed.)
+	(Use it only if you have a custom kernel name)
 
-* GRUB_BTRFS_NINIT=("initramfs-linux.img" "initramfs-linux-fallback.img")
+* GRUB_BTRFS_NINIT=("initramfs-custom.img" "initrd.img-custom")
 
-	(Use only if you have a custom initramfs name or auto-detect failed.)
+	(Use it only if you have a custom initramfs name)
 
 * GRUB_BTRFS_INTEL_UCODE=("intel-ucode.img")
 
-	(Use only if you have custom intel-ucode or auto-detect failed.)
+	(Use it only if you have custom intel-ucode)
 
 * GRUB_BTRFS_LIMIT="50"
 
@@ -73,17 +74,17 @@ Add this lines to /etc/default/grub:
 	
 	(Show Total number of snapshots found during run "grub-mkconfig")
 
-* GRUB_BTRFS_IGNORE_SPECIFIC_PATH=("var/lib/docker" "nosnapshot")
+* GRUB_BTRFS_IGNORE_SPECIFIC_PATH=("var/lib/docker")
 
 	(Ignore specific path during run "grub-mkconfig")
-
-* GRUB_BTRFS_CREATE_ONLY_HARMONIZED_ENTRIES="true"
-
-	(Create entries with matching version number instead of all possible combinations of kernel and initramfs, very useful with debian-like distributions)
 
 * GRUB_BTRFS_SNAPPER_CONFIG="root"													
 
 	(Snapper's config name to use)
+
+* GRUB_BTRFS_DISABLE="true"
+
+	(Disable grub-btrfs)
 
 
 Generate grub.cfg (on Arch linux use grub-mkconfig -o /boot/grub/grub.cfg )
