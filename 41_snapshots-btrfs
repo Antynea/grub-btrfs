@@ -182,16 +182,17 @@ make_menu_entries()
 		[[ ! -f "${boot_dir}"/"${k}" ]] && continue;
 		kversion=${k#*"-"}
 		for i in "${name_initramfs[@]}"; do
-			prefix_i=${i[@]%%"-"*}
-			suffix_i=${i[@]##*"-"}
-			if 		[ -f "${boot_dir}"/"${prefix_i}-${kversion}-${suffix_i}" ];	then i="${i}";
-			elif 	[ -f "${boot_dir}"/"${prefix_i}-${kversion}" ]; 			then i="${i}";
-			elif 	[ -f "${boot_dir}"/"${prefix_i}-${kversion}.img" ]; 		then i="${i}";
-			elif 	[ -f "${boot_dir}"/"${prefix_i}-${kversion}.gz" ]; 			then i="${i}";
+			prefix_i=${i%%"-"*}
+			suffix_i=${i#*"-"}
+         	alt_suffix_i=${i##*"-"}
+            if   [ "${kversion}" = "${suffix_i}" ];                 then i="${i}";
+            elif [ "${kversion}.img" = "${suffix_i}" ];             then i="${i}";
+            elif [ "${kversion}-fallback.img" = "${suffix_i}" ];    then i="${i}";
+            elif [ "${kversion}.gz" = "${suffix_i}" ];              then i="${i}";
 			else 	continue ;
 			fi
 			for u in "${name_microcode[@]}"; do
-				if [[ -f "${boot_dir}"/"${u}" && "${i}" != initramfs-linux-fallback.img ]] ; then
+				if [[ -f "${boot_dir}"/"${u}" && "${i}" != "${prefix_i}-${kversion}-${alt_suffix_i}" ]] ; then
 				entry "
 	menuentry '"${k}" & "${i}" & "${u}"' ${CLASS} "\$menuentry_id_option" 'gnulinux-snapshots-$boot_uuid'{"
 				else
@@ -212,7 +213,7 @@ make_menu_entries()
 		echo 'Loading Snapshot: "${snap_date_time}" "${snap_dir_name}"'
 		echo 'Loading Kernel: "${k}" ...'
 		linux \"${boot_dir_root_grub}/"${k}"\" root=UUID=${root_uuid} rw rootflags=subvol=\""${snap_dir_name}"\" ${kernel_parameters}"
-				if [[ -f "${boot_dir}"/"${u}" && "${i}" != initramfs-linux-fallback.img ]] ; then
+				if [[ -f "${boot_dir}"/"${u}" && "${i}" != "${prefix_i}-${kversion}-${alt_suffix_i}" ]] ; then
 					entry "\
 		echo 'Loading Microcode & Initramfs: "${u}" "${i}" ...'
 		initrd \"${boot_dir_root_grub}/"${u}"\" \"${boot_dir_root_grub}/"${i}"\""
