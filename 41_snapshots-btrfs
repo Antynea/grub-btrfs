@@ -4,18 +4,19 @@
 #########################################################################################################################################################################
 # Written by: Antynea																																					#
 # BTC donation address: 1Lbvz244WA8xbpHek9W2Y12cakM6rDe5Rt																												#
-#																																										#
+# Github: https://github.com/Antynea/grub-btrfs 																														#
+#                                                                                                                                                                       #
 # Purpose: Include btrfs snapshots at boot options (grub-menu).																											#
 #																																										#
 # What this script does:																																				#
 # Simple rollback using snapshots you made previously.																													#
 # - Automatically List snapshots existing on root partition (btrfs).																									#
 # - Automatically Detect if "/boot" is in separate partition.																											#
-# - Automatically Detect kernel, initramfs and intel microcode in "/boot" directory on snapshots. (For custon name, see below.)											#
+# - Automatically Detect kernel, initramfs and intel microcode in "/boot" directory on snapshots.                               										#
 # - Automatically Create corresponding "menuentry" in grub.cfg , which ensures a very easy rollback.																	#
 # - Automatically detect snapper and use snapper's snapshot description if available.																					#
 #																																										#
-# How to use it:																																						#
+# How to customize it:																																					#
 # - Add this lines to /etc/default/grub:																																#
 #																																										#
 # * GRUB_BTRFS_SUBMENUNAME="Arch Linux snapshots" 																														#
@@ -36,12 +37,12 @@
 # * GRUB_BTRFS_SHOW_TOTAL_SNAPSHOTS_FOUND="true"																														#
 #		(Show Total of snapshots found during run "grub-mkconfig")																										#
 # * GRUB_BTRFS_NKERNEL=("vmlinuz-linux") 		 																														#
-#		(Use only if you have custom kernel name or auto-detect failed.)																								#
+#		(Use only if you have custom kernel name.)			                        																					#
 # * GRUB_BTRFS_NINIT=("initramfs-linux.img" "initramfs-linux-fallback.img")																								#
-#		(Use only if you have custom initramfs name or auto-detect failed.)																								#
+#		(Use only if you have custom initramfs name.)						                      																		#
 # * GRUB_BTRFS_INTEL_UCODE=("intel-ucode.img") 																															#
-#		(Use only if you have custom intel-ucode or auto-detect failed.)		    																					#
-# * GRUB_BTRFS_IGNORE_SPECIFIC_PATH=("var/lib/docker" "nosnapshot")																										#
+#		(Use only if you have custom intel-ucode.)		    			                          																		#
+# * GRUB_BTRFS_IGNORE_SPECIFIC_PATH=("var/lib/docker")					             																					#
 #		(Ignore specific path during run "grub-mkconfig")																												#
 # * GRUB_BTRFS_SNAPPER_CONFIG="root"																																	#
 #		(Snapper's config name to use)																																	#
@@ -73,8 +74,7 @@ datarootdir="/usr/share"
 sysconfdir="/etc"
 
 . "${sysconfdir}/default/grub"
-. "$pkgdatadir/grub-mkconfig_lib"
-# . "$datarootdir/grub/grub-mkconfig_lib" # Uncomment if you run "bash -x"
+. "$datarootdir/grub/grub-mkconfig_lib"
 
 ######################################
 ### Variables in /etc/default/grub ###
@@ -182,16 +182,17 @@ make_menu_entries()
 		[[ ! -f "${boot_dir}"/"${k}" ]] && continue;
 		kversion=${k#*"-"}
 		for i in "${name_initramfs[@]}"; do
-			prefix_i=${i[@]%%"-"*}
-			suffix_i=${i[@]##*"-"}
-			if 		[ -f "${boot_dir}"/"${prefix_i}-${kversion}-${suffix_i}" ];	then i="${i}";
-			elif 	[ -f "${boot_dir}"/"${prefix_i}-${kversion}" ]; 			then i="${i}";
-			elif 	[ -f "${boot_dir}"/"${prefix_i}-${kversion}.img" ]; 		then i="${i}";
-			elif 	[ -f "${boot_dir}"/"${prefix_i}-${kversion}.gz" ]; 			then i="${i}";
+			prefix_i=${i%%"-"*}
+			suffix_i=${i#*"-"}
+         	alt_suffix_i=${i##*"-"}
+            if   [ "${kversion}" = "${suffix_i}" ];                 then i="${i}";
+            elif [ "${kversion}.img" = "${suffix_i}" ];             then i="${i}";
+            elif [ "${kversion}-fallback.img" = "${suffix_i}" ];    then i="${i}";
+            elif [ "${kversion}.gz" = "${suffix_i}" ];              then i="${i}";
 			else 	continue ;
 			fi
 			for u in "${name_microcode[@]}"; do
-				if [[ -f "${boot_dir}"/"${u}" && "${i}" != initramfs-linux-fallback.img ]] ; then
+				if [[ -f "${boot_dir}"/"${u}" && "${i}" != "${prefix_i}-${kversion}-${alt_suffix_i}" ]] ; then
 				entry "
 	menuentry '"${k}" & "${i}" & "${u}"' ${CLASS} "\$menuentry_id_option" 'gnulinux-snapshots-$boot_uuid'{"
 				else
@@ -212,7 +213,7 @@ make_menu_entries()
 		echo 'Loading Snapshot: "${snap_date_time}" "${snap_dir_name}"'
 		echo 'Loading Kernel: "${k}" ...'
 		linux \"${boot_dir_root_grub}/"${k}"\" root=UUID=${root_uuid} rw rootflags=subvol=\""${snap_dir_name}"\" ${kernel_parameters}"
-				if [[ -f "${boot_dir}"/"${u}" && "${i}" != initramfs-linux-fallback.img ]] ; then
+				if [[ -f "${boot_dir}"/"${u}" && "${i}" != "${prefix_i}-${kversion}-${alt_suffix_i}" ]] ; then
 					entry "\
 		echo 'Loading Microcode & Initramfs: "${u}" "${i}" ...'
 		initrd \"${boot_dir_root_grub}/"${u}"\" \"${boot_dir_root_grub}/"${i}"\""
@@ -394,16 +395,15 @@ path_snapshot()
 title_format()
 {
 	case "${title_format}" in
-		p/d/n) 	title_menu="${prefixentry} ${snap_date_time} ${name_snapshot}";;
 		p/n/d) 	title_menu="${prefixentry} ${name_snapshot} ${snap_date_time}";;
 		p/d) 	title_menu="${prefixentry} ${snap_date_time}";;
 		p/n) 	title_menu="${prefixentry} ${name_snapshot}";;
 		d/n) 	title_menu="${snap_date_time} ${name_snapshot}";;
 		n/d) 	title_menu="${name_snapshot} ${snap_date_time}";;
-		p) 	title_menu="${prefixentry}";;
-		d)	title_menu="${snap_date_time}";;
-		n)	title_menu="${name_snapshot}";;
-		*)	printf $"# Warning: GRUB_BTRFS_TITLE_FORMAT=${title_format}, syntax error \n" >&2
+		p) 		title_menu="${prefixentry}";;
+		d)		title_menu="${snap_date_time}";;
+		n)		title_menu="${name_snapshot}";;
+		*)		title_menu="${prefixentry} ${snap_date_time} ${name_snapshot}"
 	esac
 }
 
