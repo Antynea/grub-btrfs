@@ -17,38 +17,8 @@
 # - Automatically detect snapper and use snapper's snapshot description if available.
 #
 # How to customize it:
-# - Add this lines to /etc/default/grub:
-# Add these lines to /etc/default/grub or /etc/grub.d/41_snapshots-btrfs_config:
-#
-# * GRUB_BTRFS_SUBMENUNAME="Arch Linux snapshots"
-#		(Name appearing in the Grub menu.)
-# * GRUB_BTRFS_PREFIXENTRY="Snapshot:"
-#		(Add a name ahead your snapshots entries in the Grub menu.)
-# * GRUB_BTRFS_DISPLAY_PATH_SNAPSHOT="true"
-#		(Show full path snapshot or only name in the Grub menu)
-# * GRUB_BTRFS_TITLE_FORMAT="p/d/n"
-#		(Custom title, shows/hides p"prefix" d"date" n"name" in the Grub menu, separator "/", custom order available)
-# * GRUB_BTRFS_LIMIT="50"
-#		(Limit the number of snapshots populated in the GRUB menu.)
-# * GRUB_BTRFS_SUBVOLUME_SORT="descending"
-#		(Sort the found subvolumes by newest first ("descending") or oldest first ("ascending").
-#		If "ascending" is chosen then the $GRUB_BTRFS_LIMIT oldest subvolumes will populate the menu.)
-# * GRUB_BTRFS_SHOW_SNAPSHOTS_FOUND="true"
-#		(Show snapshots found during run "grub-mkconfig")
-# * GRUB_BTRFS_SHOW_TOTAL_SNAPSHOTS_FOUND="true"
-#		(Show Total of snapshots found during run "grub-mkconfig")
-# * GRUB_BTRFS_NKERNEL=("vmlinuz-linux")
-#		(Use only if you have custom kernel name.)
-# * GRUB_BTRFS_NINIT=("initramfs-linux.img" "initramfs-linux-fallback.img")
-#		(Use only if you have custom initramfs name.)
-# * GRUB_BTRFS_INTEL_UCODE=("intel-ucode.img")
-#		(Use only if you have custom intel-ucode.)
-# * GRUB_BTRFS_IGNORE_SPECIFIC_PATH=("var/lib/docker")
-#		(Ignore specific path during run "grub-mkconfig")
-# * GRUB_BTRFS_SNAPPER_CONFIG="root"
-#		(Snapper's config name to use)
-# * GRUB_BTRFS_DISABLE="false"
-#		Disable Grub-btrfs (default=active)
+# - Refer 41_snapshots-btrfs_config for the list of available options and their default values.
+# - Place your configurations to either /etc/grub.d/41_snapshots-btrfs_config or /etc/default/grub.
 #
 # - Generate grub.cfg (on Arch Linux use grub-mkconfig -o /boot/grub/grub.cfg)
 #
