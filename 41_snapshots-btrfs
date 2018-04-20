@@ -73,8 +73,10 @@ prefix="/usr"
 exec_prefix="/usr"
 datarootdir="/usr/share"
 sysconfdir="/etc"
+grub_btrfs_config="${sysconfdir}/grub.d/41_snapshots-btrfs_config"
 
 . "${sysconfdir}/default/grub"
+[[ -f "$grub_btrfs_config" ]] && . "$grub_btrfs_config"
 . "$datarootdir/grub/grub-mkconfig_lib"
 
 ######################################
