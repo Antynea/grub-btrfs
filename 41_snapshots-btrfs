@@ -5,7 +5,7 @@
 # Written by: Antynea
 # BTC donation address: 1Lbvz244WA8xbpHek9W2Y12cakM6rDe5Rt
 # Github: https://github.com/Antynea/grub-btrfs
-#                                                                                                                                                                       #
+#                                                                                                                                                                       
 # Purpose: Include btrfs snapshots at boot options (grub-menu).
 #
 # What this script does:
@@ -108,6 +108,16 @@ gbgmp=$(mktemp -d)
 CLASS="--class snapshots --class gnu-linux --class gnu --class os"
 ## save IFS
 oldIFS=$IFS
+## Detect uuid requirement (lvm,btrfs...)
+check_uuid_required() {
+if [ "x${GRUB_DEVICE_UUID}" = "x" ] || [ "x${GRUB_DISABLE_LINUX_UUID}" = "xtrue" ] \
+    || ! test -e "/dev/disk/by-uuid/${GRUB_DEVICE_UUID}" \
+    || ( test -e "${GRUB_DEVICE}" && uses_abstraction "${GRUB_DEVICE}" lvm ); then
+  LINUX_ROOT_DEVICE=${GRUB_DEVICE}
+else
+  LINUX_ROOT_DEVICE=UUID=${GRUB_DEVICE_UUID}
+fi
+}
 
 
 ######################
@@ -185,7 +195,7 @@ make_menu_entries()
 		fi
 		echo 'Loading Snapshot: "${snap_date_time}" "${snap_dir_name}"'
 		echo 'Loading Kernel: "${k}" ...'
-		linux \"${boot_dir_root_grub}/"${k}"\" root=UUID=${root_uuid} rw rootflags=subvol=\""${snap_dir_name}"\" ${kernel_parameters}"
+		linux \"${boot_dir_root_grub}/"${k}"\" root="${LINUX_ROOT_DEVICE}" rw rootflags=subvol=\""${snap_dir_name}"\" ${kernel_parameters}"
 				if [[ -f "${boot_dir}"/"${u}" && "${i}" != "${prefix_i}-${kversion}-${alt_suffix_i}" ]] ; then
 					entry "\
 		echo 'Loading Microcode & Initramfs: "${u}" "${i}" ...'
@@ -491,6 +501,8 @@ mount -o subvolid=5 /dev/disk/by-uuid/$root_uuid $gbgmp/
 count_warning_menuentries=0
 # Count snapshots
 count_limit_snap=0
+# detect uuid requirement
+check_uuid_required
 # Detects if /boot is a separate partition
 if [[ "$root_uuid" != "$boot_uuid" ]]; then
 	printf "# Info: Separate boot partition detected \n" >&2 ;
