@@ -86,6 +86,10 @@ Add this lines to /etc/default/grub:
 
 	(Disable grub-btrfs)
 
+* GRUB_BTRFS_DIRNAME="grub"
+
+	(Name of the grub folder on /boot/)
+
 
 Generate grub.cfg (on Arch linux use grub-mkconfig -o /boot/grub/grub.cfg )
 
@@ -99,6 +103,8 @@ If you would like grub to automatically update when Snapper timeline snapshots a
 
 - `/etc/systemd/system/snapper-timeline.service.d/`
 - `/etc/systemd/system/snapper-cleanup.service.d/`
+
+Or copy `grub-btrfs.path` and `grub-btrfs.service` to `/etc/systemd/system/`
 
 Once the configuration files are in place, `systemctl daemon-reload` should be run to reload the units and make the changes active.
 
