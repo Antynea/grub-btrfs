@@ -20,7 +20,7 @@
 # - Refer 41_snapshots-btrfs_config for the list of available options and their default values.
 # - Place your configurations to either /etc/grub.d/41_snapshots-btrfs_config or /etc/default/grub.
 #
-# - Generate grub.cfg (on Arch Linux use grub-mkconfig -o /boot/grub/grub.cfg)
+# - Generate grub.cfg (on Arch Linux use grub-mkconfig -o /boot/$grub_directory/grub.cfg)
 #
 # - grub-btrfs automatically generates snapshots entries.
 # - You will see it appear different entries (e.g : Snapshot: [2014-02-12 11:24:37] my snapshot name overkill)
@@ -86,6 +86,8 @@ ignore_specific_path=("${GRUB_BTRFS_IGNORE_SPECIFIC_PATH[@]}")
 ## snapper's config name
 snapper_config=${GRUB_BTRFS_SNAPPER_CONFIG:-"root"}
 
+grub_directory=${GRUB_BTRFS_DIRNAME:-"grub"}
+
 ########################
 ### variables script ###
 ########################
@@ -147,10 +149,10 @@ test_btrfs()
 
 ## Create entry
 entry()	{
-echo "$@" >> "/boot/grub/grub-btrfs.cfg"
+echo "$@" >> "/boot/$grub_directory/grub-btrfs.cfg"
 # local arg="$@"
-# echo "${arg}" >> "/boot/grub/grub-btrfs.cfg"
-# cat << EOF >> "/boot/grub/grub-btrfs.cfg"
+# echo "${arg}" >> "/boot/$grub_directory/grub-btrfs.cfg"
+# cat << EOF >> "/boot/$grub_directory/grub-btrfs.cfg"
 # ${arg}
 # EOF
 }
@@ -492,8 +494,8 @@ printf "###### - Grub-btrfs: Snapshot detection started - ######\n" >&2 ;
 # if btrfs prog isn't installed, exit
 test_btrfs
 # Delete existing config
-#rm -f --preserve-root "/boot/grub/grub-btrfs.cfg"
-> "/boot/grub/grub-btrfs.cfg"
+#rm -f --preserve-root "/boot/$grub_directory/grub-btrfs.cfg"
+> "/boot/$grub_directory/grub-btrfs.cfg"
 # Create mount point then mounting
 [[ ! -d $gbgmp ]] && mkdir -p $gbgmp
 mount -o subvolid=5 /dev/disk/by-uuid/$root_uuid $gbgmp/
@@ -524,7 +526,7 @@ fi
 if [[ "${count_limit_snap}" = "0" || -z "${count_limit_snap}" ]]; then
 	print_error "No snapshots found."
 fi
-root_grub="$(make_system_path_relative_to_its_root /boot/grub)"
+root_grub="$(make_system_path_relative_to_its_root /boot/$grub_directory)"
 # Make a submenu in GRUB (grub.cfg)
 cat << EOF
 submenu '${submenuname}' {

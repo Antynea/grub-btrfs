@@ -1,0 +1,10 @@
+[Unit]
+Description=Regenerate grub-btrfs.cfg
+
+[Service]
+Type=oneshot
+#Inital setup
+EnvironmentFile=/etc/grub.d/41_snapshots-btrfs_config
+ExecStartPre=-/bin/bash -c '[ ! -f "/boot/${GRUB_BTRFS_DIRNAME:-grub}/grub-btrfs.cfg" ] && grub2-mkconfig -o /boot/${GRUB_BTRFS_DIRNAME:-grub}/grub.cfg'
+#Regenerate grub-btrfs.cfg instead of the whole grub menu
+ExecStart=/etc/grub.d/41_snapshots-btrfs
