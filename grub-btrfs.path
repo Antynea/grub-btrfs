@@ -1,0 +1,8 @@
+[Unit]
+Description=Monitors for new snapshots
+
+[Path]
+PathModified=/.snapshots
+
+[Install]
+WantedBy=multi-user.target
