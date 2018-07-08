@@ -14,4 +14,5 @@
 # GRUB_BTRFS_IGNORE_SPECIFIC_PATH=("var/lib/docker")                         # Ignore specific path during run "grub-mkconfig"
 # GRUB_BTRFS_SNAPPER_CONFIG="root"                                           # Snapper's config name to use
 # GRUB_BTRFS_DISABLE="false"                                                 # Disable Grub-btrfs
-# GRUB_BTRFS_DIRNAME=grub							     # Might be grub2 on some systems ex. /boot/grub2/...
+# GRUB_BTRFS_DIRNAME=grub							                                       # Might be grub2 on some systems ex. /boot/grub2/...
+# GRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION="false"                       # Change to "true" if you have a boot partition in a different subvolume
