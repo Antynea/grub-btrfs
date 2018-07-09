@@ -90,6 +90,8 @@ Add this lines to /etc/default/grub:
 
 	(Name of the grub folder on /boot/)
 
+* GRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION="false"
+	(Change to "true" if you have a boot partition in a different subvolume)
 
 Generate grub.cfg (on Arch linux use grub-mkconfig -o /boot/grub/grub.cfg )
 

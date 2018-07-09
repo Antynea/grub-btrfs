@@ -83,9 +83,11 @@ show_snap_found=${GRUB_BTRFS_SHOW_SNAPSHOTS_FOUND:-"true"}
 show_total_snap_found=${GRUB_BTRFS_SHOW_TOTAL_SNAPSHOTS_FOUND:-"true"}
 ## Ignore specific path during run "grub-mkconfig"
 ignore_specific_path=("${GRUB_BTRFS_IGNORE_SPECIFIC_PATH[@]}")
-## snapper's config name
+## Snapper's config name
 snapper_config=${GRUB_BTRFS_SNAPPER_CONFIG:-"root"}
-
+## Override boot partition detection
+override_boot_partition_detection=${GRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION:-"false"}
+## Customize GRUB directory
 grub_directory=${GRUB_BTRFS_DIRNAME:-"grub"}
 
 ########################
@@ -506,12 +508,17 @@ count_limit_snap=0
 # detect uuid requirement
 check_uuid_required
 # Detects if /boot is a separate partition
-if [[ "$root_uuid" != "$boot_uuid" ]]; then
-	printf "# Info: Separate boot partition detected \n" >&2 ;
+if [[ "$override_boot_partition_detection" == "true" ]]; then
+	printf "# Info: Override boot partition detection : enable \n" >&2 ;
 	boot_separate
 	else
-	printf "# Info: Separate boot partition not detected \n" >&2 ;
-	boot_bounded
+	if [[ "$root_uuid" != "$boot_uuid" ]]; then
+		printf "# Info: Separate boot partition detected \n" >&2 ;
+		boot_separate
+		else
+		printf "# Info: Separate boot partition not detected \n" >&2 ;
+		boot_bounded
+	fi
 fi
 # unmounting mount point
 umount $gbgmp
