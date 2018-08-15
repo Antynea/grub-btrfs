@@ -93,6 +93,10 @@ Add this lines to /etc/default/grub:
 * GRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION="false"
 	(Change to "true" if you have a boot partition in a different subvolume)
 
+* GRUB_BTRFS_MKCONFIG=grub-mkconfig
+
+    (Name or path of the 'grub-mkconfig' executable; this is 'grub2-mkconfig' on some systems)
+
 Generate grub.cfg (on Arch linux use grub-mkconfig -o /boot/grub/grub.cfg )
 
 grub-btrfs automatically generates snapshots entries.

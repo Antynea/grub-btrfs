@@ -5,7 +5,7 @@
 # Written by: Antynea
 # BTC donation address: 1Lbvz244WA8xbpHek9W2Y12cakM6rDe5Rt
 # Github: https://github.com/Antynea/grub-btrfs
-#                                                                                                                                                                       
+#
 # Purpose: Include btrfs snapshots at boot options (grub-menu).
 #
 # What this script does:
@@ -96,14 +96,20 @@ grub_directory=${GRUB_BTRFS_DIRNAME:-"grub"}
 ## Internationalization (default : english)
 export TEXTDOMAIN=grub-btrfs-git
 export TEXTDOMAINDIR="/usr/share/locale"
-## hints string
-hs_boot=$(${grub_probe} --target="hints_string" "/boot" 2>/dev/null)
-## UUID of the boot partition
-boot_uuid=$(${grub_probe} --target="fs_uuid" "/boot" 2>/dev/null)
-## Type filesystem of boot partition
+## Probe info "Boot partition"
+# Boot device
+boot_device=$(${grub_probe} --target=device "/boot")
+# hints string
+boot_hs=$(${grub_probe} --device "${boot_device}" --target="hints_string" 2>/dev/null)
+# UUID of the boot partition
+boot_uuid=$(${grub_probe} --device "${boot_device}" --target="fs_uuid" 2>/dev/null)
+# Type filesystem of boot partition
 boot_fs=$(${grub_probe} --target="fs" "/boot" 2>/dev/null)
-## UUID of the root partition
-root_uuid=$(${grub_probe} "/" --target="fs_uuid" 2>/dev/null)
+## Probe info "Root partition"
+# Root device
+root_device=$(${grub_probe} --target=device "/")
+# UUID of the root partition
+root_uuid=$(${grub_probe} --device "${root_device}" --target="fs_uuid" 2>/dev/null)
 ## Parameters passed to the kernel
 kernel_parameters="$GRUB_CMDLINE_LINUX $GRUB_CMDLINE_LINUX_DEFAULT"
 ## Mount point location
@@ -114,12 +120,12 @@ CLASS="--class snapshots --class gnu-linux --class gnu --class os"
 oldIFS=$IFS
 ## Detect uuid requirement (lvm,btrfs...)
 check_uuid_required() {
-if [ "x${GRUB_DEVICE_UUID}" = "x" ] || [ "x${GRUB_DISABLE_LINUX_UUID}" = "xtrue" ] \
-    || ! test -e "/dev/disk/by-uuid/${GRUB_DEVICE_UUID}" \
-    || ( test -e "${GRUB_DEVICE}" && uses_abstraction "${GRUB_DEVICE}" lvm ); then
-  LINUX_ROOT_DEVICE=${GRUB_DEVICE}
+if [ "x${root_uuid}" = "x" ] || [ "x${GRUB_DISABLE_LINUX_UUID}" = "xtrue" ] \
+    || ! test -e "/dev/disk/by-uuid/${root_uuid}" \
+    || ( test -e "${root_device}" && uses_abstraction "${root_device}" lvm ); then
+  LINUX_ROOT_DEVICE=${root_device}
 else
-  LINUX_ROOT_DEVICE=UUID=${GRUB_DEVICE_UUID}
+  LINUX_ROOT_DEVICE=UUID=${root_uuid}
 fi
 }
 
@@ -193,7 +199,7 @@ make_menu_entries()
 		set gfxpayload=keep
 		insmod ${boot_fs}
 		if [ x\$feature_platform_search_hint = xy ]; then
-			search --no-floppy --fs-uuid  --set=root ${hs_boot} ${boot_uuid}
+			search --no-floppy --fs-uuid  --set=root ${boot_hs} ${boot_uuid}
 		else
 			search --no-floppy --fs-uuid  --set=root ${boot_uuid}
 		fi
