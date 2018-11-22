@@ -98,18 +98,18 @@ export TEXTDOMAIN=grub-btrfs-git
 export TEXTDOMAINDIR="/usr/share/locale"
 ## Probe info "Boot partition"
 # Boot device
-boot_device=$(${grub_probe} --target=device "/boot")
+boot_device=$(${grub_probe} --target=device /boot)
 # hints string
-boot_hs=$(${grub_probe} --device "${boot_device}" --target="hints_string" 2>/dev/null)
+boot_hs=$(${grub_probe} --device ${boot_device} --target="hints_string" 2>/dev/null)
 # UUID of the boot partition
-boot_uuid=$(${grub_probe} --device "${boot_device}" --target="fs_uuid" 2>/dev/null)
+boot_uuid=$(${grub_probe} --device ${boot_device} --target="fs_uuid" 2>/dev/null)
 # Type filesystem of boot partition
-boot_fs=$(${grub_probe} --target="fs" "/boot" 2>/dev/null)
+boot_fs=$(${grub_probe} --target="fs" /boot 2>/dev/null)
 ## Probe info "Root partition"
 # Root device
-root_device=$(${grub_probe} --target=device "/")
+root_device=$(${grub_probe} --target=device /)
 # UUID of the root partition
-root_uuid=$(${grub_probe} --device "${root_device}" --target="fs_uuid" 2>/dev/null)
+root_uuid=$(${grub_probe} --device ${root_device} --target="fs_uuid" 2>/dev/null)
 ## Parameters passed to the kernel
 kernel_parameters="$GRUB_CMDLINE_LINUX $GRUB_CMDLINE_LINUX_DEFAULT"
 ## Mount point location
