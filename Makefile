@@ -12,4 +12,3 @@ install:
 	@install -Dm644 -t "$(LIB_DIR)/systemd/system/snapper-timeline.service.d" 10-update_grub.conf
 	@install -Dm644 -t "$(LIB_DIR)/systemd/system/snapper-cleanup.service.d" 10-update_grub.conf
 	@install -Dm644 -t "$(SHARE_DIR)/licenses/$(PKGNAME)/" LICENSE
-	@install -Dm644 "localisation/fr/grub-btrfs.mo" "$(SHARE_DIR)/locale/fr/LC_MESSAGES/$(PKGNAME).mo"
