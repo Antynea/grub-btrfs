@@ -45,13 +45,12 @@ datarootdir="/usr/share"
 sysconfdir="/etc"
 grub_btrfs_config="${sysconfdir}/default/grub-btrfs/config"
 
-. "${sysconfdir}/default/grub"
 [[ -f "$grub_btrfs_config" ]] && . "$grub_btrfs_config"
 . "$datarootdir/grub/grub-mkconfig_lib"
 
-######################################
-### Variables in /etc/default/grub ###
-######################################
+###################################################
+### Variables in /etc/default/grub-btrfs/config ###
+###################################################
 ## Disable Grub-btrfs (default=active)
 grub_btrfs_disable=${GRUB_BTRFS_DISABLE:-"false"}
 [[ "${grub_btrfs_disable}" == "true" ]] && exit 0
