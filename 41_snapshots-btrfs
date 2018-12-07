@@ -17,8 +17,8 @@
 # - Automatically detect snapper and use snapper's snapshot description if available.
 #
 # How to customize it:
-# - Refer 41_snapshots-btrfs_config for the list of available options and their default values.
-# - Place your configurations to either /etc/grub.d/41_snapshots-btrfs_config or /etc/default/grub.
+# - Refer to config for the list of available options and their default values.
+# - Place your configurations to /etc/default/grub-btrfs/config.
 #
 # - Generate grub.cfg (on Arch Linux use grub-mkconfig -o /boot/$grub_directory/grub.cfg)
 #
@@ -43,15 +43,14 @@ prefix="/usr"
 exec_prefix="/usr"
 datarootdir="/usr/share"
 sysconfdir="/etc"
-grub_btrfs_config="${sysconfdir}/grub.d/41_snapshots-btrfs_config"
+grub_btrfs_config="${sysconfdir}/default/grub-btrfs/config"
 
-. "${sysconfdir}/default/grub"
 [[ -f "$grub_btrfs_config" ]] && . "$grub_btrfs_config"
 . "$datarootdir/grub/grub-mkconfig_lib"
 
-######################################
-### Variables in /etc/default/grub ###
-######################################
+###################################################
+### Variables in /etc/default/grub-btrfs/config ###
+###################################################
 ## Disable Grub-btrfs (default=active)
 grub_btrfs_disable=${GRUB_BTRFS_DISABLE:-"false"}
 [[ "${grub_btrfs_disable}" == "true" ]] && exit 0
