@@ -31,7 +31,7 @@ Simple rollback using snapshots you made previously.
 * Copy `grub-btrfs.path` to `/etc/systemd/system/` or `/lib/systemd/system/`. (make sure the permissions are 644)
 * Copy `grub-btrfs.service` to `/etc/systemd/system/` or `/lib/systemd/system/`. (make sure the permissions are 644)
 * Generate your Grub menu after installation for the changes to take effect. (on Arch linux use `grub-mkconfig -o /boot/grub/grub.cfg`)
-
+##
 ### Customization:
 
 You have the possibility to modify many parameters in `41_snapshots-btrfs_config`.
