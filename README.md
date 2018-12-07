@@ -6,24 +6,24 @@ This is a version 4.xx of grub-btrfs
 ##### BTC donation address: `1Lbvz244WA8xbpHek9W2Y12cakM6rDe5Rt`
 ##
 ### Description
+improves Grub by adding "btrfs snapshots" to the Grub menu.
 
-grub-btrfs, Include btrfs snapshots at boot options. (Grub menu)
+You can start your system on a "snapshot" from the Grub menu.
+
+Supports manual snapshots, snapper ...
 ##
 ### What does grub-btrfs v4.xx do :
-
-Simple rollback using snapshots you made previously.
-
 * Automatically List snapshots existing on root partition (btrfs).
 
 * Automatically Detect if "/boot" is in separate partition.
 
 * Automatically Detect kernel, initramfs and intel microcode in "/boot" directory on snapshots.
 
-* Automatically Create corresponding "menuentry" in grub.cfg , which ensures a very easy rollback.
+* Automatically Create corresponding "menuentry" in `grub.cfg`
 
 * Automatically detect snapper and use snapper's snapshot description if available.
 
-* Automatically generate grub.cfg if you use the provided systemd service.
+* Automatically generate `grub.cfg` if you use the provided systemd service.
 ##
 ### Installation :
 * Copy `41_snapshots-btrfs` to `/etc/grub.d/`. (make sure the permissions are 755)
