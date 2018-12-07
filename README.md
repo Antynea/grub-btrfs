@@ -6,7 +6,7 @@ This is a version 4.xx of grub-btrfs
 ##### BTC donation address: `1Lbvz244WA8xbpHek9W2Y12cakM6rDe5Rt`
 ##
 ### Description
-improves Grub by adding "btrfs snapshots" to the Grub menu.
+Improves Grub by adding "btrfs snapshots" to the Grub menu.
 
 You can start your system on a "snapshot" from the Grub menu.
 
@@ -14,15 +14,10 @@ Supports manual snapshots, snapper ...
 ##
 ### What does grub-btrfs v4.xx do :
 * Automatically List snapshots existing on root partition (btrfs).
-
 * Automatically Detect if "/boot" is in separate partition.
-
 * Automatically Detect kernel, initramfs and intel microcode in "/boot" directory on snapshots.
-
 * Automatically Create corresponding "menuentry" in `grub.cfg`
-
 * Automatically detect snapper and use snapper's snapshot description if available.
-
 * Automatically generate `grub.cfg` if you use the provided systemd service.
 ##
 ### Installation :
@@ -109,14 +104,13 @@ You have the possibility to modify many parameters in `41_snapshots-btrfs_config
 If you would like Grub to automatically update when a snapshots is made or deleted:
 * Mount your subvolume which contains snapshots to `/.snapshots`
 * Use `systemctl start/enable grub-btrfs.path`
-* `grub-btrfs.path` automatically (re)generate grub.cfg when a modification appear in `/.snapshots`
+* `grub-btrfs.path` automatically (re)generate `grub.cfg` when a modification appear in `/.snapshots`
 
 ##
 ### Discussion
 Pour les francophones : https://forums.archlinux.fr/viewtopic.php?f=18&t=17177
 ##
 ### Special thanks for assistance and contributions
-
 * [maximbaz](https://github.com/maximbaz)
 * [crossroads1112](https://github.com/crossroads1112)
 * [penetal](https://github.com/penetal)
