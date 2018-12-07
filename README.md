@@ -2,14 +2,14 @@
   
 ## grub-btrfs
 
-This is a version 3.xx of grub-btrfs
-##### BTC donation address: 1Lbvz244WA8xbpHek9W2Y12cakM6rDe5Rt
+This is a version 4.xx of grub-btrfs
+##### BTC donation address: `1Lbvz244WA8xbpHek9W2Y12cakM6rDe5Rt`
 ##
 ### Description
 
-grub-btrfs, Include btrfs snapshots at boot options. (grub menu)
+grub-btrfs, Include btrfs snapshots at boot options. (Grub menu)
 ##
-### What does grub-btrfs v3.xx do :
+### What does grub-btrfs v4.xx do :
 
 Simple rollback using snapshots you made previously.
 
@@ -22,39 +22,35 @@ Simple rollback using snapshots you made previously.
 * Automatically Create corresponding "menuentry" in grub.cfg , which ensures a very easy rollback.
 
 * Automatically detect snapper and use snapper's snapshot description if available.
-##
-### How to customize it:
 
-You have the possibility to modify many parameters.
-Add this lines to /etc/default/grub:
+* Automatically generate grub.cfg if you use the provided systemd service.
+##
+### Installation :
+* Copy `41_snapshots-btrfs` to `/etc/grub.d/`. (make sure the permissions are 755)
+* Copy `41_snapshots-btrfs_config` to `/etc/default/grub-btrfs/`. (make sure the permissions are 644)
+* Copy `grub-btrfs.path` to `/etc/systemd/system/` or `/lib/systemd/system/`. (make sure the permissions are 644)
+* Copy `grub-btrfs.service` to `/etc/systemd/system/` or `/lib/systemd/system/`. (make sure the permissions are 644)
+* Generate your Grub menu after installation for the changes to take effect. (on Arch linux use `grub-mkconfig -o /boot/grub/grub.cfg`)
+
+### Customization:
+
+You have the possibility to modify many parameters in `41_snapshots-btrfs_config`.
 
 * GRUB_BTRFS_SUBMENUNAME="Arch Linux Snapshots"
 
-	(Name menu appearing in grub.)
+	(Name appearing in the Grub menu.)
 
 * GRUB_BTRFS_PREFIXENTRY="Snapshot:"
 
-	(Add a name ahead your snapshots entries.)
+	(Add a name ahead your snapshots entries in the Grub menu.)
 	
 * GRUB_BTRFS_DISPLAY_PATH_SNAPSHOT="true"
 	
-	(Show full path snapshot or only name, weird reaction with snapper)
+	(Show full path snapshot or only name in the Grub menu, weird reaction with snapper)
 	
 * GRUB_BTRFS_TITLE_FORMAT="p/d/n"
 
- 	(Custom title, shows/hides p"prefix" d"date" n"name" in grub-menu, separator "/", custom order available)
-
-* GRUB_BTRFS_NKERNEL=("kernel-custom")
-
-	(Use it only if you have a custom kernel name)
-
-* GRUB_BTRFS_NINIT=("initramfs-custom.img" "initrd.img-custom")
-
-	(Use it only if you have a custom initramfs name)
-
-* GRUB_BTRFS_INTEL_UCODE=("intel-ucode.img")
-
-	(Use it only if you have custom intel-ucode)
+ 	(Custom title, shows/hides p"prefix" d"date" n"name" in the Grub menu, separator "/", custom order available)
 
 * GRUB_BTRFS_LIMIT="50"
 
@@ -74,6 +70,18 @@ Add this lines to /etc/default/grub:
 	
 	(Show Total number of snapshots found during run "grub-mkconfig")
 
+* GRUB_BTRFS_NKERNEL=("kernel-custom")
+
+	(Use it only if you have a custom kernel name)
+
+* GRUB_BTRFS_NINIT=("initramfs-custom.img" "initrd.img-custom")
+
+	(Use it only if you have a custom initramfs name)
+
+* GRUB_BTRFS_INTEL_UCODE=("intel-ucode.img")
+
+	(Use it only if you have custom intel-ucode)
+
 * GRUB_BTRFS_IGNORE_SPECIFIC_PATH=("var/lib/docker")
 
 	(Ignore specific path during run "grub-mkconfig")
@@ -82,37 +90,26 @@ Add this lines to /etc/default/grub:
 
 	(Snapper's config name to use)
 
-* GRUB_BTRFS_DISABLE="true"
+* GRUB_BTRFS_DISABLE="false"
 
-	(Disable grub-btrfs)
+	(Disable Grub-btrfs)
 
 * GRUB_BTRFS_DIRNAME="grub"
 
-	(Name of the grub folder on /boot/)
+	(Name of the grub folder in `/boot/`, might be grub2 on some distributions )
 
 * GRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION="false"
 	(Change to "true" if you have a boot partition in a different subvolume)
 
 * GRUB_BTRFS_MKCONFIG=grub-mkconfig
 
-    (Name or path of the 'grub-mkconfig' executable; this is 'grub2-mkconfig' on some systems)
-
-Generate grub.cfg (on Arch linux use grub-mkconfig -o /boot/grub/grub.cfg )
-
-grub-btrfs automatically generates snapshots entries.
-
-You will see it appear differents entries (e.g : Snapshot: 2018-01-03 15:08:41  @test1 )
+    (Name or path of the 'grub-mkconfig' executable; might be 'grub2-mkconfig' on some distributions)
 ##
 ### Automatically update grub
-
-If you would like grub to automatically update when Snapper timeline snapshots and cleanups occur, simply install `10-update_grub.conf` in the following locations:
-
-- `/etc/systemd/system/snapper-timeline.service.d/`
-- `/etc/systemd/system/snapper-cleanup.service.d/`
-
-Or copy `grub-btrfs.path` and `grub-btrfs.service` to `/etc/systemd/system/`
-
-Once the configuration files are in place, `systemctl daemon-reload` should be run to reload the units and make the changes active.
+If you would like Grub to automatically update when a snapshots is made or deleted:
+* Mount your subvolume which contains snapshots to `/.snapshots`
+* Use `systemctl start/enable grub-btrfs.path`
+* `grub-btrfs.path` automatically (re)generate grub.cfg when a modification appear in `/.snapshots`
 
 ##
 ### Discussion
