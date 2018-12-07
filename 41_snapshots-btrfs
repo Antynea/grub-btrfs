@@ -18,7 +18,7 @@
 #
 # How to customize it:
 # - Refer to config for the list of available options and their default values.
-# - Place your configurations to either /etc/default/grub-btrfs/config or /etc/default/grub.
+# - Place your configurations to /etc/default/grub-btrfs/config.
 #
 # - Generate grub.cfg (on Arch Linux use grub-mkconfig -o /boot/$grub_directory/grub.cfg)
 #
