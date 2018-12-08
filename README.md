@@ -11,6 +11,8 @@ Improves Grub by adding "btrfs snapshots" to the Grub menu.
 You can start your system on a "snapshot" from the Grub menu.
 
 Supports manual snapshots, snapper ...
+
+##### Warning : it isn't recommended to start on read-only snapshot
 ##
 ### What does grub-btrfs v4.xx do :
 * Automatically List snapshots existing on root partition (btrfs).
@@ -29,7 +31,7 @@ Supports manual snapshots, snapper ...
 ##
 ### Customization:
 
-You have the possibility to modify many parameters in `41_snapshots-btrfs_config`.
+You have the possibility to modify many parameters in `/etc/default/grub-btrfs/config`.
 
 * GRUB_BTRFS_SUBMENUNAME="Arch Linux Snapshots"
 
