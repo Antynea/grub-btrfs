@@ -53,6 +53,7 @@ grub_btrfs_config="${sysconfdir}/default/grub-btrfs/config"
 
 [[ -f "$grub_btrfs_config" ]] && . "$grub_btrfs_config"
 . "$datarootdir/grub/grub-mkconfig_lib"
+. "${sysconfdir}/default/grub"
 
 ###################################################
 ### Variables in /etc/default/grub-btrfs/config ###
