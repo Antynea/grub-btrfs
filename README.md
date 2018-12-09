@@ -25,7 +25,7 @@ Supports manual snapshots, snapper ...
 ##
 ### Installation :
 * Copy `41_snapshots-btrfs` to `/etc/grub.d/`. (make sure the permissions are 755)
-* Copy `41_snapshots-btrfs_config` to `/etc/default/grub-btrfs/`. (make sure the permissions are 644)
+* Copy `config` to `/etc/default/grub-btrfs/`. (make sure the permissions are 644)
 * Copy `grub-btrfs.path` to `/etc/systemd/system/` or `/lib/systemd/system/`. (make sure the permissions are 644)
 * Copy `grub-btrfs.service` to `/etc/systemd/system/` or `/lib/systemd/system/`. (make sure the permissions are 644)
 * Generate your Grub menu after installation for the changes to take effect. (on Arch linux use `grub-mkconfig -o /boot/grub/grub.cfg`)
