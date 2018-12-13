@@ -24,10 +24,7 @@ Supports manual snapshots, snapper ...
 * Automatically generate `grub.cfg` if you use the provided systemd service.
 ##
 ### Installation :
-* Copy `41_snapshots-btrfs` to `/etc/grub.d/`. (make sure the permissions are 755)
-* Copy `config` to `/etc/default/grub-btrfs/`. (make sure the permissions are 644)
-* Copy `grub-btrfs.path` to `/etc/systemd/system/` or `/lib/systemd/system/`. (make sure the permissions are 644)
-* Copy `grub-btrfs.service` to `/etc/systemd/system/` or `/lib/systemd/system/`. (make sure the permissions are 644)
+* Run `make install` or look into Makefile for instructions on where to put each file.
 * Generate your Grub menu after installation for the changes to take effect. (on Arch linux use `grub-mkconfig -o /boot/grub/grub.cfg`)
 ##
 ### Customization:
@@ -90,7 +87,7 @@ You have the possibility to modify many parameters in `/etc/default/grub-btrfs/c
 
 * GRUB_BTRFS_DISABLE="false"
 
-	(Disable Grub-btrfs)
+	(Disable grub-btrfs)
 
 * GRUB_BTRFS_DIRNAME="grub"
 
