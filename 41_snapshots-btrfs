@@ -6,30 +6,32 @@
 # BTC donation address: 1Lbvz244WA8xbpHek9W2Y12cakM6rDe5Rt
 # Github: https://github.com/Antynea/grub-btrfs
 #
-# Purpose: Include btrfs snapshots at boot options (grub-menu).
+# Purpose:
+#   Improves Grub by adding "btrfs snapshots" to the Grub menu.
+#   You can start your system on a "snapshot" from the Grub menu.
+#   Supports manual snapshots, snapper ...
+#   Warning : it isn't recommended to start on read-only snapshot
 #
 # What this script does:
-# Simple rollback using snapshots you made previously.
 # - Automatically List snapshots existing on root partition (btrfs).
 # - Automatically Detect if "/boot" is in separate partition.
 # - Automatically Detect kernel, initramfs and intel microcode in "/boot" directory on snapshots.
-# - Automatically Create corresponding "menuentry" in grub.cfg , which ensures a very easy rollback.
+# - Automatically Create corresponding "menuentry" in grub.cfg
 # - Automatically detect snapper and use snapper's snapshot description if available.
+# - Automatically generate grub.cfg if you use the provided systemd service.
 #
-# How to customize it:
-# - Refer to config for the list of available options and their default values.
-# - Place your configurations to /etc/default/grub-btrfs/config.
+# Installation:
+# - Run `make install` or look into Makefile for instructions on where to put each file.
 #
-# - Generate grub.cfg (on Arch Linux use grub-mkconfig -o /boot/$grub_directory/grub.cfg)
+# Customization:
+#  Refer to config for the list of available options and their default values.
+#  Place your configurations to /etc/default/grub-btrfs/config.
 #
-# - grub-btrfs automatically generates snapshots entries.
-# - You will see it appear different entries (e.g : Snapshot: [2014-02-12 11:24:37] my snapshot name overkill)
-#
-# Automatically update grub
-#  If you would like grub to automatically update when Snapper timeline snapshots and cleanups occur, simply install 10-update_grub.conf in the following locations:
-# - /etc/systemd/system/snapper-timeline.service.d/
-# - /etc/systemd/system/snapper-cleanup.service.d/
-# Once the configuration files are in place, systemctl daemon-reload should be run to reload the units and make the changes active.
+# Automatically update Grub
+#  If you would like Grub to automatically update when a snapshots is made or deleted:
+# - Mount your subvolume which contains snapshots to /.snapshots
+# - Use systemctl start/enable grub-btrfs.path
+#  grub-btrfs.path will automatically (re)generate grub.cfg when a modification appear in /.snapshots
 #
 # Special thanks for assistance and contributions:
 # - My friends
@@ -47,6 +49,7 @@ grub_btrfs_config="${sysconfdir}/default/grub-btrfs/config"
 
 [[ -f "$grub_btrfs_config" ]] && . "$grub_btrfs_config"
 . "$datarootdir/grub/grub-mkconfig_lib"
+. "${sysconfdir}/default/grub"
 
 ###################################################
 ### Variables in /etc/default/grub-btrfs/config ###
