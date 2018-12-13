@@ -24,8 +24,17 @@ Supports manual snapshots, snapper ...
 * Automatically generate `grub.cfg` if you use the provided systemd service.
 ##
 ### Installation :
+#### Arch Linux
+
+```
+pacman -S grub-btrfs
+```
+
+### Manual
+
 * Run `make install` or look into Makefile for instructions on where to put each file.
-* Generate your Grub menu after installation for the changes to take effect. (on Arch linux use `grub-mkconfig -o /boot/grub/grub.cfg`)
+
+NOTE: Generate your Grub menu after installation for the changes to take effect. (on Arch Linux use `grub-mkconfig -o /boot/grub/grub.cfg`)
 ##
 ### Customization:
 
