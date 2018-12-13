@@ -21,11 +21,7 @@
 # - Automatically generate grub.cfg if you use the provided systemd service.
 #
 # Installation:
-# - Copy 41_snapshots-btrfs to /etc/grub.d/. (make sure the permissions are 755)
-# - Copy config to /etc/default/grub-btrfs/. (make sure the permissions are 644)
-# - Copy grub-btrfs.path to /etc/systemd/system/ or /lib/systemd/system/. (make sure the permissions are 644)
-# - Copy grub-btrfs.service to /etc/systemd/system/ or /lib/systemd/system/. (make sure the permissions are 644)
-# - Generate your Grub menu after installation for the changes to take effect. (on Arch linux use grub-mkconfig -o /boot/grub/grub.cfg)
+# - Run `make install` or look into Makefile for instructions on where to put each file.
 #
 # Customization:
 #  Refer to config for the list of available options and their default values.
@@ -35,7 +31,7 @@
 #  If you would like Grub to automatically update when a snapshots is made or deleted:
 # - Mount your subvolume which contains snapshots to /.snapshots
 # - Use systemctl start/enable grub-btrfs.path
-#  grub-btrfs.path automatically (re)generate grub.cfg when a modification appear in /.snapshots
+#  grub-btrfs.path will automatically (re)generate grub.cfg when a modification appear in /.snapshots
 #
 # Special thanks for assistance and contributions:
 # - My friends
