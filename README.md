@@ -19,8 +19,9 @@ Supports manual snapshots, snapper ...
 * Automatically List snapshots existing on root partition (btrfs).
 * Automatically Detect if "/boot" is in separate partition.
 * Automatically Detect kernel, initramfs and intel microcode in "/boot" directory on snapshots.
-* Automatically Create corresponding "menuentry" in `grub.cfg`
+* Automatically Create corresponding "menuentry" in `grub.cfg`.
 * Automatically detect snapper and use snapper's snapshot description if available.
+* Automatically clear the read-only flag of (snapper-)snapshots if configured.
 * Automatically generate `grub.cfg` if you use the provided systemd service.
 ##
 ### Installation :
@@ -90,7 +91,7 @@ You have the possibility to modify many parameters in `/etc/default/grub-btrfs/c
 
 	(Ignore specific path during run "grub-mkconfig")
 
-* GRUB_BTRFS_SNAPPER_CONFIG="root"													
+* GRUB_BTRFS_SNAPPER_CONFIG="root"
 
 	(Snapper's config name to use)
 
@@ -103,11 +104,16 @@ You have the possibility to modify many parameters in `/etc/default/grub-btrfs/c
 	(Name of the grub folder in `/boot/`, might be grub2 on some distributions )
 
 * GRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION="false"
+
 	(Change to "true" if you have a boot partition in a different subvolume)
 
 * GRUB_BTRFS_MKCONFIG=grub-mkconfig
 
-    (Name or path of the 'grub-mkconfig' executable; might be 'grub2-mkconfig' on some distributions)
+	(Name or path of the 'grub-mkconfig' executable; might be 'grub2-mkconfig' on some distributions)
+
+* GRUB_BTRFS_RW_SNAPSHOTS="false"
+
+	(Clear the snapshots' read-only attribute to make them bootable without issues)
 ##
 ### Automatically update grub
 If you would like Grub to automatically update when a snapshots is made or deleted:

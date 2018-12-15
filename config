@@ -17,3 +17,4 @@
 # GRUB_BTRFS_DIRNAME=grub                                                    # Might be grub2 on some systems ex. /boot/grub2/...
 # GRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION="false"                       # Change to "true" if you have a boot partition in a different subvolume
 # GRUB_BTRFS_MKCONFIG=grub-mkconfig                                          # Might be 'grub2-mkconfig' on some systems
+# GRUB_BTRFS_RW_SNAPSHOTS="false"                                            # Clear the snapshots' read-only flag (to make them bootable without issues)

@@ -10,14 +10,16 @@
 #   Improves Grub by adding "btrfs snapshots" to the Grub menu.
 #   You can start your system on a "snapshot" from the Grub menu.
 #   Supports manual snapshots, snapper ...
-#   Warning : it isn't recommended to start on read-only snapshot
+#   Warning : it isn't recommended to start on read-only snapshot - you should consider to configure
+#             grub-btrfs to make read-only snapshots writeable (esp. when using snapper)
 #
 # What this script does:
 # - Automatically List snapshots existing on root partition (btrfs).
 # - Automatically Detect if "/boot" is in separate partition.
 # - Automatically Detect kernel, initramfs and intel microcode in "/boot" directory on snapshots.
-# - Automatically Create corresponding "menuentry" in grub.cfg
+# - Automatically Create corresponding "menuentry" in grub.cfg.
 # - Automatically detect snapper and use snapper's snapshot description if available.
+# - Automatically clear the read-only flag of (snapper-)snapshots if configured.
 # - Automatically generate grub.cfg if you use the provided systemd service.
 #
 # Installation:
@@ -91,6 +93,8 @@ snapper_config=${GRUB_BTRFS_SNAPPER_CONFIG:-"root"}
 override_boot_partition_detection=${GRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION:-"false"}
 ## Customize GRUB directory
 grub_directory=${GRUB_BTRFS_DIRNAME:-"grub"}
+## Does the user want writeable snapshots ?
+rw_snapshots=${GRUB_BTRFS_RW_SNAPSHOTS:-"false"}
 
 ########################
 ### variables script ###
@@ -271,7 +275,13 @@ snapshot_list()
 		# detect if /boot directory exists
 		[[ ! -d "$gbgmp/$snap_path_name/boot" ]] && continue;
 
-		local id="${snap_path_name//[!0-9]}" # brutal way to get id: remove everything non-numeric
+		# if demanded, make readonly snapshots writeable
+		if [ "$rw_snapshots" != "false" ] && [ $(btrfs property get "$gbgmp/$snap_path_name" ro) == "ro=true" ]; then
+  			btrfs property set "$gbgmp/$snap_path_name" ro false
+  			printf "# Read-only attribute removed from snapshot %s\n" "$snap_path_name" >&2 ;
+  		fi
+
+		local id="${snap_path_name//[!0-9]}"  # brutal way to get id: remove all non-digits
 		ids+=("$id")
 
 		local entry="${snap[@]:10:2} | ${snap_path_name}"
