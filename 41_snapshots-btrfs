@@ -243,7 +243,7 @@ snapshot_list()
 		local snapper_types=($(snapper -t 0 -c "$snapper_config" list | tail -n +3 | cut -d'|' -f 2))
 
 		IFS=$'\n'
-		local snapper_descriptions=($(snapper -t 0 -c "$snapper_config" list | tail -n +3 | cut -d'|' -f 7))
+		local snapper_descriptions=($(snapper -t 0 -c "$snapper_config" list | tail -n +3 | rev | cut -d'|' -f 2 | rev))
 	fi
 
 	IFS=$'\n'
