@@ -545,6 +545,7 @@ root_grub="$(make_system_path_relative_to_its_root /boot/$grub_directory)"
 # Make a submenu in GRUB (grub.cfg)
 cat << EOF
 submenu '${submenuname}' {
+	search -f --set=root --no-floppy /grub/grub-btrfs.cfg
 	configfile "${root_grub}/grub-btrfs.cfg"
 }
 EOF
