@@ -300,6 +300,10 @@ snapshot_list()
 		local entry="${entries[$i]}"
 		for j in "${!snapper_ids[@]}"; do
 			local snapper_id="${snapper_ids[$j]//[[:space:]]/}"
+			# remove other non numeric characters
+			snapper_id="${snapper_id//\*/}"
+			snapper_id="${snapper_id//\+/}"
+			snapper_id="${snapper_id//-/}"
 			if [[ "$snapper_id" == "$id" ]]; then
 				local snapper_type=$(trim "${snapper_types[$j]}")
 				local snapper_description=$(trim "${snapper_descriptions[$j]}")
