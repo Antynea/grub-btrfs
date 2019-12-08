@@ -11,7 +11,7 @@ Improves Grub by adding "btrfs snapshots" to the Grub menu.
 
 You can start your system on a "snapshot" from the Grub menu.
 
-Supports manual snapshots, snapper ...
+Supports manual snapshots, snapper, timeshift ...
 
 ##### Warning : it isn't recommended to start on read-only snapshot
 ##
@@ -34,7 +34,10 @@ pacman -S grub-btrfs
 
 * Run `make install` or look into Makefile for instructions on where to put each file.
 
-NOTE: Generate your Grub menu after installation for the changes to take effect. (on Arch Linux use `grub-mkconfig -o /boot/grub/grub.cfg`)
+NOTE: Generate your Grub menu after installation for the changes to take effect.
+
+On Arch Linux use `grub-mkconfig -o /boot/grub/grub.cfg`.
+
 ##
 ### Customization:
 
@@ -42,72 +45,91 @@ You have the possibility to modify many parameters in `/etc/default/grub-btrfs/c
 
 * GRUB_BTRFS_SUBMENUNAME="Arch Linux Snapshots"
 
-	(Name appearing in the Grub menu.)
+	Name appearing in the Grub menu.
 
 * GRUB_BTRFS_PREFIXENTRY="Snapshot:"
 
-	(Add a name ahead your snapshots entries in the Grub menu.)
+	Add a name ahead your snapshots entries in the Grub menu.
 	
 * GRUB_BTRFS_DISPLAY_PATH_SNAPSHOT="true"
 	
-	(Show full path snapshot or only name in the Grub menu, weird reaction with snapper)
+	Show full path snapshot or only name in the Grub menu, weird reaction with snapper.
 	
 * GRUB_BTRFS_TITLE_FORMAT="p/d/n"
 
- 	(Custom title, shows/hides p"prefix" d"date" n"name" in the Grub menu, separator "/", custom order available)
+ 	Custom title, shows/hides p"prefix" d"date" n"name" in the Grub menu, separator "/", custom order available.
 
 * GRUB_BTRFS_LIMIT="50"
 
-	(Limit the number of snapshots populated in the GRUB menu.)
+	Limit the number of snapshots populated in the GRUB menu.
 
 * GRUB_BTRFS_SUBVOLUME_SORT="descending"
 
-	(Sort the found subvolumes by newest first ("descending") or oldest first ("ascending"). 
-	If "ascending" is chosen then the $GRUB_BTRFS_LIMIT oldest
-	subvolumes will populate the menu.)
+	Sort the found subvolumes by newest first ("descending") or oldest first ("ascending"). 
+	
+	If "ascending" is chosen then 
+	
+	the $GRUB_BTRFS_LIMIT oldest subvolumes will populate the menu.
 
 * GRUB_BTRFS_SHOW_SNAPSHOTS_FOUND="true"
 	
-	(Show snapshots found during run "grub-mkconfig") 
+	Show snapshots found during run "grub-mkconfig".
 	
 * GRUB_BTRFS_SHOW_TOTAL_SNAPSHOTS_FOUND="true"
 	
-	(Show Total number of snapshots found during run "grub-mkconfig")
+	Show Total number of snapshots found during run "grub-mkconfig".
 
 * GRUB_BTRFS_NKERNEL=("kernel-custom")
 
-	(Use it only if you have a custom kernel name)
+	Use it only if you have a custom kernel name
 
 * GRUB_BTRFS_NINIT=("initramfs-custom.img" "initrd.img-custom")
 
-	(Use it only if you have a custom initramfs name)
+	Use it only if you have a custom initramfs name.
 
 * GRUB_BTRFS_INTEL_UCODE=("intel-ucode.img")
 
-	(Use it only if you have custom intel-ucode)
+	Use it only if you have custom intel-ucode.
 
 * GRUB_BTRFS_IGNORE_SPECIFIC_PATH=("var/lib/docker")
 
-	(Ignore specific path during run "grub-mkconfig")
+	Ignore specific path during run "grub-mkconfig".
+	
+	For example: 
+	
+	If path is a directory `# Found Snapshot: 2016-03-31 10:24:41` **var/lib/docker/btrfs/subvolumes/...**
+	
+	use : `GRUB_BTRFS_IGNORE_SPECIFIC_PATH=("var/lib/docker")`
+	
+	If path is a subvolume : `# Found Snapshot: 2016-03-31 10:24:41` **@var/lib/docker/btrfs/subvolumes/...**
+	
+	use : `GRUB_BTRFS_IGNORE_SPECIFIC_PATH=("@var/lib/docker")`
+	
+	You can combine them
+	
+	use : `GRUB_BTRFS_IGNORE_SPECIFIC_PATH=("@var/lib/docker" "var/lib/docker")`
+
 
 * GRUB_BTRFS_SNAPPER_CONFIG="root"													
 
-	(Snapper's config name to use)
+	Snapper's config name to use.
 
 * GRUB_BTRFS_DISABLE="false"
 
-	(Disable grub-btrfs)
+	Disable grub-btrfs.
 
 * GRUB_BTRFS_DIRNAME="grub"
 
-	(Name of the grub folder in `/boot/`, might be grub2 on some distributions )
+	Name of the grub folder in `/boot/`, might be grub2 on some distributions.
 
 * GRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION="false"
-	(Change to "true" if you have a boot partition in a different subvolume)
+
+	Change to "true" if you have a boot partition in a different subvolume.
 
 * GRUB_BTRFS_MKCONFIG=grub-mkconfig
 
-    (Name or path of the 'grub-mkconfig' executable; might be 'grub2-mkconfig' on some distributions)
+	Name or path of the 'grub-mkconfig' executable; might be 'grub2-mkconfig' on some distributions.
+	
 ##
 ### Automatically update grub
 If you would like Grub to automatically update when a snapshots is made or deleted:
