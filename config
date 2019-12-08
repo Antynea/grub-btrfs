@@ -1,19 +1,76 @@
 #!/usr/bin/env bash
 
-# GRUB_BTRFS_SUBMENUNAME="Arch Linux snapshots"                              # Name appearing in the Grub menu
-# GRUB_BTRFS_PREFIXENTRY="Snapshot:"                                         # Add a name ahead your snapshots entries in the Grub menu
-# GRUB_BTRFS_DISPLAY_PATH_SNAPSHOT="true"                                    # Show full path snapshot or only name in the Grub menu
-# GRUB_BTRFS_TITLE_FORMAT="p/d/n"                                            # Custom title, shows/hides p"prefix" d"date" n"name" in the Grub menu, separator "/", custom order available
-# GRUB_BTRFS_LIMIT="50"                                                      # Limit the number of snapshots populated in the GRUB menu
-# GRUB_BTRFS_SUBVOLUME_SORT="descending"                                     # Sort the found subvolumes by newest first ("descending") or oldest first ("ascending") and show $GRUB_BTRFS_LIMIT first entries.
-# GRUB_BTRFS_SHOW_SNAPSHOTS_FOUND="true"                                     # Show snapshots found during run "grub-mkconfig"
-# GRUB_BTRFS_SHOW_TOTAL_SNAPSHOTS_FOUND="true"                               # Show Total of snapshots found during run "grub-mkconfig"
-# GRUB_BTRFS_NKERNEL=("vmlinuz-linux")                                       # Use only if you have custom kernel name
-# GRUB_BTRFS_NINIT=("initramfs-linux.img" "initramfs-linux-fallback.img")    # Use only if you have custom initramfs name
-# GRUB_BTRFS_INTEL_UCODE=("intel-ucode.img")                                 # Use only if you have custom intel-ucode
-# GRUB_BTRFS_IGNORE_SPECIFIC_PATH=("var/lib/docker")                         # Ignore specific path during run "grub-mkconfig"
-# GRUB_BTRFS_SNAPPER_CONFIG="root"                                           # Snapper's config name to use
-# GRUB_BTRFS_DISABLE="false"                                                 # Disable Grub-btrfs
-# GRUB_BTRFS_DIRNAME=grub                                                    # Might be grub2 on some systems ex. /boot/grub2/...
-# GRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION="false"                       # Change to "true" if you have a boot partition in a different subvolume
-# GRUB_BTRFS_MKCONFIG=grub-mkconfig                                          # Might be 'grub2-mkconfig' on some systems
+# Name appearing in the Grub menu
+# Default: "Arch Linux snapshots"
+#GRUB_BTRFS_SUBMENUNAME="Arch Linux snapshots"
+
+# Add a name ahead your snapshots entries in the Grub menu
+# Default: "Snapshot:"
+#GRUB_BTRFS_PREFIXENTRY="Snapshot:"
+
+# Show full path snapshot or only name in the Grub menu
+# Default: "true"
+#GRUB_BTRFS_DISPLAY_PATH_SNAPSHOT="true"
+
+# Custom title
+# shows/hides p"prefix" d"date" n"name" in the Grub menu, separator "/", custom order available
+# Default: "p/d/n"
+#GRUB_BTRFS_TITLE_FORMAT="p/d/n"
+
+# Limit the number of snapshots populated in the GRUB menu
+# Default: "50"
+#GRUB_BTRFS_LIMIT="50"
+
+# Sort the found subvolumes by newest first ("descending") or oldest first ("ascending") and show $GRUB_BTRFS_LIMIT first entries.
+# Default: "descending"
+#GRUB_BTRFS_SUBVOLUME_SORT="descending"
+
+# Show snapshots found during run "grub-mkconfig"
+# Default: "true"
+#GRUB_BTRFS_SHOW_SNAPSHOTS_FOUND="true"
+
+# Show Total of snapshots found during run "grub-mkconfig"
+# Default: "true"
+#GRUB_BTRFS_SHOW_TOTAL_SNAPSHOTS_FOUND="true"
+
+# Use only if you have custom kernel name
+# Default:
+#GRUB_BTRFS_NKERNEL=("vmlinuz-linux")
+
+# Use only if you have custom initramfs name
+# Default:
+#GRUB_BTRFS_NINIT=("initramfs-linux.img" "initramfs-linux-fallback.img")
+
+# Use only if you have custom intel-ucode
+# Default:
+#GRUB_BTRFS_INTEL_UCODE=("intel-ucode.img")
+
+# Ignore specific path during run "grub-mkconfig".
+# If path is a directory, # Found Snapshot: 2016-03-31 10:24:41 var/lib/docker/btrfs/subvolumes/...
+# use : GRUB_BTRFS_IGNORE_SPECIFIC_PATH=("var/lib/docker");
+# If path is a subvolume, # Found Snapshot: 2016-03-31 10:24:41 @var/lib/docker/btrfs/subvolumes/...
+# use : GRUB_BTRFS_IGNORE_SPECIFIC_PATH=("@var/lib/docker");
+# You can combine them
+# use : GRUB_BTRFS_IGNORE_SPECIFIC_PATH=("@var/lib/docker" "var/lib/docker")
+# Default: 
+GRUB_BTRFS_IGNORE_SPECIFIC_PATH=("var/lib/docker" "@var/lib/docker")
+
+# Snapper's config name to use
+# Default: "root"
+#GRUB_BTRFS_SNAPPER_CONFIG="root"
+
+# Disable Grub-btrfs
+# Default: "false"
+#GRUB_BTRFS_DISABLE="false"
+
+# Change to "true" if you have a boot partition in a different subvolume
+# Default: "false"
+#GRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION="false"
+
+# Might be grub2 on some systems ex. /boot/grub2/...
+# Default: "grub"
+#GRUB_BTRFS_DIRNAME="grub"
+
+# Might be 'grub2-mkconfig' on some systems
+# Default: /usr/bin/grub-mkconfig
+#GRUB_BTRFS_MKCONFIG=/usr/bin/grub2-mkconfig
