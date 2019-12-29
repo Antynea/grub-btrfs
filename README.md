@@ -132,10 +132,10 @@ You have the possibility to modify many parameters in `/etc/default/grub-btrfs/c
 	
 ##
 ### Automatically update grub
-If you would like Grub to automatically update when a snapshots is made or deleted:
+If you would like Grub to automatically update when a snapshot is made or deleted:
 * Mount your subvolume which contains snapshots to `/.snapshots`
 * Use `systemctl start/enable grub-btrfs.path`
-* `grub-btrfs.path` automatically (re)generate `grub.cfg` when a modification appear in `/.snapshots`
+* `grub-btrfs.path` automatically (re)generates `grub.cfg` when a modification appears in `/.snapshots`
 ##
 ### Special thanks for assistance and contributions
 * [maximbaz](https://github.com/maximbaz)
