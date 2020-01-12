@@ -152,6 +152,7 @@ test_btrfs()
 	fi
 	set -e
 }
+
 ##############
 ### Script ###
 ##############
@@ -238,12 +239,17 @@ snapshot_list()
 {
 	# Query info from snapper if it is installed
 	type snapper >/dev/null 2>&1
-	if [[ $? -eq 0 ]]; then
-		local snapper_ids=($(snapper --no-dbus -t 0 -c "$snapper_config" list | tail -n +3 | cut -d'|' -f 1))
-		local snapper_types=($(snapper --no-dbus -t 0 -c "$snapper_config" list | tail -n +3 | cut -d'|' -f 2))
+	if [ $? -eq 0 ]; then
+		if [ -s "/etc/snapper/configs/$snapper_config" ]; then
+			printf "# Info: snapper detected, using config '$snapper_config'\n" >&2
+			local snapper_ids=($(snapper --no-dbus -t 0 -c "$snapper_config" list | tail -n +3 | cut -d'|' -f 1))
+			local snapper_types=($(snapper --no-dbus -t 0 -c "$snapper_config" list | tail -n +3 | cut -d'|' -f 2))
 
-		IFS=$'\n'
-		local snapper_descriptions=($(snapper --no-dbus -t 0 -c "$snapper_config" list | tail -n +3 | rev | cut -d'|' -f 2 | rev))
+			IFS=$'\n'
+			local snapper_descriptions=($(snapper --no-dbus -t 0 -c "$snapper_config" list | tail -n +3 | rev | cut -d'|' -f 2 | rev))
+		else
+			printf "# Warning: snapper detected but config '$snapper_config' does not exist\n" >&2
+		fi
 	fi
 
 	IFS=$'\n'
@@ -523,11 +529,11 @@ check_uuid_required
 if [[ "$override_boot_partition_detection" == "true" ]]; then
 	printf "# Info: Override boot partition detection : enable \n" >&2 ;
 	boot_separate
-	else
+else
 	if [[ "$root_uuid" != "$boot_uuid" ]]; then
 		printf "# Info: Separate boot partition detected \n" >&2 ;
 		boot_separate
-		else
+	else
 		printf "# Info: Separate boot partition not detected \n" >&2 ;
 		boot_bounded
 	fi
