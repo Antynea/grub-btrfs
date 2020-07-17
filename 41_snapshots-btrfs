@@ -242,11 +242,11 @@ snapshot_list()
 	if [ $? -eq 0 ]; then
 		if [ -s "/etc/snapper/configs/$snapper_config" ]; then
 			printf "# Info: snapper detected, using config '$snapper_config'\n" >&2
-			local snapper_ids=($(snapper --no-dbus -t 0 -c "$snapper_config" list | tail -n +3 | cut -d'|' -f 1))
-			local snapper_types=($(snapper --no-dbus -t 0 -c "$snapper_config" list | tail -n +3 | cut -d'|' -f 2))
+			local snapper_ids=($(snapper --no-dbus -t 0 -c "$snapper_config" list --disable-used-space | tail -n +3 | cut -d'|' -f 1))
+			local snapper_types=($(snapper --no-dbus -t 0 -c "$snapper_config" list --disable-used-space | tail -n +3 | cut -d'|' -f 2))
 
 			IFS=$'\n'
-			local snapper_descriptions=($(snapper --no-dbus -t 0 -c "$snapper_config" list | tail -n +3 | rev | cut -d'|' -f 2 | rev))
+			local snapper_descriptions=($(snapper --no-dbus -t 0 -c "$snapper_config" list --disable-used-space | tail -n +3 | rev | cut -d'|' -f 2 | rev))
 		else
 			printf "# Warning: snapper detected but config '$snapper_config' does not exist\n" >&2
 		fi
