@@ -58,7 +58,8 @@ grub_btrfs_config="${sysconfdir}/default/grub-btrfs/config"
 grub_btrfs_disable=${GRUB_BTRFS_DISABLE:-"false"}
 [[ "${grub_btrfs_disable}" == "true" ]] && exit 0
 ## Submenu name
-submenuname=${GRUB_BTRFS_SUBMENUNAME:-"Arch Linux snapshots"}
+distro=$(awk -F "=" '/^NAME=/ {gsub(/"/, "", $2); print $2}' /etc/os-release)
+submenuname=${GRUB_BTRFS_SUBMENUNAME:-"${distro:-Linux} snapshots"}
 ## Prefix entry
 prefixentry=${GRUB_BTRFS_PREFIXENTRY:-"Snapshot:"}
 ## Show full path snapshot or only name
