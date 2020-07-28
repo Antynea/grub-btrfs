@@ -53,7 +53,7 @@
 # You can combine them
 # use : GRUB_BTRFS_IGNORE_SPECIFIC_PATH=("@var/lib/docker" "var/lib/docker")
 # Default: 
-GRUB_BTRFS_IGNORE_SPECIFIC_PATH=("var/lib/docker" "@var/lib/docker")
+GRUB_BTRFS_IGNORE_SPECIFIC_PATH=("@" "var/lib/docker" "@var/lib/docker")
 
 # Snapper's config name to use
 # Default: "root"
