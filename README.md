@@ -13,8 +13,14 @@ You can start your system on a "snapshot" from the Grub menu.
 
 Supports manual snapshots, snapper, timeshift ...
 
-##### Warning : it isn't recommended to start on read-only snapshot
-##
+##### Warning: booting on read-only snapshots can be tricky
+
+If you choose to do it, `/var/log` must be on a separate subvolume.
+
+Otherwise, make sure your snapshots are writeable.
+
+See [this ticket](https://github.com/Antynea/grub-btrfs/issues/92) for more info.
+
 ### What does grub-btrfs v4.xx do :
 * Automatically List snapshots existing on root partition (btrfs).
 * Automatically Detect if "/boot" is in separate partition.
