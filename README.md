@@ -51,7 +51,7 @@ You have the possibility to modify many parameters in `/etc/default/grub-btrfs/c
 
 * GRUB_BTRFS_SUBMENUNAME="Arch Linux Snapshots"
 
-	Name appearing in the Grub menu.
+	Name appearing in the Grub menu. Use distribution information from /etc/os-release by default.
 
 * GRUB_BTRFS_PREFIXENTRY="Snapshot:"
 
