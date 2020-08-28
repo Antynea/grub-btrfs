@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Name appearing in the Grub menu
-# Default: "Arch Linux snapshots"
+# Default: Use distribution information from /etc/os-release
 #GRUB_BTRFS_SUBMENUNAME="Arch Linux snapshots"
 
 # Add a name ahead your snapshots entries in the Grub menu
