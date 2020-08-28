@@ -92,6 +92,18 @@ snapper_config=${GRUB_BTRFS_SNAPPER_CONFIG:-"root"}
 override_boot_partition_detection=${GRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION:-"false"}
 ## Customize GRUB directory
 grub_directory=${GRUB_BTRFS_DIRNAME:-"grub"}
+## Password protection management for submenu
+# Protection support for submenu (--unrestricted)
+unrestricted_access_submenu=${GRUB_BTRFS_DISABLE_PROTECTION_SUBMENU:-"false"}
+case "${unrestricted_access_submenu}" in
+	true)	unrestricted_access_submenu="--unrestricted ";;
+	*)		unrestricted_access_submenu=""
+esac
+# Authorized users (--users foo,bar)
+protection_authorized_users=${GRUB_BTRFS_PROTECTION_AUTHORIZED_USERS}
+if [ ! -z "${protection_authorized_users}" ] ; then
+	protection_authorized_users="--users ${GRUB_BTRFS_PROTECTION_AUTHORIZED_USERS} "
+fi
 
 ########################
 ### variables script ###
@@ -191,10 +203,10 @@ make_menu_entries()
 			for u in "${name_microcode[@]}"; do
 				if [[ -f "${boot_dir}"/"${u}" && "${i}" != "${prefix_i}-${kversion}-${alt_suffix_i}" ]] ; then
 				entry "
-	menuentry '"${k}" & "${i}" & "${u}"' ${CLASS} "\$menuentry_id_option" 'gnulinux-snapshots-$boot_uuid'{"
+	menuentry '"${k}" & "${i}" & "${u}"' ${CLASS} "\$menuentry_id_option" 'gnulinux-snapshots-$boot_uuid' {"
 				else
 				entry "
-	menuentry '"${k}" & "${i}"' ${CLASS} "\$menuentry_id_option" 'gnulinux-snapshots-$boot_uuid'{"
+	menuentry '"${k}" & "${i}"' ${CLASS} "\$menuentry_id_option" 'gnulinux-snapshots-$boot_uuid' {"
 				fi
 				entry "\
 		if [ x\$feature_all_video_module = xy ]; then
@@ -555,7 +567,7 @@ fi
 root_grub="$(make_system_path_relative_to_its_root /boot/$grub_directory)"
 # Make a submenu in GRUB (grub.cfg)
 cat << EOF
-submenu '${submenuname}' {
+submenu '${submenuname}' ${protection_authorized_users}${unrestricted_access_submenu}{
 	configfile "\${prefix}/grub-btrfs.cfg"
 }
 EOF
