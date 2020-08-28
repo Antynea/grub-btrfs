@@ -74,3 +74,14 @@ GRUB_BTRFS_IGNORE_SPECIFIC_PATH=("@" "var/lib/docker" "@var/lib/docker")
 # Might be 'grub2-mkconfig' on some systems
 # Default: /usr/bin/grub-mkconfig
 #GRUB_BTRFS_MKCONFIG=/usr/bin/grub2-mkconfig
+
+## Password protection management for submenu,snapshots
+# Add authorized usernames separate by comma (foo,bar)
+# When Grub's password protection is enabled, the superuser is authorized by default, it isn't necessary to add it
+# Default:
+# GRUB_BTRFS_PROTECTION_AUTHORIZED_USERS=""
+#
+# Disable authentication support for submenu of Grub-btrfs only (--unrestricted)
+# doesn't work if GRUB_BTRFS_PROTECTION_AUTHORIZED_USERS isn't empty
+# Default: false
+# GRUB_BTRFS_DISABLE_PROTECTION_SUBMENU="false"
