@@ -136,6 +136,20 @@ You have the possibility to modify many parameters in `/etc/default/grub-btrfs/c
 
 	Name or path of the 'grub-mkconfig' executable; might be 'grub2-mkconfig' on some distributions.
 	
+- Password protection management for submenu (refer to the [Grub documentation](https://www.gnu.org/software/grub/manual/grub/grub.html#Authentication-and-authorisation))
+
+	- GRUB_BTRFS_PROTECTION_AUTHORIZED_USERS=""
+
+		Add authorized usernames separate by comma (foo,bar)
+	
+		When Grub's password protection is enabled, the superuser is authorized by default, it isn't necessary to add it
+		
+	- GRUB_BTRFS_DISABLE_PROTECTION_SUBMENU="false"
+
+		Disable authentication support for submenu of Grub-btrfs only (--unrestricted)
+	
+		doesn't work if `GRUB_BTRFS_PROTECTION_AUTHORIZED_USERS` isn't empty
+
 ##
 ### Automatically update grub
 If you would like Grub to automatically update when a snapshot is made or deleted:
