@@ -201,7 +201,7 @@ make_menu_entries()
 			else 	continue ;
 			fi
 			for u in "${name_microcode[@]}"; do
-				if [[ -f "${boot_dir}"/"${u}" && "${i}" != "${prefix_i}-${kversion}-${alt_suffix_i}" ]] ; then
+				if [[ "${name_microcode}" != "x" ]] ; then
 				entry "
 	menuentry '"${k}" & "${i}" & "${u}"' ${CLASS} "\$menuentry_id_option" 'gnulinux-snapshots-$boot_uuid' {"
 				else
@@ -222,7 +222,7 @@ make_menu_entries()
 		echo 'Loading Snapshot: "${snap_date_time}" "${snap_dir_name}"'
 		echo 'Loading Kernel: "${k}" ...'
 		linux \"${boot_dir_root_grub}/"${k}"\" root="${LINUX_ROOT_DEVICE}" rw ${kernel_parameters} rootflags=subvol=\""${snap_dir_name}"\""
-				if [[ -f "${boot_dir}"/"${u}" && "${i}" != "${prefix_i}-${kversion}-${alt_suffix_i}" ]] ; then
+				if [[ "${name_microcode}" != "x" ]] ; then
 					entry "\
 		echo 'Loading Microcode & Initramfs: "${u}" "${i}" ...'
 		initrd \"${boot_dir_root_grub}/"${u}"\" \"${boot_dir_root_grub}/"${i}"\""
@@ -385,8 +385,14 @@ detect_initramfs()
 detect_microcode()
 {
 	list_ucode=()
-	# Original intel microcode
-	for oiucode in "${boot_dir}"/intel-ucode.img ; do
+	# Original intel/amd microcode (auto-detect)
+	# See "https://www.gnu.org/software/grub/manual/grub/html_node/Simple-configuration.html"
+	for oiucode in "${boot_dir}"/intel-uc.img \
+					"${boot_dir}"/intel-ucode.img \
+					"${boot_dir}"/amd-uc.img \
+					"${boot_dir}"/amd-ucode.img \
+					"${boot_dir}"/early_ucode.cpio \
+					"${boot_dir}"/microcode.cpio; do
 		[[ ! -f "${oiucode}" ]] && continue;
 		list_ucode+=("$oiucode")
 	done
