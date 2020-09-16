@@ -41,9 +41,9 @@
 # Default:
 #GRUB_BTRFS_NINIT=("initramfs-linux.img" "initramfs-linux-fallback.img")
 
-# Use only if you have custom intel-ucode
+# Use only if you have custom microcode
 # Default:
-#GRUB_BTRFS_INTEL_UCODE=("intel-ucode.img")
+#GRUB_BTRFS_CUSTOM_MICROCODE=("intel-ucode.img")
 
 # Ignore specific path during run "grub-mkconfig".
 # If path is a directory, # Found Snapshot: 2016-03-31 10:24:41 var/lib/docker/btrfs/subvolumes/...
