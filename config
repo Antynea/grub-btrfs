@@ -21,9 +21,10 @@
 # Default: "50"
 #GRUB_BTRFS_LIMIT="50"
 
-# Sort the found subvolumes by newest first ("descending") or oldest first ("ascending") and show $GRUB_BTRFS_LIMIT first entries.
-# Default: "descending"
-#GRUB_BTRFS_SUBVOLUME_SORT="descending"
+# Sort the found subvolumes by "ogeneration" or "generation" or "path" or "rootid"
+# Default: "-rootid"
+# See Sorting section to https://btrfs.wiki.kernel.org/index.php/Manpage/btrfs-subvolume#SUBCOMMAND
+#GRUB_BTRFS_SUBVOLUME_SORT="+ogen,-gen,path,rootid"
 
 # Show snapshots found during run "grub-mkconfig"
 # Default: "true"
