@@ -458,7 +458,7 @@ boot_bounded()
 		name_microcode=("${list_ucode[@]##*"/"}")
 		# show snapshot found during run "grub-mkconfig"
 		if [[ "${show_snap_found}" = "true" ]]; then
-		printf $"Found snapshot: %s\n" "$item" >&2 ;
+		printf "Found snapshot: %s\n" "$item" >&2 ;
 		fi
 		# Show full path snapshot or only name
 		path_snapshot
@@ -509,7 +509,7 @@ boot_separate()
 		snap_date_time="$(trim "$snap_date_time")"
 		# show snapshot found during run "grub-mkconfig"
 		if [[ "${show_snap_found}" = "true" ]]; then
-		printf $"Found snapshot: %s\n" "$item" >&2 ;
+		printf "Found snapshot: %s\n" "$item" >&2 ;
 		fi
 		# Show full path snapshot or only name
 		path_snapshot
@@ -568,7 +568,6 @@ fi
 if [[ "${count_limit_snap}" = "0" || -z "${count_limit_snap}" ]]; then
 	print_error "No snapshots found."
 fi
-root_grub="$(make_system_path_relative_to_its_root /boot/$grub_directory)"
 # Make a submenu in GRUB (grub.cfg)
 cat << EOF
 submenu '${submenuname}' ${protection_authorized_users}${unrestricted_access_submenu}{
