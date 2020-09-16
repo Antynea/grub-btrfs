@@ -93,9 +93,9 @@ You have the possibility to modify many parameters in `/etc/default/grub-btrfs/c
 
 	Use it only if you have a custom initramfs name.
 
-* GRUB_BTRFS_INTEL_UCODE=("intel-ucode.img")
+* GRUB_BTRFS_CUSTOM_MICROCODE=("intel-ucode.img")
 
-	Use it only if you have custom intel-ucode.
+	Use it only if you have custom microcode.
 
 * GRUB_BTRFS_IGNORE_SPECIFIC_PATH=("var/lib/docker")
 
