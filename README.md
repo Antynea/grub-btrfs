@@ -69,13 +69,13 @@ You have the possibility to modify many parameters in `/etc/default/grub-btrfs/c
 
 	Limit the number of snapshots populated in the GRUB menu.
 
-* GRUB_BTRFS_SUBVOLUME_SORT="descending"
+* GRUB_BTRFS_SUBVOLUME_SORT="+ogen,-gen,path,rootid"
 
-	Sort the found subvolumes by newest first ("descending") or oldest first ("ascending"). 
+	Sort the found subvolumes by "ogeneration" or "generation" or "path" or "rootid".
 	
-	If "ascending" is chosen then 
+	Default: "-rootid" means list snapshot by new ones first
 	
-	the $GRUB_BTRFS_LIMIT oldest subvolumes will populate the menu.
+	See [Sorting section](https://btrfs.wiki.kernel.org/index.php/Manpage/btrfs-subvolume#SUBCOMMAND)
 
 * GRUB_BTRFS_SHOW_SNAPSHOTS_FOUND="true"
 	
