@@ -76,11 +76,7 @@ microcode=("${GRUB_BTRFS_CUSTOM_MICROCODE[@]}")
 ## Limit snapshots to show in the Grub menu
 limit_snap_show="${GRUB_BTRFS_LIMIT:-50}"
 ## How to sort snapshots list
-snap_list_sort=${GRUB_BTRFS_SUBVOLUME_SORT:-"descending"}
-case "${snap_list_sort}" in
-    ascending)          btrfssubvolsort=("--sort=+rootid");;
-    *)                  btrfssubvolsort=("--sort=-rootid")
-esac
+btrfssubvolsort=(--sort="${GRUB_BTRFS_SUBVOLUME_SORT:-"-rootid"}")
 ## Show snapshots found during run "grub-mkconfig"
 show_snap_found=${GRUB_BTRFS_SHOW_SNAPSHOTS_FOUND:-"true"}
 ## Show Total of snapshots found during run "grub-mkconfig"
