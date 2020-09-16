@@ -72,7 +72,7 @@ nkernel=("${GRUB_BTRFS_NKERNEL[@]}")
 ## Initramfs name(s)
 ninit=("${GRUB_BTRFS_NINIT[@]}")
 ## Microcode(s) name(s)
-microcode=("${GRUB_BTRFS_INTEL_UCODE[@]}")
+microcode=("${GRUB_BTRFS_CUSTOM_MICROCODE[@]}")
 ## Limit snapshots to show in the Grub menu
 limit_snap_show="${GRUB_BTRFS_LIMIT:-50}"
 ## How to sort snapshots list
@@ -454,7 +454,7 @@ boot_bounded()
 		detect_initramfs
 		if [ -z "${list_initramfs}" ]; then continue; fi
 		name_initramfs=("${list_initramfs[@]##*"/"}")
-		# microcode (intel-ucode + custom microcode)
+		# microcode (auto-detect + custom microcode)
 		detect_microcode
 		name_microcode=("${list_ucode[@]##*"/"}")
 		# show snapshot found during run "grub-mkconfig"
