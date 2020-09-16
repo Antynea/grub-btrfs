@@ -337,8 +337,8 @@ detect_kernel()
 	list_kernel=()
 	# Original kernel (auto-detect)
 	for okernel in	"${boot_dir}"/vmlinuz-* \
-			"${boot_dir}"/vmlinux-* \
-			"${boot_dir}"/kernel-* ; do
+					"${boot_dir}"/vmlinux-* \
+					"${boot_dir}"/kernel-* ; do
 		[[ ! -f "${okernel}" ]] && continue;
 		list_kernel+=("$okernel")
 	done
@@ -358,10 +358,10 @@ detect_initramfs()
 	list_initramfs=()
 	# Original initramfs (auto-detect)
 	for oinitramfs in	"${boot_dir}"/initrd.img-* \
-				"${boot_dir}"/initrd-*.img \
-				"${boot_dir}"/initrd-*.gz \
-				"${boot_dir}"/initramfs-*.img \
-				"${boot_dir}"/initramfs-*.gz ; do
+						"${boot_dir}"/initrd-*.img \
+						"${boot_dir}"/initrd-*.gz \
+						"${boot_dir}"/initramfs-*.img \
+						"${boot_dir}"/initramfs-*.gz ; do
 		[[ ! -f "${oinitramfs}" ]] && continue;
 		list_initramfs+=("$oinitramfs")
 	done
@@ -381,7 +381,7 @@ detect_microcode()
 	list_ucode=()
 	# Original intel/amd microcode (auto-detect)
 	# See "https://www.gnu.org/software/grub/manual/grub/html_node/Simple-configuration.html"
-	for oiucode in "${boot_dir}"/intel-uc.img \
+	for oiucode in  "${boot_dir}"/intel-uc.img \
 					"${boot_dir}"/intel-ucode.img \
 					"${boot_dir}"/amd-uc.img \
 					"${boot_dir}"/amd-ucode.img \
@@ -440,7 +440,7 @@ boot_bounded()
 		snap_dir_name="$(trim "$snap_dir_name")"
 		snap_date_time="$(echo "$item" | cut -d' ' -f1-2)"
 		snap_date_time="$(trim "$snap_date_time")"
-
+		
 		boot_dir="$gbgmp/$snap_dir_name/boot"
 		# Kernel (Original + custom kernel)
 		detect_kernel
@@ -466,8 +466,8 @@ boot_bounded()
 		# Make menuentries
 		make_menu_entries
 		### Limit snapshots found during run "grub-mkconfig"
-	        count_limit_snap=$((1+$count_limit_snap))
-	        [[ $count_limit_snap -ge $limit_snap_show ]] && break;
+		count_limit_snap=$((1+$count_limit_snap))
+		[[ $count_limit_snap -ge $limit_snap_show ]] && break;
 		# Limit generation of menuentries if exceeds 250
 		# [[ $count_warning_menuentries -ge 250 ]] && break;
 	done
@@ -516,7 +516,7 @@ boot_separate()
 		make_menu_entries
 		# Limit snapshots found during run "grub-mkconfig"
 		count_limit_snap=$((1+$count_limit_snap))
-	        [[ $count_limit_snap -ge $limit_snap_show ]] && break;
+		[[ $count_limit_snap -ge $limit_snap_show ]] && break;
 		# Limit generation of menuentries if exceeds 250
 		# [[ $count_warning_menuentries -ge 250 ]] && break;
 	done
