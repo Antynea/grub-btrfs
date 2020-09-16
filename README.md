@@ -24,7 +24,7 @@ See [this ticket](https://github.com/Antynea/grub-btrfs/issues/92) for more info
 ### What does grub-btrfs v4.xx do :
 * Automatically List snapshots existing on root partition (btrfs).
 * Automatically Detect if "/boot" is in separate partition.
-* Automatically Detect kernel, initramfs and intel microcode in "/boot" directory on snapshots.
+* Automatically Detect kernel, initramfs and intel/amd microcode in "/boot" directory on snapshots.
 * Automatically Create corresponding "menuentry" in `grub.cfg`
 * Automatically detect snapper and use snapper's snapshot description if available.
 * Automatically generate `grub.cfg` if you use the provided systemd service.
