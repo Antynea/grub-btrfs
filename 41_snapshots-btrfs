@@ -108,9 +108,6 @@ fi
 ########################
 ### variables script ###
 ########################
-## Internationalization (default : english)
-export TEXTDOMAIN=grub-btrfs-git
-export TEXTDOMAINDIR="/usr/share/locale"
 ## Probe info "Boot partition"
 # Boot device
 boot_device=$(${grub_probe} --target=device /boot)
