@@ -156,6 +156,18 @@ If you would like Grub to automatically update when a snapshot is made or delete
 * Mount your subvolume which contains snapshots to `/.snapshots`
 * Use `systemctl start/enable grub-btrfs.path`
 * `grub-btrfs.path` automatically (re)generates `grub.cfg` when a modification appears in `/.snapshots`
+* For timeshift users, use this command:
+	`systemctl edit grub-btrfs.path`
+
+	* Then wrote:
+	```
+	[Path]
+	PathModified=/run/timeshift/backup/timeshift-btrfs/snapshots
+	```
+	
+		and finally save.
+
+	* You can view your change to `systemctl cat grub-btrfs.path`
 ##
 ### Special thanks for assistance and contributions
 * [maximbaz](https://github.com/maximbaz)
