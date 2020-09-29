@@ -21,6 +21,7 @@ Otherwise, make sure your snapshots are writeable.
 
 See [this ticket](https://github.com/Antynea/grub-btrfs/issues/92) for more info.
 
+##
 ### What does grub-btrfs v4.xx do :
 * Automatically List snapshots existing on root partition (btrfs).
 * Automatically Detect if "/boot" is in separate partition.
@@ -28,6 +29,7 @@ See [this ticket](https://github.com/Antynea/grub-btrfs/issues/92) for more info
 * Automatically Create corresponding "menuentry" in `grub.cfg`
 * Automatically detect snapper and use snapper's snapshot description if available.
 * Automatically generate `grub.cfg` if you use the provided systemd service.
+
 ##
 ### Installation :
 #### Arch Linux
@@ -49,106 +51,7 @@ On Arch Linux use `grub-mkconfig -o /boot/grub/grub.cfg`.
 
 You have the possibility to modify many parameters in `/etc/default/grub-btrfs/config`.
 
-* GRUB_BTRFS_SUBMENUNAME="Arch Linux Snapshots"
-
-	Name appearing in the Grub menu. Use distribution information from /etc/os-release by default.
-
-* GRUB_BTRFS_PREFIXENTRY="Snapshot:"
-
-	Add a name ahead your snapshots entries in the Grub menu.
-	
-* GRUB_BTRFS_DISPLAY_PATH_SNAPSHOT="true"
-	
-	Show full path snapshot or only name in the Grub menu, weird reaction with snapper.
-	
-* GRUB_BTRFS_TITLE_FORMAT="p/d/n"
-
- 	Custom title, shows/hides p"prefix" d"date" n"name" in the Grub menu, separator "/", custom order available.
-
-* GRUB_BTRFS_LIMIT="50"
-
-	Limit the number of snapshots populated in the GRUB menu.
-
-* GRUB_BTRFS_SUBVOLUME_SORT="+ogen,-gen,path,rootid"
-
-	Sort the found subvolumes by "ogeneration" or "generation" or "path" or "rootid".
-	
-	Default: "-rootid" means list snapshot by new ones first
-	
-	See [Sorting section](https://btrfs.wiki.kernel.org/index.php/Manpage/btrfs-subvolume#SUBCOMMAND)
-
-* GRUB_BTRFS_SHOW_SNAPSHOTS_FOUND="true"
-	
-	Show snapshots found during run "grub-mkconfig".
-	
-* GRUB_BTRFS_SHOW_TOTAL_SNAPSHOTS_FOUND="true"
-	
-	Show Total number of snapshots found during run "grub-mkconfig".
-
-* GRUB_BTRFS_NKERNEL=("kernel-custom")
-
-	Use it only if you have a custom kernel name
-
-* GRUB_BTRFS_NINIT=("initramfs-custom.img" "initrd.img-custom")
-
-	Use it only if you have a custom initramfs name.
-
-* GRUB_BTRFS_CUSTOM_MICROCODE=("intel-ucode.img")
-
-	Use it only if you have custom microcode.
-
-* GRUB_BTRFS_IGNORE_SPECIFIC_PATH=("var/lib/docker")
-
-	Ignore specific path during run "grub-mkconfig".
-	
-	For example: 
-	
-	If path is a directory `# Found Snapshot: 2016-03-31 10:24:41` **var/lib/docker/btrfs/subvolumes/...**
-	
-	use : `GRUB_BTRFS_IGNORE_SPECIFIC_PATH=("var/lib/docker")`
-	
-	If path is a subvolume : `# Found Snapshot: 2016-03-31 10:24:41` **@var/lib/docker/btrfs/subvolumes/...**
-	
-	use : `GRUB_BTRFS_IGNORE_SPECIFIC_PATH=("@var/lib/docker")`
-	
-	You can combine them
-	
-	use : `GRUB_BTRFS_IGNORE_SPECIFIC_PATH=("@var/lib/docker" "var/lib/docker")`
-
-
-* GRUB_BTRFS_SNAPPER_CONFIG="root"													
-
-	Snapper's config name to use.
-
-* GRUB_BTRFS_DISABLE="false"
-
-	Disable grub-btrfs.
-
-* GRUB_BTRFS_DIRNAME="grub"
-
-	Name of the grub folder in `/boot/`, might be grub2 on some distributions.
-
-* GRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION="false"
-
-	Change to "true" if you have a boot partition in a different subvolume.
-
-* GRUB_BTRFS_MKCONFIG=grub-mkconfig
-
-	Name or path of the 'grub-mkconfig' executable; might be 'grub2-mkconfig' on some distributions.
-	
-- Password protection management for submenu (refer to the [Grub documentation](https://www.gnu.org/software/grub/manual/grub/grub.html#Authentication-and-authorisation))
-
-	- GRUB_BTRFS_PROTECTION_AUTHORIZED_USERS=""
-
-		Add authorized usernames separate by comma (foo,bar)
-	
-		When Grub's password protection is enabled, the superuser is authorized by default, it isn't necessary to add it
-		
-	- GRUB_BTRFS_DISABLE_PROTECTION_SUBMENU="false"
-
-		Disable authentication support for submenu of Grub-btrfs only (--unrestricted)
-	
-		doesn't work if `GRUB_BTRFS_PROTECTION_AUTHORIZED_USERS` isn't empty
+See [config file](https://github.com/Antynea/grub-btrfs/blob/master/config) for more information.
 
 ##
 ### Automatically update grub
