@@ -1,7 +1,6 @@
 #! /usr/bin/env bash
 #
 #
-#########################################################################################################################################################################
 # Written by: Antynea
 # BTC donation address: 1Lbvz244WA8xbpHek9W2Y12cakM6rDe5Rt
 # Github: https://github.com/Antynea/grub-btrfs
@@ -30,15 +29,15 @@
 #
 # Automatically update Grub
 #  If you would like Grub to automatically update when a snapshots is made or deleted:
-# - Mount your subvolume which contains snapshots to /.snapshots
-# - Use systemctl start/enable grub-btrfs.path
-#  grub-btrfs.path will automatically (re)generate grub.cfg when a modification appear in /.snapshots
+#  - Use systemctl start/enable grub-btrfs.path
+#  - grub-btrfs.path automatically (re)generates grub.cfg when a modification appears in /.snapshots folder (by default).
+#  - If your snapshots aren't mounted in /.snapshots, you must modify the watch folder using systemctl edit grub-btrfs.path
+#  - See https://github.com/Antynea/grub-btrfs#automatically-update-grub
 #
 # Special thanks for assistance and contributions:
 # - My friends
 # - All contributors on Github
 #
-#########################################################################################################################################################################
 
 set -e
 
@@ -52,9 +51,7 @@ grub_btrfs_config="${sysconfdir}/default/grub-btrfs/config"
 . "$datarootdir/grub/grub-mkconfig_lib"
 . "${sysconfdir}/default/grub"
 
-###################################################
-### Variables in /etc/default/grub-btrfs/config ###
-###################################################
+### Variables in /etc/default/grub-btrfs/config
 ## Disable Grub-btrfs (default=active)
 grub_btrfs_disable=${GRUB_BTRFS_DISABLE:-"false"}
 [[ "${grub_btrfs_disable}" == "true" ]] && exit 0
@@ -102,9 +99,7 @@ if [ ! -z "${protection_authorized_users}" ] ; then
 	protection_authorized_users="--users ${GRUB_BTRFS_PROTECTION_AUTHORIZED_USERS} "
 fi
 
-########################
-### variables script ###
-########################
+### variables script
 ## Probe info "Boot partition"
 # Boot device
 boot_device=$(${grub_probe} --target=device /boot)
@@ -138,10 +133,7 @@ else
 fi
 }
 
-
-######################
-### Error Handling ###
-######################
+### Error Handling
 print_error()
 {
 	local arg="$@"
@@ -160,11 +152,7 @@ test_btrfs()
 	set -e
 }
 
-##############
-### Script ###
-##############
-
-
+### Script
 ## Create entry
 entry()	{
 echo "$@" >> "/boot/$grub_directory/grub-btrfs.cfg"
@@ -523,7 +511,7 @@ boot_separate()
 	IFS=$oldIFS
 }
 
-### Start ###
+### Start
 printf "Detecting snapshots ...\n" >&2 ;
 # if btrfs prog isn't installed, exit
 test_btrfs
@@ -571,4 +559,4 @@ submenu '${submenuname}' ${protection_authorized_users}${unrestricted_access_sub
 	configfile "\${prefix}/grub-btrfs.cfg"
 }
 EOF
-### End ###
+### End
