@@ -110,6 +110,8 @@ boot_uuid=$(${grub_probe} --device ${boot_device} --target="fs_uuid" 2>/dev/null
 # Type filesystem of boot partition
 boot_fs=$(${grub_probe} --target="fs" /boot 2>/dev/null)
 ## Probe info "Root partition"
+# Type filesystem of root partition
+root_fs=$(${grub_probe} --target="fs" / 2>/dev/null)
 # Root device
 root_device=$(${grub_probe} --target=device /)
 # UUID of the root partition
@@ -144,10 +146,11 @@ print_error()
 
 test_btrfs()
 {
+	[[ "$root_fs" != "btrfs" ]] && print_error "Root partition isn't a btrfs filesystem.\nThis script only supports snapshots of the btrfs filesystem."
 	set +e
 	type btrfs >/dev/null 2>&1
 	if [[ $? -ne 0 ]]; then
-		print_error "This script only supports snapshots of the btrfs filesystem, make sure you have btrfs-progs on your system."
+		print_error "Unable to retrieve info from btrfs filesystem, make sure you have btrfs-progs on your system."
 	fi
 	set -e
 }
@@ -513,7 +516,7 @@ boot_separate()
 
 ### Start
 printf "Detecting snapshots ...\n" >&2 ;
-# if btrfs prog isn't installed, exit
+# Only support btrfs snapshots
 test_btrfs
 # Delete existing config
 #rm -f --preserve-root "/boot/$grub_directory/grub-btrfs.cfg"
