@@ -61,8 +61,8 @@
 # use : GRUB_BTRFS_IGNORE_SPECIFIC_PATH=("@var/lib/docker");
 # You can combine them
 # use : GRUB_BTRFS_IGNORE_SPECIFIC_PATH=("@var/lib/docker" "var/lib/docker")
-# Default: ("var/lib/docker" "@var/lib/docker") and "@" subvolume is hardcode.
-GRUB_BTRFS_IGNORE_SPECIFIC_PATH=("var/lib/docker" "@var/lib/docker")
+# Default: ("var/lib/docker" "@var/lib/docker" "@/var/lib/docker") and "@" subvolume is hardcode.
+GRUB_BTRFS_IGNORE_SPECIFIC_PATH=("var/lib/docker" "@var/lib/docker" "@/var/lib/docker")
 
 # By default "grub-btrfs" automatically detects your boot partition,
 # either located at the system root or on a separate partition,
