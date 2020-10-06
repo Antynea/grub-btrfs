@@ -53,51 +53,28 @@ grub_btrfs_config="${sysconfdir}/default/grub-btrfs/config"
 
 ### Variables in /etc/default/grub-btrfs/config
 ## Disable Grub-btrfs (default=active)
-grub_btrfs_disable=${GRUB_BTRFS_DISABLE:-"false"}
-[[ "${grub_btrfs_disable}" == "true" ]] && exit 0
+[[ "${GRUB_BTRFS_DISABLE:-"false"}" == "true" ]] && exit 0
 ## Submenu name
 distro=$(awk -F "=" '/^NAME=/ {gsub(/"/, "", $2); print $2}' /etc/os-release)
 submenuname=${GRUB_BTRFS_SUBMENUNAME:-"${distro:-Linux} snapshots"}
 ## Prefix entry
 prefixentry=${GRUB_BTRFS_PREFIXENTRY:-"Snapshot:"}
-## Show full path snapshot or only name
-path_snapshot=${GRUB_BTRFS_DISPLAY_PATH_SNAPSHOT:-"true"}
-## Title format
-title_format=${GRUB_BTRFS_TITLE_FORMAT:-"p/d/n"}
-## Kernel(s) name(s)
-nkernel=("${GRUB_BTRFS_NKERNEL[@]}")
-## Initramfs name(s)
-ninit=("${GRUB_BTRFS_NINIT[@]}")
-## Microcode(s) name(s)
-microcode=("${GRUB_BTRFS_CUSTOM_MICROCODE[@]}")
 ## Limit snapshots to show in the Grub menu
 limit_snap_show="${GRUB_BTRFS_LIMIT:-50}"
 ## How to sort snapshots list
 btrfssubvolsort=(--sort="${GRUB_BTRFS_SUBVOLUME_SORT:-"-rootid"}")
-## Show snapshots found during run "grub-mkconfig"
-show_snap_found=${GRUB_BTRFS_SHOW_SNAPSHOTS_FOUND:-"true"}
-## Show Total of snapshots found during run "grub-mkconfig"
-show_total_snap_found=${GRUB_BTRFS_SHOW_TOTAL_SNAPSHOTS_FOUND:-"true"}
-## Ignore specific path during run "grub-mkconfig"
-ignore_specific_path=("${GRUB_BTRFS_IGNORE_SPECIFIC_PATH[@]}")
-## Ignore prefix path during run "grub-mkconfig"
-ignore_prefix_path=("${GRUB_BTRFS_IGNORE_PREFIX_PATH[@]}")
 ## Snapper's config name
 snapper_config=${GRUB_BTRFS_SNAPPER_CONFIG:-"root"}
-## Override boot partition detection
-override_boot_partition_detection=${GRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION:-"false"}
 ## Customize GRUB directory
 grub_directory=${GRUB_BTRFS_DIRNAME:-"grub"}
 ## Password protection management for submenu
 # Protection support for submenu (--unrestricted)
-unrestricted_access_submenu=${GRUB_BTRFS_DISABLE_PROTECTION_SUBMENU:-"false"}
-case "${unrestricted_access_submenu}" in
+case "${GRUB_BTRFS_DISABLE_PROTECTION_SUBMENU:-"false"}" in
 	true)	unrestricted_access_submenu="--unrestricted ";;
 	*)		unrestricted_access_submenu=""
 esac
 # Authorized users (--users foo,bar)
-protection_authorized_users=${GRUB_BTRFS_PROTECTION_AUTHORIZED_USERS}
-if [ ! -z "${protection_authorized_users}" ] ; then
+if [ ! -z "${GRUB_BTRFS_PROTECTION_AUTHORIZED_USERS}" ] ; then
 	protection_authorized_users="--users ${GRUB_BTRFS_PROTECTION_AUTHORIZED_USERS} "
 fi
 
@@ -268,13 +245,13 @@ snapshot_list()
 		[[ ${snap_path_name%%"/"*} == "<FS_TREE>" ]] && snap_path_name=${snap_path_name#*"/"}
 
 		# ignore specific path during run "grub-mkconfig"
-		if [ ! -z "${ignore_specific_path}" ] ; then
-			for isp in ${ignore_specific_path[@]} ; do
+		if [ ! -z "${GRUB_BTRFS_IGNORE_SPECIFIC_PATH}" ] ; then
+			for isp in ${GRUB_BTRFS_IGNORE_SPECIFIC_PATH[@]} ; do
 				[[ "${snap_path_name}" == "${isp}" ]] && continue 2;
 			done
 		fi
-		if [ ! -z "${ignore_prefix_path}" ] ; then
-			for isp in ${ignore_prefix_path[@]} ; do
+		if [ ! -z "${GRUB_BTRFS_IGNORE_PREFIX_PATH}" ] ; then
+			for isp in ${GRUB_BTRFS_IGNORE_PREFIX_PATH[@]} ; do
 				[[ "${snap_path_name}" == "${isp}"/* ]] && continue 2;
 			done
 		fi
@@ -341,8 +318,8 @@ detect_kernel()
 	done
 
 	# Custom name kernel in GRUB_BTRFS_NKERNEL
-	if [ ! -z "${nkernel}" ] ; then
-		for ckernel in "${boot_dir}/${nkernel[@]}" ; do
+	if [ ! -z "${GRUB_BTRFS_NKERNEL}" ] ; then
+		for ckernel in "${boot_dir}/${GRUB_BTRFS_NKERNEL[@]}" ; do
 			[[ ! -f "${ckernel}" ]] && continue;
 			list_kernel+=("$ckernel")
 		done
@@ -364,8 +341,8 @@ detect_initramfs()
 	done
 
 	# Custom name initramfs in GRUB_BTRFS_NINIT
-	if [ ! -z "$ninit" ] ; then
-		for cinitramfs in "${boot_dir}/${ninit[@]}" ; do
+	if [ ! -z "${GRUB_BTRFS_NINIT}" ] ; then
+		for cinitramfs in "${boot_dir}/${GRUB_BTRFS_NINIT[@]}" ; do
 			[[ ! -f "${cinitramfs}" ]] && continue;
 			list_initramfs+=("$cinitramfs")
 		done
@@ -388,9 +365,9 @@ detect_microcode()
 		list_ucode+=("$oiucode")
 	done
 
-	# Custom name microcode in GRUB_BTRFS_INTEL_UCODE
-	if [ ! -z "$microcode" ] ; then
-		for cucode in "${boot_dir}/${microcode[@]}" ; do
+	# Custom name microcode in GRUB_BTRFS_CUSTOM_MICROCODE
+	if [ ! -z "${GRUB_BTRFS_CUSTOM_MICROCODE}" ] ; then
+		for cucode in "${boot_dir}/${GRUB_BTRFS_CUSTOM_MICROCODE[@]}" ; do
 			[[ ! -f "${cucode}" ]] && continue
 			list_ucode+=("$cucode")
 		done
@@ -401,7 +378,7 @@ detect_microcode()
 ## Show full path snapshot or only name
 path_snapshot()
 {
-	case "${path_snapshot}" in
+	case "${GRUB_BTRFS_DISPLAY_PATH_SNAPSHOT:-"true"}" in
 		true) name_snapshot=("${snap_full_name}");;
 		*) name_snapshot=("${snap_full_name#*"/"}")
 	esac
@@ -410,7 +387,7 @@ path_snapshot()
 ## Title format in grub-menu
 title_format()
 {
-	case "${title_format}" in
+	case "${GRUB_BTRFS_TITLE_FORMAT:-"p/d/n"}" in
 		p/n/d) 	title_menu="${prefixentry} ${name_snapshot} ${snap_date_time}";;
 		p/d) 	title_menu="${prefixentry} ${snap_date_time}";;
 		p/n) 	title_menu="${prefixentry} ${name_snapshot}";;
@@ -429,8 +406,7 @@ boot_bounded()
 	# Initialize menu entries
 	IFS=$'\n'
 	for item in $(snapshot_list); do
-		# fix: limit_snap_show=0
-		[[ ${limit_snap_show} -le 0 ]] && break;
+		[[ ${limit_snap_show} -le 0 ]] && break; # fix: limit_snap_show=0
 		IFS=$oldIFS
 		snap_full_name="$(echo "$item" | cut -d'|' -f2-)" # do not trim it to keep nice formatting
 		snap_dir_name="$(echo "$item" | cut -d'|' -f2)"
@@ -451,7 +427,7 @@ boot_bounded()
 		detect_microcode
 		name_microcode=("${list_ucode[@]##*"/"}")
 		# show snapshot found during run "grub-mkconfig"
-		if [[ "${show_snap_found}" = "true" ]]; then
+		if [[ "${GRUB_BTRFS_SHOW_SNAPSHOTS_FOUND:-"true"}" = "true" ]]; then
 		printf "Found snapshot: %s\n" "$item" >&2 ;
 		fi
 		# Show full path snapshot or only name
@@ -493,8 +469,7 @@ boot_separate()
 	# Initialize menu entries
 	IFS=$'\n'
 	for item in $(snapshot_list); do
-		# fix: limit_snap_show=0
-		[[ ${limit_snap_show} -le 0 ]] && break;
+		[[ ${limit_snap_show} -le 0 ]] && break; # fix: limit_snap_show=0
 		IFS=$oldIFS
 		snap_full_name="$(echo "$item" | cut -d'|' -f2-)" # do not trim it to keep nice formatting
 		snap_dir_name="$(echo "$item" | cut -d'|' -f2)"
@@ -502,7 +477,7 @@ boot_separate()
 		snap_date_time="$(echo "$item" | cut -d' ' -f1-2)"
 		snap_date_time="$(trim "$snap_date_time")"
 		# show snapshot found during run "grub-mkconfig"
-		if [[ "${show_snap_found}" = "true" ]]; then
+		if [[ "${GRUB_BTRFS_SHOW_SNAPSHOTS_FOUND:-"true"}" = "true" ]]; then
 		printf "Found snapshot: %s\n" "$item" >&2 ;
 		fi
 		# Show full path snapshot or only name
@@ -537,7 +512,7 @@ count_limit_snap=0
 # detect uuid requirement
 check_uuid_required
 # Detects if /boot is a separate partition
-if [[ "$override_boot_partition_detection" == "true" ]]; then
+if [[ "${GRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION:-"false"}" == "true" ]]; then
 	printf "Info: Override boot partition detection : enable \n" >&2 ;
 	boot_separate
 else
@@ -555,7 +530,7 @@ umount $gbgmp
 [[ $count_warning_menuentries -ge 250 ]] && printf "Generated ${count_warning_menuentries} total GRUB entries. You might experience issues loading snapshots menu in GRUB.\n" >&2 ;
 # printf "menuentries = $count_warning_menuentries \n" >&2 ;
 # Show total found snapshots
-if [[ "${show_total_snap_found}" = "true" && ! -z "${count_limit_snap}" && "${count_limit_snap}" != "0" ]]; then
+if [[ "${GRUB_BTRFS_SHOW_TOTAL_SNAPSHOTS_FOUND:-"true"}" = "true" && ! -z "${count_limit_snap}" && "${count_limit_snap}" != "0" ]]; then
 	printf "Found ${count_limit_snap} snapshot(s)\n" >&2 ;
 fi
 # if no snapshot found, exit
