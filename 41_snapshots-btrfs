@@ -267,9 +267,13 @@ snapshot_list()
 
 		# ignore specific path during run "grub-mkconfig"
 		if [ ! -z "${ignore_specific_path}" ] ; then
-			[[ "${snap_path_name}" == "@" ]] && continue 2;
 			for isp in ${ignore_specific_path[@]} ; do
-				[[ "${snap_path_name}" == "${isp}" || "${snap_path_name}" == "${isp}"/* ]] && continue 2;
+				[[ "${snap_path_name}" == "${isp}" ]] && continue 2;
+			done
+		fi
+		if [ ! -z "${ignore_prefix_path}" ] ; then
+			for isp in ${ignore_prefix_path[@]} ; do
+				[[ "${snap_path_name}" == "${isp}"/* ]] && continue 2;
 			done
 		fi
 
