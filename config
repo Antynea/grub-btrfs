@@ -55,14 +55,16 @@
 #GRUB_BTRFS_CUSTOM_MICROCODE=("custom-ucode.img" "custom-uc.img "custom_ucode.cpio")
 
 # Ignore specific path during run "grub-mkconfig".
-# If path is a directory, # Found Snapshot: 2016-03-31 10:24:41 var/lib/docker/btrfs/subvolumes/...
-# use : GRUB_BTRFS_IGNORE_SPECIFIC_PATH=("var/lib/docker");
-# If path is a subvolume, # Found Snapshot: 2016-03-31 10:24:41 @var/lib/docker/btrfs/subvolumes/...
-# use : GRUB_BTRFS_IGNORE_SPECIFIC_PATH=("@var/lib/docker");
-# You can combine them
-# use : GRUB_BTRFS_IGNORE_SPECIFIC_PATH=("@var/lib/docker" "var/lib/docker")
-# Default: ("var/lib/docker" "@var/lib/docker" "@/var/lib/docker") and "@" subvolume is hardcode.
-GRUB_BTRFS_IGNORE_SPECIFIC_PATH=("var/lib/docker" "@var/lib/docker" "@/var/lib/docker")
+# Only exact paths are ignored.
+# e.g : if `specific path` = @, only `@` snapshot will be ignored.
+# Default: ("@")
+GRUB_BTRFS_IGNORE_SPECIFIC_PATH=("@")
+
+# Ignore prefix path during run "grub-mkconfig".
+# Any path starting with the specified string will be ignored.
+# e.g : if `prefix path` = @, all snapshots beginning with "@/..." will be ignored.
+# Default: ("var/lib/docker" "@var/lib/docker" "@/var/lib/docker")
+GRUB_BTRFS_IGNORE_PREFIX_PATH=("var/lib/docker" "@var/lib/docker" "@/var/lib/docker")
 
 # By default "grub-btrfs" automatically detects your boot partition,
 # either located at the system root or on a separate partition,
