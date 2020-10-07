@@ -136,13 +136,9 @@ test_btrfs()
 
 ### Script
 ## Create entry
-entry()	{
+entry()
+{
 echo "$@" >> "/boot/$grub_directory/grub-btrfs.cfg"
-# local arg="$@"
-# echo "${arg}" >> "/boot/$grub_directory/grub-btrfs.cfg"
-# cat << EOF >> "/boot/$grub_directory/grub-btrfs.cfg"
-# ${arg}
-# EOF
 }
 
 ## menu entries
