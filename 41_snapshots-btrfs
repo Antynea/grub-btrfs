@@ -66,7 +66,7 @@ btrfssubvolsort=(--sort="${GRUB_BTRFS_SUBVOLUME_SORT:-"-rootid"}")
 ## Snapper's config name
 snapper_config=${GRUB_BTRFS_SNAPPER_CONFIG:-"root"}
 ## Customize GRUB directory
-grub_directory=${GRUB_BTRFS_DIRNAME:-"grub"}
+grub_directory=${GRUB_BTRFS_DIRNAME:-"/boot/grub"}
 ## Password protection management for submenu
 # Protection support for submenu (--unrestricted)
 case "${GRUB_BTRFS_DISABLE_PROTECTION_SUBMENU:-"false"}" in
@@ -81,13 +81,13 @@ fi
 ### variables script
 ## Probe info "Boot partition"
 # Boot device
-boot_device=$(${grub_probe} --target=device /boot)
+boot_device=$(${grub_probe} --target=device ${grub_directory})
 # hints string
 boot_hs=$(${grub_probe} --device ${boot_device} --target="hints_string" 2>/dev/null)
 # UUID of the boot partition
 boot_uuid=$(${grub_probe} --device ${boot_device} --target="fs_uuid" 2>/dev/null)
 # Type filesystem of boot partition
-boot_fs=$(${grub_probe} --target="fs" /boot 2>/dev/null)
+boot_fs=$(${grub_probe} --target="fs" ${grub_directory} 2>/dev/null)
 ## Probe info "Root partition"
 # Type filesystem of root partition
 root_fs=$(${grub_probe} --target="fs" / 2>/dev/null)
@@ -138,7 +138,7 @@ test_btrfs()
 ## Create entry
 entry()
 {
-echo "$@" >> "/boot/$grub_directory/grub-btrfs.cfg"
+echo "$@" >> "$grub_directory/grub-btrfs.cfg"
 }
 
 ## menu entries
@@ -496,8 +496,8 @@ printf "Detecting snapshots ...\n" >&2 ;
 # Only support btrfs snapshots
 test_btrfs
 # Delete existing config
-#rm -f --preserve-root "/boot/$grub_directory/grub-btrfs.cfg"
-> "/boot/$grub_directory/grub-btrfs.cfg"
+#rm -f --preserve-root "$grub_directory/grub-btrfs.cfg"
+> "$grub_directory/grub-btrfs.cfg"
 # Create mount point then mounting
 [[ ! -d $gbgmp ]] && mkdir -p $gbgmp
 mount -o subvolid=5 /dev/disk/by-uuid/$root_uuid $gbgmp/

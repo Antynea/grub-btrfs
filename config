@@ -73,11 +73,10 @@ GRUB_BTRFS_IGNORE_PREFIX_PATH=("var/lib/docker" "@var/lib/docker" "@/var/lib/doc
 # Default: "false"
 #GRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION="true"
 
-# GRUB folder location, by default "/boot/" is hardcode.
-# Might be grub2 on some systems ex. /boot/grub2/...
-# "grub" means "/boot/grub/"
-# Default: "grub"
-#GRUB_BTRFS_DIRNAME="grub2"
+# GRUB folder location.
+# Might be grub2 on some systems.
+# Default: "/boot/grub"
+#GRUB_BTRFS_DIRNAME="/boot/grub2"
 
 # Name/path of grub-mkconfig, use by "grub-btrfs.service"
 # Might be 'grub2-mkconfig' on some systems
