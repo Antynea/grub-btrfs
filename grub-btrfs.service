@@ -8,4 +8,4 @@ Environment="PATH=/sbin:/bin:/usr/sbin:/usr/bin"
 # Load environment variables from the configuration
 EnvironmentFile=/etc/default/grub-btrfs/config
 # Regenerate just '/boot/grub/grub-btrfs.cfg' if it exists and is not empty, else regenerate the whole grub menu
-ExecStart=/bin/bash -c 'if [ -s "${GRUB_BTRFS_DIRNAME:-/boot/grub}/grub-btrfs.cfg" ]; then /etc/grub.d/41_snapshots-btrfs; else ${GRUB_BTRFS_MKCONFIG:-/usr/bin/grub-mkconfig} -o /boot/${GRUB_BTRFS_DIRNAME:-/boot/grub}/grub.cfg; fi'
+ExecStart=/bin/bash -c 'if [ -s "${GRUB_BTRFS_DIRNAME:-/boot/grub}/grub-btrfs.cfg" ]; then /etc/grub.d/41_snapshots-btrfs; else ${GRUB_BTRFS_MKCONFIG:-/usr/bin/grub-mkconfig} -o ${GRUB_BTRFS_DIRNAME:-/boot/grub}/grub.cfg; fi' 
