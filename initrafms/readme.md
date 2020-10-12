@@ -32,8 +32,9 @@ For example :
 You notice that the name of the `hook' must match the name of the 2 installed files. (don't forget it)
 
 Re-generate your initramfs  
-`mkinitcpio -P` (option -p means, all preset present in `/etc/mkinitcpio.d`
+`mkinitcpio -P` (option -p means, all preset present in `/etc/mkinitcpio.d`)
 
 #### Other distribution
 Refer to your distribution's documentation  
 or contribute to this project to add a paragraph.
+#
