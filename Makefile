@@ -12,10 +12,10 @@ install:
 	@install -Dm644 -t "$(LIB_DIR)/systemd/system/" grub-btrfs.service
 	@install -Dm644 -t "$(LIB_DIR)/systemd/system/" grub-btrfs.path
 	@install -Dm644 -t "$(SHARE_DIR)/licenses/$(PKGNAME)/" LICENSE
-	@install -Dm644 "initrafms/Arch Linux/overlay_snap_ro-install" "$(LIB_DIR)/initcpio/install/grub-btrfs-overlayfs" # Arch Linux only
-    	@install -Dm644 "initrafms/Arch Linux/overlay_snap_ro-hook" "$(LIB_DIR)/initcpio/hooks/grub-btrfs-overlayfs" # Arch Linux only
+	@install -Dm644 "initramfs/Arch Linux/overlay_snap_ro-install" "$(LIB_DIR)/initcpio/install/grub-btrfs-overlayfs"	# Arch Linux only
+	@install -Dm644 "initramfs/Arch Linux/overlay_snap_ro-install" "$(LIB_DIR)/initcpio/install/grub-btrfs-overlayfs"	# Arch Linux only
 	@install -Dm644 -t "$(SHARE_DIR)/doc/$(PKGNAME)/" README.md
-    	@install -Dm644 "initramfs/readme.md" "$(SHARE_DIR)/doc/$(PKGNAME)/initramfs-overlayfs.md"
+	@install -Dm644 "initramfs/readme.md" "$(SHARE_DIR)/doc/$(PKGNAME)/initramfs-overlayfs.md"
 
 uninstall:
 	rm -f "$(DESTDIR)/etc/grub.d/41_snapshots-btrfs"
