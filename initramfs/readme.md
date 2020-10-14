@@ -18,22 +18,22 @@ This means that any snapshot that does not include this modified initramfs will 
 1.
 `Pacman -S grub-btrfs`  
 Or if you use git  
-copy the `overlay_snap_ro-install` file to `/etc/initcpio/install/grub-btrfs-overlaysfs`  
-copy the `overlay_snap_ro-hook` file to `/etc/initcpio/hooks/grub-btrfs-overlaysfs`  
+copy the `overlay_snap_ro-install` file to `/etc/initcpio/install/grub-btrfs-overlayfs`  
+copy the `overlay_snap_ro-hook` file to `/etc/initcpio/hooks/grub-btrfs-overlayfs`  
 You must rename the files. (I did it above)
 
 For example :  
-overlay_snap_ro-install to grub-btrfs-overlaysfs  
-overlay_snap_ro-hook to grub-btrfs-overlaysfs  
+`overlay_snap_ro-install` to `grub-btrfs-overlayfs`  
+`overlay_snap_ro-hook` to `grub-btrfs-overlayfs`  
 Keep in mind that the files must have exactly the same name to ensure a match.
 
 2.
 Edit the file `/etc/mkinitcpio.conf`  
-Added hook `grub-btrfs-overlaysfs` at the end of the line `HOOKS`.
+Added hook `grub-btrfs-overlayfs` at the end of the line `HOOKS`.
 
 For example :  
-`HOOKS=(base udev autodetect modconf block filesystems keyboard fsck grub-btrfs-overlaysfs)`  
-You notice that the name of the `hook' must match the name of the 2 installed files. (don't forget it)
+`HOOKS=(base udev autodetect modconf block filesystems keyboard fsck grub-btrfs-overlayfs)`  
+You notice that the name of the `hook` must match the name of the 2 installed files. (don't forget it)
 
 3.
 Re-generate your initramfs  
