@@ -1,0 +1,15 @@
+#!/usr/bin/ash
+
+run_latehook() {
+	local root_mnt="/new_root"
+	local current_dev=$(resolve_device "$root"); # resolve devices for blkid
+	if [[ $(blkid "${current_dev}" -s TYPE -o value) = "btrfs" ]] && [[ $(btrfs property get ${root_mnt} ro) != "ro=false" ]]; then # run only on a read only snapshot
+		local lower_dir=$(mktemp -d -p /)
+		local ram_dir=$(mktemp -d -p /)
+		mount --move ${root_mnt} ${lower_dir} # move new_root to lower_dir
+		mount -t tmpfs cowspace ${ram_dir}  #meuh!!! space, you can't test !
+		mkdir -p ${ram_dir}/upper
+		mkdir -p ${ram_dir}/work
+		mount -t overlay -o lowerdir=${lower_dir},upperdir=${ram_dir}/upper,workdir=${ram_dir}/work rootfs ${root_mnt}
+	fi
+}

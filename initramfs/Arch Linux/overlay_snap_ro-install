@@ -1,0 +1,18 @@
+#!/bin/bash
+
+build() {
+    add_module btrfs
+    add_module overlay
+    add_binary btrfs
+    add_binary btrfsck
+    add_binary blkid
+    add_runscript
+}
+
+help() {
+    cat <<HELPEOF
+This hook uses overlayfs to boot on a read only snapshot.
+HELPEOF
+}
+
+# vim: set ft=sh ts=4 sw=4 et:
