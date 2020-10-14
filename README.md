@@ -19,7 +19,7 @@ Otherwise, make sure your snapshots are writeable.
 See [this ticket](https://github.com/Antynea/grub-btrfs/issues/92) for more info.
 
 This project includes its own solution.  
-Refer to the [documentation](https://github.com/Antynea/grub-btrfs/blob/boot-read-only-snapshot/initramfs/readme.md).
+Refer to the [documentation](https://github.com/Antynea/grub-btrfs/blob/master/initramfs/readme.md).
 
 ##
 ### What does grub-btrfs v4.xx do :
