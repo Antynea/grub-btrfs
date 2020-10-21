@@ -73,13 +73,21 @@ GRUB_BTRFS_IGNORE_PREFIX_PATH=("var/lib/docker" "@var/lib/docker" "@/var/lib/doc
 # Default: "false"
 #GRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION="true"
 
-# GRUB folder location.
+# Location of the folder containing the "grub.cfg" file.
+# Use by grub-btrfs to save the file "grub-btrfs.cfg".
 # Might be grub2 on some systems.
+# For example, on Fedora with EFI : "/boot/efi/EFI/fedora"
 # Default: "/boot/grub"
-#GRUB_BTRFS_DIRNAME="/boot/grub2"
+#GRUB_BTRFS_GRUB_DIRNAME="/boot/grub2"
+
+# Location of kernels/initramfs/microcode.
+# Use by "grub-btrfs" to detect the boot partition and the location of kernels/initrafms/microcodes.
+# Default: "/boot"
+#GRUB_BTRFS_BOOT_DIRNAME="/boot"
 
 # Name/path of grub-mkconfig, use by "grub-btrfs.service"
 # Might be 'grub2-mkconfig' on some systems
+# For example, on Fedora : "/sbin/grub2-mkconfig"
 # Default: /usr/bin/grub-mkconfig
 #GRUB_BTRFS_MKCONFIG=/usr/bin/grub2-mkconfig
 
