@@ -68,6 +68,10 @@ If you would like Grub to automatically update when a snapshot is made or delete
 		and finally save.
 	* You can view your change to `systemctl cat grub-btrfs.path`.
 	* To revert change use `systemctl revert grub-btrfs.path`.
+##### Warning:
+by default, `grub-mkconfig` command is used.  
+Might be `grub2-mkconfig` on some systems (Fedora ...).   
+Edit `GRUB_BTRFS_MKCONFIG` variable in `/etc/default/grub-btrfs/config` file to reflect this.
 ##
 ### Special thanks for assistance and contributions
 * [maximbaz](https://github.com/maximbaz)

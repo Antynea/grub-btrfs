@@ -85,10 +85,13 @@ GRUB_BTRFS_IGNORE_PREFIX_PATH=("var/lib/docker" "@var/lib/docker" "@/var/lib/doc
 # Default: "/boot"
 #GRUB_BTRFS_BOOT_DIRNAME="/boot"
 
-# Name/path of grub-mkconfig, use by "grub-btrfs.service"
-# Might be 'grub2-mkconfig' on some systems
+# Name/path of grub-mkconfig command, use by "grub-btrfs.service"
+# Might be 'grub2-mkconfig' on some systems (Fedora ...)
+# Default paths are /sbin:/bin:/usr/sbin:/usr/bin,
+# if your path is missing, report it on the upstream project.
 # For example, on Fedora : "/sbin/grub2-mkconfig"
-# Default: /usr/bin/grub-mkconfig
+# You can use only name or full path.
+# Default: grub-mkconfig
 #GRUB_BTRFS_MKCONFIG=/usr/bin/grub2-mkconfig
 
 # Snapper
