@@ -190,7 +190,7 @@ make_menu_entries()
         fi
         echo 'Loading Snapshot: "${snap_date_time}" "${snap_dir_name}"'
         echo 'Loading Kernel: "${k}" ...'
-        linux \"${boot_dir_root_grub}/"${k}"\" root="${LINUX_ROOT_DEVICE}" rw ${kernel_parameters} ${rootflags}subvol=\""${snap_dir_name}"\""
+        linux \"${boot_dir_root_grub}/"${k}"\" root="${LINUX_ROOT_DEVICE}" ${kernel_parameters} ${rootflags}subvol=\""${snap_dir_name}"\""
                 if [[ "${name_microcode}" != "x" ]] ; then
                     entry "\
         echo 'Loading Microcode & Initramfs: "${u}" "${i}" ...'
