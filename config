@@ -55,9 +55,12 @@
 #GRUB_BTRFS_CUSTOM_MICROCODE=("custom-ucode.img" "custom-uc.img "custom_ucode.cpio")
 
 # Comma seperated mount options to be used when booting a snapshot.
-# You do NOT need to include "subvol=..." or "subvolid=...".
+# They can be defined here as well as in the "/" line inside the respective snapshots'
+# "/etc/fstab" files.  Mount options found in both places are combined, and this variable
+# takes priority over `fstab` entries.
+# NB: Do NOT include "subvol=..." or "subvolid=..." here.
 # Default: ""
-#GRUB_BTRFS_ROOTFLAGS="noatime,compress=zstd:7,commit=10,norecovery"
+#GRUB_BTRFS_ROOTFLAGS="space_cache,commit=10,norecovery"
 
 # Ignore specific path during run "grub-mkconfig".
 # Only exact paths are ignored.

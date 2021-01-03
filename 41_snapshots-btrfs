@@ -118,8 +118,9 @@ fi
 ## Detect rootflags
 detect_rootflags()
 {
-    rootflags="rootflags=${GRUB_BTRFS_ROOTFLAGS:+$GRUB_BTRFS_ROOTFLAGS,}"
-    # TODO: parse <snapshot>/etc/fstab and append mount options from there
+    local fstabflags=$(grep -oE '^\s*[^#][[:print:]]+\s+/\s+btrfs\s+[[:print:]]+' ${gbgmp}/${snap_dir_name}/etc/fstab \
+                        | sed -E 's/^.*[[:space:]]([[:print:]]+)$/\1/;s/,?subvol(id)?=[^,$]+//g;s/^,//')
+    rootflags="rootflags=${fstabflags:+$fstabflags,}${GRUB_BTRFS_ROOTFLAGS:+$GRUB_BTRFS_ROOTFLAGS,}"
 }
 
 ### Error Handling
@@ -423,6 +424,8 @@ boot_bounded()
         detect_kernel
         if [ -z "${list_kernel}" ]; then continue; fi
         name_kernel=("${list_kernel[@]##*"/"}")
+        # Detect rootflags
+        detect_rootflags
         # Initramfs (Original + custom initramfs)
         detect_initramfs
         if [ -z "${list_initramfs}" ]; then continue; fi
@@ -478,6 +481,8 @@ boot_separate()
         snap_dir_name="$(trim "$snap_dir_name")"
         snap_date_time="$(echo "$item" | cut -d' ' -f1-2)"
         snap_date_time="$(trim "$snap_date_time")"
+        # Detect rootflags
+        detect_rootflags
         # show snapshot found during run "grub-mkconfig"
         if [[ "${GRUB_BTRFS_SHOW_SNAPSHOTS_FOUND:-"true"}" = "true" ]]; then
             printf "Found snapshot: %s\n" "$item" >&2 ;
@@ -511,8 +516,6 @@ mount -o subvolid=5 /dev/disk/by-uuid/$root_uuid $gbgmp/
 count_warning_menuentries=0
 # Count snapshots
 count_limit_snap=0
-# Detect rootflags
-detect_rootflags
 # detect uuid requirement
 check_uuid_required
 # Detects if /boot is a separate partition
