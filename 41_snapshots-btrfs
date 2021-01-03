@@ -115,6 +115,12 @@ else
     LINUX_ROOT_DEVICE=UUID=${root_uuid}
 fi
 }
+## Detect rootflags
+detect_rootflags()
+{
+    rootflags="rootflags=${GRUB_BTRFS_ROOTFLAGS:+$GRUB_BTRFS_ROOTFLAGS,}"
+    # TODO: parse <snapshot>/etc/fstab and append mount options from there
+}
 
 ### Error Handling
 print_error()
@@ -183,7 +189,7 @@ make_menu_entries()
         fi
         echo 'Loading Snapshot: "${snap_date_time}" "${snap_dir_name}"'
         echo 'Loading Kernel: "${k}" ...'
-        linux \"${boot_dir_root_grub}/"${k}"\" root="${LINUX_ROOT_DEVICE}" rw ${kernel_parameters} rootflags=subvol=\""${snap_dir_name}"\""
+        linux \"${boot_dir_root_grub}/"${k}"\" root="${LINUX_ROOT_DEVICE}" rw ${kernel_parameters} ${rootflags}subvol=\""${snap_dir_name}"\""
                 if [[ "${name_microcode}" != "x" ]] ; then
                     entry "\
         echo 'Loading Microcode & Initramfs: "${u}" "${i}" ...'
@@ -505,6 +511,8 @@ mount -o subvolid=5 /dev/disk/by-uuid/$root_uuid $gbgmp/
 count_warning_menuentries=0
 # Count snapshots
 count_limit_snap=0
+# Detect rootflags
+detect_rootflags
 # detect uuid requirement
 check_uuid_required
 # Detects if /boot is a separate partition
