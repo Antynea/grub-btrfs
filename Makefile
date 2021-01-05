@@ -31,6 +31,11 @@ uninstall:
 	if test -f "$(LIB_DIR)/initcpio/install/grub-btrfs-overlayfs"; then \
 		rm -f "$(LIB_DIR)/initcpio/install/grub-btrfs-overlayfs"; \
 		rm -f "$(LIB_DIR)/initcpio/hooks/grub-btrfs-overlayfs"; \
+		if command -V mkinitcpio >/dev/null 2>&1; then \
+			rmdir --ignore-fail-on-non-empty "$(LIB_DIR)/initcpio/install"; \
+			rmdir --ignore-fail-on-non-empty "$(LIB_DIR)/initcpio/hooks"; \
+			rmdir --ignore-fail-on-non-empty "$(LIB_DIR)/initcpio"; \
+		fi; \
 	fi
 	rm -rf "$(SHARE_DIR)/doc/$(PKGNAME)/README.md"
 	rm -rf "$(SHARE_DIR)/doc/$(PKGNAME)/initramfs-overlayfs.md"
