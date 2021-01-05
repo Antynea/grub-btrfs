@@ -28,7 +28,7 @@ uninstall:
 	rm -f "$(SHARE_DIR)/licenses/$(PKGNAME)/LICENSE"
 	rm -f "$(DESTDIR)/boot/grub/grub-btrfs.cfg"
 	@# Arch Linux like distros only :
-	if command -V mkinitcpio >/dev/null 2>&1; then \
+	if test -f "$(LIB_DIR)/initcpio/install/grub-btrfs-overlayfs"; then \
 		rm -f "$(LIB_DIR)/initcpio/install/grub-btrfs-overlayfs"; \
 		rm -f "$(LIB_DIR)/initcpio/hooks/grub-btrfs-overlayfs"; \
 	fi
