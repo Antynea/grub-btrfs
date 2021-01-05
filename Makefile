@@ -32,6 +32,6 @@ uninstall:
 		rm -f "$(LIB_DIR)/initcpio/install/grub-btrfs-overlayfs"; \
 		rm -f "$(LIB_DIR)/initcpio/hooks/grub-btrfs-overlayfs"; \
 	fi
-	rm -rf "$(SHARE_DIR)/doc/$(PKGNAME)/" README.md
+	rm -rf "$(SHARE_DIR)/doc/$(PKGNAME)/README.md"
 	rm -rf "$(SHARE_DIR)/doc/$(PKGNAME)/initramfs-overlayfs.md"
 	rmdir --ignore-fail-on-non-empty "$(DESTDIR)/etc/default/grub-btrfs"
