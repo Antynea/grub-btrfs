@@ -28,8 +28,8 @@ uninstall:
 	rm -f "$(DESTDIR)/boot/grub/grub-btrfs.cfg"
 	rm -f "$(LIB_DIR)/initcpio/install/grub-btrfs-overlayfs"
 	rm -f "$(LIB_DIR)/initcpio/hooks/grub-btrfs-overlayfs"
-	@# Arch Linux like distros only :
-	if command -V mkinitcpio >/dev/null 2>&1; then \
+	@# Arch Linux unlike distros only :
+	if ! command -V mkinitcpio >/dev/null 2>&1; then \
 		rmdir --ignore-fail-on-non-empty "$(LIB_DIR)/initcpio/install" || :; \
 		rmdir --ignore-fail-on-non-empty "$(LIB_DIR)/initcpio/hooks" || :; \
 		rmdir --ignore-fail-on-non-empty "$(LIB_DIR)/initcpio" || :; \
