@@ -26,15 +26,13 @@ uninstall:
 	rm -f "$(LIB_DIR)/systemd/system/grub-btrfs.service"
 	rm -f "$(LIB_DIR)/systemd/system/grub-btrfs.path"
 	rm -f "$(DESTDIR)/boot/grub/grub-btrfs.cfg"
+	rm -f "$(LIB_DIR)/initcpio/install/grub-btrfs-overlayfs"
+	rm -f "$(LIB_DIR)/initcpio/hooks/grub-btrfs-overlayfs"
 	@# Arch Linux like distros only :
-	if test -f "$(LIB_DIR)/initcpio/install/grub-btrfs-overlayfs"; then \
-		rm -f "$(LIB_DIR)/initcpio/install/grub-btrfs-overlayfs"; \
-		rm -f "$(LIB_DIR)/initcpio/hooks/grub-btrfs-overlayfs"; \
-		if command -V mkinitcpio >/dev/null 2>&1; then \
-			rmdir --ignore-fail-on-non-empty "$(LIB_DIR)/initcpio/install" || :; \
-			rmdir --ignore-fail-on-non-empty "$(LIB_DIR)/initcpio/hooks" || :; \
-			rmdir --ignore-fail-on-non-empty "$(LIB_DIR)/initcpio" || :; \
-		fi; \
+	if command -V mkinitcpio >/dev/null 2>&1; then \
+		rmdir --ignore-fail-on-non-empty "$(LIB_DIR)/initcpio/install" || :; \
+		rmdir --ignore-fail-on-non-empty "$(LIB_DIR)/initcpio/hooks" || :; \
+		rmdir --ignore-fail-on-non-empty "$(LIB_DIR)/initcpio" || :; \
 	fi
 	rm -f "$(SHARE_DIR)/doc/$(PKGNAME)/README.md"
 	rm -f "$(SHARE_DIR)/doc/$(PKGNAME)/initramfs-overlayfs.md"
