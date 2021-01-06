@@ -43,7 +43,7 @@ uninstall:
 
 help:
 	@echo
-	@echo "Usage: make [ <parameter>=<value> ... ] [ <action> ]"
+	@echo "Usage: $(MAKE) [ <parameter>=<value> ... ] [ <action> ]"
 	@echo
 	@echo "  actions: install"
 	@echo "           uninstall"
