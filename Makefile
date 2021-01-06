@@ -25,7 +25,6 @@ uninstall:
 	rm -f "$(DESTDIR)/etc/default/grub-btrfs/config"
 	rm -f "$(LIB_DIR)/systemd/system/grub-btrfs.service"
 	rm -f "$(LIB_DIR)/systemd/system/grub-btrfs.path"
-	rm -f "$(SHARE_DIR)/licenses/$(PKGNAME)/LICENSE"
 	rm -f "$(DESTDIR)/boot/grub/grub-btrfs.cfg"
 	@# Arch Linux like distros only :
 	if test -f "$(LIB_DIR)/initcpio/install/grub-btrfs-overlayfs"; then \
@@ -39,4 +38,7 @@ uninstall:
 	fi
 	rm -rf "$(SHARE_DIR)/doc/$(PKGNAME)/README.md"
 	rm -rf "$(SHARE_DIR)/doc/$(PKGNAME)/initramfs-overlayfs.md"
+	rm -f "$(SHARE_DIR)/licenses/$(PKGNAME)/LICENSE"
+	rmdir --ignore-fail-on-non-empty "$(SHARE_DIR)/doc/$(PKGNAME)/" || :
+	rmdir --ignore-fail-on-non-empty "$(SHARE_DIR)/licenses/$(PKGNAME)/" || :
 	rmdir --ignore-fail-on-non-empty "$(DESTDIR)/etc/default/grub-btrfs" || :
