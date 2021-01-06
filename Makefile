@@ -36,8 +36,8 @@ uninstall:
 			rmdir --ignore-fail-on-non-empty "$(LIB_DIR)/initcpio" || :; \
 		fi; \
 	fi
-	rm -rf "$(SHARE_DIR)/doc/$(PKGNAME)/README.md"
-	rm -rf "$(SHARE_DIR)/doc/$(PKGNAME)/initramfs-overlayfs.md"
+	rm -f "$(SHARE_DIR)/doc/$(PKGNAME)/README.md"
+	rm -f "$(SHARE_DIR)/doc/$(PKGNAME)/initramfs-overlayfs.md"
 	rm -f "$(SHARE_DIR)/licenses/$(PKGNAME)/LICENSE"
 	rmdir --ignore-fail-on-non-empty "$(SHARE_DIR)/doc/$(PKGNAME)/" || :
 	rmdir --ignore-fail-on-non-empty "$(SHARE_DIR)/licenses/$(PKGNAME)/" || :
