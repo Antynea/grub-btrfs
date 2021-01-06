@@ -49,11 +49,11 @@ help:
 	@echo "           uninstall"
 	@echo "           help"
 	@echo
-	@echo "  parameters  description                     defaults"
-	@echo "  --------------------------------------------------------------------"
-	@echo "  DESTDIR     install destination             <unset>"
-	@echo "  PREFIX      system tree prefix              '/usr'"
-	@echo "  SHARE_DIR   shared data location            '\$$(DESTDIR)\$$(PREFIX)/share'"
-	@echo "  LIB_DIR     system libraries location       '\$$(DESTDIR)\$$(PREFIX)/lib'"
-	@echo "  PKGNAME     name of the ditributed package  'grub-btrfs'"
+	@echo "  parameters | description                    | defaults"
+	@echo "  -----------+--------------------------------+----------------------------"
+	@echo "  DESTDIR    | install destination            | <unset>"
+	@echo "  PREFIX     | system tree prefix             | '/usr'"
+	@echo "  SHARE_DIR  | shared data location           | '\$$(DESTDIR)\$$(PREFIX)/share'"
+	@echo "  LIB_DIR    | system libraries location      | '\$$(DESTDIR)\$$(PREFIX)/lib'"
+	@echo "  PKGNAME    | name of the ditributed package | 'grub-btrfs'"
 	@echo
