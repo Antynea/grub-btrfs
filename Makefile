@@ -4,7 +4,7 @@ PREFIX ?= /usr
 SHARE_DIR = $(DESTDIR)$(PREFIX)/share
 LIB_DIR = $(DESTDIR)$(PREFIX)/lib
 
-.PHONY: install uninstall
+.PHONY: install uninstall help
 
 install:
 	@install -Dm755 -t "$(DESTDIR)/etc/grub.d/" 41_snapshots-btrfs
@@ -40,3 +40,20 @@ uninstall:
 	@rmdir --ignore-fail-on-non-empty "$(SHARE_DIR)/doc/$(PKGNAME)/" || :
 	@rmdir --ignore-fail-on-non-empty "$(SHARE_DIR)/licenses/$(PKGNAME)/" || :
 	@rmdir --ignore-fail-on-non-empty "$(DESTDIR)/etc/default/grub-btrfs" || :
+
+help:
+	@echo
+	@echo "Usage: make [ <parameter>=<value> ... ] [ <action> ]"
+	@echo
+	@echo "  actions: install"
+	@echo "           uninstall"
+	@echo "           help"
+	@echo
+	@echo "  parameters  description                     defaults"
+	@echo "  --------------------------------------------------------------------"
+	@echo "  DESTDIR     install destination             <unset>"
+	@echo "  PREFIX      system tree prefix              '/usr'"
+	@echo "  SHARE_DIR   shared data location            '\$$(DESTDIR)\$$(PREFIX)/share'"
+	@echo "  LIB_DIR     system libraries location       '\$$(DESTDIR)\$$(PREFIX)/lib'"
+	@echo "  PKGNAME     name of the ditributed package  'grub-btrfs'"
+	@echo
