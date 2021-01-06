@@ -4,7 +4,7 @@ PREFIX ?= /usr
 SHARE_DIR = $(DESTDIR)$(PREFIX)/share
 LIB_DIR = $(DESTDIR)$(PREFIX)/lib
 
-.PHONY: install
+.PHONY: install uninstall
 
 install:
 	@install -Dm755 -t "$(DESTDIR)/etc/grub.d/" 41_snapshots-btrfs
