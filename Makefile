@@ -21,11 +21,12 @@ install:
 	@install -Dm644 "initramfs/readme.md" "$(SHARE_DIR)/doc/$(PKGNAME)/initramfs-overlayfs.md"
 
 uninstall:
-	@rm -f "$(DESTDIR)/etc/grub.d/41_snapshots-btrfs"
+	@grub_dirname="$$(grep -oP '^[[:space:]]*GRUB_BTRFS_GRUB_DIRNAME=\K.*' "$(DESTDIR)/etc/default/grub-btrfs/config" | sed "s|(\s*\(.\+\)\s*)|\1|;s|['\"]||g;s|\s*#.*||")"; \
+	 rm -f "$${grub_dirname:-/boot/grub}/grub-btrfs.cfg"
 	@rm -f "$(DESTDIR)/etc/default/grub-btrfs/config"
+	@rm -f "$(DESTDIR)/etc/grub.d/41_snapshots-btrfs"
 	@rm -f "$(LIB_DIR)/systemd/system/grub-btrfs.service"
 	@rm -f "$(LIB_DIR)/systemd/system/grub-btrfs.path"
-	@rm -f "$(DESTDIR)/boot/grub/grub-btrfs.cfg"
 	@rm -f "$(LIB_DIR)/initcpio/install/grub-btrfs-overlayfs"
 	@rm -f "$(LIB_DIR)/initcpio/hooks/grub-btrfs-overlayfs"
 	@# Arch Linux unlike distros only :
