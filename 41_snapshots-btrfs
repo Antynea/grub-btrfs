@@ -115,6 +115,13 @@ else
     LINUX_ROOT_DEVICE=UUID=${root_uuid}
 fi
 }
+## Detect rootflags
+detect_rootflags()
+{
+    local fstabflags=$(grep -oE '^\s*[^#][[:graph:]]+\s+/\s+btrfs\s+[[:graph:]]+' "${gbgmp}/${snap_dir_name}/etc/fstab" \
+                        | sed -E 's/^.*[[:space:]]([[:graph:]]+)$/\1/;s/,?subvol(id)?=[^,$]+//g;s/^,//')
+    rootflags="rootflags=${fstabflags:+$fstabflags,}${GRUB_BTRFS_ROOTFLAGS:+$GRUB_BTRFS_ROOTFLAGS,}"
+}
 
 ### Error Handling
 print_error()
@@ -183,7 +190,7 @@ make_menu_entries()
         fi
         echo 'Loading Snapshot: "${snap_date_time}" "${snap_dir_name}"'
         echo 'Loading Kernel: "${k}" ...'
-        linux \"${boot_dir_root_grub}/"${k}"\" root="${LINUX_ROOT_DEVICE}" rw ${kernel_parameters} rootflags=subvol=\""${snap_dir_name}"\""
+        linux \"${boot_dir_root_grub}/"${k}"\" root="${LINUX_ROOT_DEVICE}" ${kernel_parameters} ${rootflags}subvol=\""${snap_dir_name}"\""
                 if [[ "${name_microcode}" != "x" ]] ; then
                     entry "\
         echo 'Loading Microcode & Initramfs: "${u}" "${i}" ...'
@@ -417,6 +424,8 @@ boot_bounded()
         detect_kernel
         if [ -z "${list_kernel}" ]; then continue; fi
         name_kernel=("${list_kernel[@]##*"/"}")
+        # Detect rootflags
+        detect_rootflags
         # Initramfs (Original + custom initramfs)
         detect_initramfs
         if [ -z "${list_initramfs}" ]; then continue; fi
@@ -472,6 +481,8 @@ boot_separate()
         snap_dir_name="$(trim "$snap_dir_name")"
         snap_date_time="$(echo "$item" | cut -d' ' -f1-2)"
         snap_date_time="$(trim "$snap_date_time")"
+        # Detect rootflags
+        detect_rootflags
         # show snapshot found during run "grub-mkconfig"
         if [[ "${GRUB_BTRFS_SHOW_SNAPSHOTS_FOUND:-"true"}" = "true" ]]; then
             printf "Found snapshot: %s\n" "$item" >&2 ;
