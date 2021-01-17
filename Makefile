@@ -32,7 +32,7 @@ uninstall:
 	@rm -f "$(LIB_DIR)/initcpio/install/grub-btrfs-overlayfs"
 	@rm -f "$(LIB_DIR)/initcpio/hooks/grub-btrfs-overlayfs"
 	@# Arch Linux UNlike distros only :
-	@if test "$(INITCPIO)" != true; then \
+	@if test "$(INITCPIO)" != true && test -d "$(LIB_DIR)/initcpio"; then \
 		rmdir --ignore-fail-on-non-empty "$(LIB_DIR)/initcpio/install" || :; \
 		rmdir --ignore-fail-on-non-empty "$(LIB_DIR)/initcpio/hooks" || :; \
 		rmdir --ignore-fail-on-non-empty "$(LIB_DIR)/initcpio" || :; \
