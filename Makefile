@@ -1,6 +1,8 @@
 PKGNAME ?= grub-btrfs
 PREFIX ?= /usr
 
+INITCPIO ?= false
+
 SHARE_DIR = $(DESTDIR)$(PREFIX)/share
 LIB_DIR = $(DESTDIR)$(PREFIX)/lib
 
@@ -13,7 +15,7 @@ install:
 	@install -Dm644 -t "$(LIB_DIR)/systemd/system/" grub-btrfs.path
 	@install -Dm644 -t "$(SHARE_DIR)/licenses/$(PKGNAME)/" LICENSE
 	@# Arch Linux like distros only :
-	@if command -V mkinitcpio >/dev/null 2>&1; then \
+	@if test "$(INITCPIO)" = true; then \
 		install -Dm644 "initramfs/Arch Linux/overlay_snap_ro-install" "$(LIB_DIR)/initcpio/install/grub-btrfs-overlayfs"; \
 		install -Dm644 "initramfs/Arch Linux/overlay_snap_ro-hook" "$(LIB_DIR)/initcpio/hooks/grub-btrfs-overlayfs"; \
 	 fi
@@ -29,8 +31,8 @@ uninstall:
 	@rm -f "$(LIB_DIR)/systemd/system/grub-btrfs.path"
 	@rm -f "$(LIB_DIR)/initcpio/install/grub-btrfs-overlayfs"
 	@rm -f "$(LIB_DIR)/initcpio/hooks/grub-btrfs-overlayfs"
-	@# Arch Linux unlike distros only :
-	@if ! command -V mkinitcpio >/dev/null 2>&1; then \
+	@# Arch Linux UNlike distros only :
+	@if test "$(INITCPIO)" != true && test -d "$(LIB_DIR)/initcpio"; then \
 		rmdir --ignore-fail-on-non-empty "$(LIB_DIR)/initcpio/install" || :; \
 		rmdir --ignore-fail-on-non-empty "$(LIB_DIR)/initcpio/hooks" || :; \
 		rmdir --ignore-fail-on-non-empty "$(LIB_DIR)/initcpio" || :; \
