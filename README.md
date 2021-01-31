@@ -6,10 +6,10 @@
 This is a version 4.xx of grub-btrfs
 ##### BTC donation address: `1Lbvz244WA8xbpHek9W2Y12cakM6rDe5Rt`
 ##
-### Description
+### Description :
 Improves Grub by adding "btrfs snapshots" to the Grub menu.
 
-You can start your system on a "snapshot" from the Grub menu.  
+You can boot your system on a "snapshot" from the Grub menu.  
 Supports manual snapshots, snapper, timeshift ...
 
 ##### Warning: booting on read-only snapshots can be tricky
@@ -46,29 +46,48 @@ NOTE: Generate your Grub menu after installation for the changes to take effect.
 On Arch Linux use `grub-mkconfig -o /boot/grub/grub.cfg`.
 
 ##
-### Customization:
+### Customization :
 
 You have the possibility to modify many parameters in `/etc/default/grub-btrfs/config`.  
 See [config file](https://github.com/Antynea/grub-btrfs/blob/master/config) for more information.
 
 ##
 ### Automatically update grub
-If you would like Grub to automatically update when a snapshot is made or deleted:
-* Use `systemctl start/enable grub-btrfs.path`.
-* `grub-btrfs.path` automatically (re)generates `grub.cfg` when a modification appears in `/.snapshots` folder (by default).
-* If your snapshots aren't mounted in `/.snapshots`, you must modify the watch folder using `systemctl edit grub-btrfs.path`.  
-	* For example: Timeshift mount its snapshots in `/run/timeshift/backup/timeshift-btrfs/snapshots` folder.
+If you would like grub-btrfs menu to automatically update when a snapshot is created or deleted:
+* Use `systemctl enable grub-btrfs.path`.
+  * `grub-btrfs.path` automatically (re)generates `grub-btrfs.cfg` when a modification appears in `/.snapshots` mount point (by default).
+  * If the `/.snapshots` mount point is already mounted, then use `systemctl start grub-btrfs.path` to start monitoring.  
+    Otherwise, the unit will automatically start monitoring when the mount point will be available.
+* If your snapshots location aren't mounted in `/.snapshots`, you must modify `grub-btrfs.path` unit using  
+`systemctl edit --full grub-btrfs.path` and run `systemctl reenable grub-btrfs.path` for changes take effect.  
+To find out the name of the `.mount` unit  
+use `systemctl list-units -t mount`.  
+	* For example: Timeshift mounts its snapshot folder in `/run/timeshift/backup/timeshift-btrfs/snapshots`.
 
-		Use `systemctl edit grub-btrfs.path`.
-		Then wrote:
+		Use `systemctl edit --full grub-btrfs.path`.
+		Then replace the whole block by:
 		```
+		[Unit]
+		Description=Monitors for new snapshots
+		DefaultDependencies=no
+		Requires=run-timeshift-backup.mount
+		After=run-timeshift-backup.mount
+		BindsTo=run-timeshift-backup.mount
+
 		[Path]
 		PathModified=/run/timeshift/backup/timeshift-btrfs/snapshots
+
+		[Install]
+		WantedBy=run-timeshift-backup.mount
 		```
-		and finally save.
+		Then save and finally run `systemctl reenable grub-btrfs.path` for changes take effect.  
+		Optional:  
+		If the `/run/timeshift/backup/timeshift-btrfs/snapshots` mount point is already mounted,  
+		then use `systemctl start grub-btrfs.path` to start monitoring.  
+		Otherwise, the unit will automatically start monitoring when the mount point will be available.  
 	* You can view your change to `systemctl cat grub-btrfs.path`.
 	* To revert change use `systemctl revert grub-btrfs.path`.
-##### Warning:
+##### Warning :
 by default, `grub-mkconfig` command is used.  
 Might be `grub2-mkconfig` on some systems (Fedora ...).   
 Edit `GRUB_BTRFS_MKCONFIG` variable in `/etc/default/grub-btrfs/config` file to reflect this.
