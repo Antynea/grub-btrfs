@@ -53,7 +53,7 @@ See [config file](https://github.com/Antynea/grub-btrfs/blob/master/config) for 
 
 ##
 ### Automatically update grub
-If you would like grub-btrfs menu to automatically update when a snapshot is created or deleted:
+1- If you would like grub-btrfs menu to automatically update when a snapshot is created or deleted:
 * Use `systemctl enable grub-btrfs.path`.
   * `grub-btrfs.path` automatically (re)generates `grub-btrfs.cfg` when a modification appears in `/.snapshots` mount point (by default).
   * If the `/.snapshots` mount point is already mounted, then use `systemctl start grub-btrfs.path` to start monitoring.  
@@ -87,6 +87,10 @@ use `systemctl list-units -t mount`.
 		Otherwise, the unit will automatically start monitoring when the mount point will be available.  
 	* You can view your change to `systemctl cat grub-btrfs.path`.
 	* To revert change use `systemctl revert grub-btrfs.path`.
+
+2- If you would like grub-btrfs menu to automatically update on system restart/shutdown:  
+[Look at this comment](https://github.com/Antynea/grub-btrfs/issues/138#issuecomment-766918328)  
+Currently not implemented  
 ##### Warning :
 by default, `grub-mkconfig` command is used.  
 Might be `grub2-mkconfig` on some systems (Fedora ...).   
