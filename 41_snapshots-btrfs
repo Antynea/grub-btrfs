@@ -7,16 +7,16 @@
 #
 # Purpose:
 #   Improves Grub by adding "btrfs snapshots" to the Grub menu.
-#   You can start your system on a "snapshot" from the Grub menu.
-#   Supports manual snapshots, snapper ...
-#   Warning : booting on read-only snapshots can be tricky
+#   You can boot your system on a "snapshot" from the Grub menu.
+#   Supports manual snapshots, snapper, timeshift ...
+#   Warning : booting on read-only snapshots can be tricky.
 #   (Read about it, https://github.com/Antynea/grub-btrfs#warning-booting-on-read-only-snapshots-can-be-tricky)
 #
 # What this script does:
 # - Automatically List snapshots existing on root partition (btrfs).
 # - Automatically Detect if "/boot" is in separate partition.
-# - Automatically Detect kernel, initramfs and intel microcode in "/boot" directory on snapshots.
-# - Automatically Create corresponding "menuentry" in grub.cfg
+# - Automatically Detect kernel, initramfs and intel/amd microcode in "/boot" directory on snapshots.
+# - Automatically Create corresponding "menuentry" in grub.cfg.
 # - Automatically detect snapper and use snapper's snapshot description if available.
 # - Automatically generate grub.cfg if you use the provided systemd service.
 #
@@ -24,15 +24,11 @@
 # - Run `make install` or look into Makefile for instructions on where to put each file.
 #
 # Customization:
-#  Refer to config for the list of available options and their default values.
-#  Place your configurations to /etc/default/grub-btrfs/config.
+#  You have the possibility to modify many parameters in /etc/default/grub-btrfs/config.
 #
 # Automatically update Grub
-#  If you would like Grub to automatically update when a snapshots is made or deleted:
-#  - Use systemctl start/enable grub-btrfs.path
-#  - grub-btrfs.path automatically (re)generates grub.cfg when a modification appears in /.snapshots folder (by default).
-#  - If your snapshots aren't mounted in /.snapshots, you must modify the watch folder using systemctl edit grub-btrfs.path
-#  - See https://github.com/Antynea/grub-btrfs#automatically-update-grub
+#  If you would like grub-btrfs menu to automatically update when a snapshot is created or deleted:
+#  - Refer to https://github.com/Antynea/grub-btrfs#automatically-update-grub.
 #
 # Special thanks for assistance and contributions:
 # - My friends
