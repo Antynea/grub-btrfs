@@ -41,9 +41,12 @@ prefix="/usr"
 exec_prefix="/usr"
 datarootdir="/usr/share"
 sysconfdir="/etc"
-grub_btrfs_config="${sysconfdir}/default/grub-btrfs/config"
+grub_btrfs_config="${sysconfdir}/conf.d/grub-btrfs"
 
-[[ -f "$grub_btrfs_config" ]] && . "$grub_btrfs_config"
+for file in "$grub_btrfs_config"/*.conf; do
+	[[ -f "$file" ]] && . "$file"
+done
+
 . "$datarootdir/grub/grub-mkconfig_lib"
 . "${sysconfdir}/default/grub"
 
