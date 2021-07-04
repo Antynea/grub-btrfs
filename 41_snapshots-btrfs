@@ -296,6 +296,18 @@ snapshot_list()
             if [[ "$snapper_id" == "$id" ]]; then
                 local snapper_type=$(trim "${snapper_types[$j]}")
                 local snapper_description=$(trim "${snapper_descriptions[$j]}")
+                
+                # ignore snapper_type or snapper_description during run "grub-mkconfig"
+                if [ ! -z "${GRUB_BTRFS_IGNORE_SNAPPER_TYPE}" ] ; then
+                    for ist in ${GRUB_BTRFS_IGNORE_SNAPPER_TYPE[@]} ; do
+                        [[ "${snapper_type}" == "${ist}" ]] && continue 3;
+                    done
+                fi
+                if [ ! -z "${GRUB_BTRFS_IGNORE_SNAPPER_DESCRIPTION}" ] ; then
+                    for isd in ${GRUB_BTRFS_IGNORE_SNAPPER_DESCRIPTION[@]} ; do
+                        [[ "${snapper_description}" == "${isd}" ]] && continue 3;
+                    done
+                fi
                 printf -v entry "%-${max_entry_length}s | %-${max_type_length}s | %s" "$entry" "$snapper_type" "$snapper_description"
                 break
             fi
