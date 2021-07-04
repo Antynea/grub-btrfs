@@ -74,6 +74,15 @@ GRUB_BTRFS_IGNORE_SPECIFIC_PATH=("@")
 # Default: ("var/lib/docker" "@var/lib/docker" "@/var/lib/docker")
 GRUB_BTRFS_IGNORE_PREFIX_PATH=("var/lib/docker" "@var/lib/docker" "@/var/lib/docker")
 
+# Ignore specific type of snapper's snapshot during run "grub-mkconfig".
+# Type = number, timeline, pre, post.
+# Default: ("")
+GRUB_BTRFS_IGNORE_SNAPPER_TYPE=("")
+
+# Ignore specific description of snapper's snapshot during run "grub-mkconfig".
+# Default: ("")
+GRUB_BTRFS_IGNORE_SNAPPER_DESCRIPTION=("")
+
 # By default "grub-btrfs" automatically detects your boot partition,
 # either located at the system root or on a separate partition,
 # but cannot detect if it is in a subvolume.
