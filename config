@@ -75,7 +75,7 @@ GRUB_BTRFS_IGNORE_SPECIFIC_PATH=("@")
 GRUB_BTRFS_IGNORE_PREFIX_PATH=("var/lib/docker" "@var/lib/docker" "@/var/lib/docker")
 
 # Ignore specific type of snapper's snapshot during run "grub-mkconfig".
-# Type = number, timeline, pre, post.
+# Type = single, pre, post.
 # Default: ("")
 GRUB_BTRFS_IGNORE_SNAPPER_TYPE=("")
 
