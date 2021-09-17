@@ -156,23 +156,23 @@ make_menu_entries()
         [[ ! -f "${boot_dir}"/"${k}" ]] && continue;
         kversion=${k#*"-"}
         for i in "${name_initramfs[@]}"; do
-            prefix_i=${i%%"-"*}
-            suffix_i=${i#*"-"}
-            alt_suffix_i=${i##*"-"}
-            if   [ "${kversion}" = "${suffix_i}" ];                 then i="${i}";
-            elif [ "${kversion}.img" = "${suffix_i}" ];             then i="${i}";
-            elif [ "${kversion}-fallback.img" = "${suffix_i}" ];    then i="${i}";
-            elif [ "${kversion}.gz" = "${suffix_i}" ];              then i="${i}";
-            else continue ;
-            fi
-            for u in "${name_microcode[@]}"; do
-                if [[ "${name_microcode}" != "x" ]] ; then
+            if [[ "${name_initramfs}" != "x" ]] ; then
+                prefix_i=${i%%"-"*}
+                suffix_i=${i#*"-"}
+                alt_suffix_i=${i##*"-"}
+                if   [ "${kversion}" = "${suffix_i}" ];                 then i="${i}";
+                elif [ "${kversion}.img" = "${suffix_i}" ];             then i="${i}";
+                elif [ "${kversion}-fallback.img" = "${suffix_i}" ];    then i="${i}";
+                elif [ "${kversion}.gz" = "${suffix_i}" ];              then i="${i}";
+                fi
+                for u in "${name_microcode[@]}"; do
+                    if [[ "${name_microcode}" != "x" ]] ; then
                     entry "
     menuentry '"${k}" & "${i}" & "${u}"' ${CLASS} "\$menuentry_id_option" 'gnulinux-snapshots-$boot_uuid' {"
-                else
+                    else
                     entry "
     menuentry '"${k}" & "${i}"' ${CLASS} "\$menuentry_id_option" 'gnulinux-snapshots-$boot_uuid' {"
-                fi
+                    fi
                 entry "\
         if [ x\$feature_all_video_module = xy ]; then
         insmod all_video
@@ -187,18 +187,50 @@ make_menu_entries()
         echo 'Loading Snapshot: "${snap_date_time}" "${snap_dir_name}"'
         echo 'Loading Kernel: "${k}" ...'
         linux \"${boot_dir_root_grub}/"${k}"\" root="${LINUX_ROOT_DEVICE}" ${kernel_parameters} ${rootflags}subvol=\""${snap_dir_name}"\""
-                if [[ "${name_microcode}" != "x" ]] ; then
-                    entry "\
+                    if [[ "${name_microcode}" != "x" ]] ; then
+                        entry "\
         echo 'Loading Microcode & Initramfs: "${u}" "${i}" ...'
         initrd \"${boot_dir_root_grub}/"${u}"\" \"${boot_dir_root_grub}/"${i}"\""
-                else
-                    entry "\
+                    else
+                        entry "\
         echo 'Loading Initramfs: "${i}" ...'
         initrd \"${boot_dir_root_grub}/"${i}"\""
-                fi
-                entry "    }"
-                count_warning_menuentries=$((1+$count_warning_menuentries))
-            done
+                    fi
+                    entry "    }"
+                    count_warning_menuentries=$((1+$count_warning_menuentries))
+                done
+            else 
+                for u in "${name_microcode[@]}"; do
+                    if [[ "${name_microcode}" != "x" ]] ; then
+                    entry "
+    menuentry '"${k}" & "${u}"' ${CLASS} "\$menuentry_id_option" 'gnulinux-snapshots-$boot_uuid' {"
+                    else
+                    entry "
+    menuentry '"${k}"' ${CLASS} "\$menuentry_id_option" 'gnulinux-snapshots-$boot_uuid' {"
+                    fi
+                entry "\
+        if [ x\$feature_all_video_module = xy ]; then
+        insmod all_video
+        fi
+        set gfxpayload=keep
+        insmod ${boot_fs}
+        if [ x\$feature_platform_search_hint = xy ]; then
+            search --no-floppy --fs-uuid  --set=root ${boot_hs} ${boot_uuid}
+        else
+            search --no-floppy --fs-uuid  --set=root ${boot_uuid}
+        fi
+        echo 'Loading Snapshot: "${snap_date_time}" "${snap_dir_name}"'
+        echo 'Loading Kernel: "${k}" ...'
+        linux \"${boot_dir_root_grub}/"${k}"\" root="${LINUX_ROOT_DEVICE}" ${kernel_parameters} ${rootflags}subvol=\""${snap_dir_name}"\""
+                    if [[ "${name_microcode}" != "x" ]] ; then
+                        entry "\
+        echo 'Loading Microcode: "${u}" ...'
+        initrd \"${boot_dir_root_grub}/"${u}"\""
+                    fi
+                    entry "    }"
+                    count_warning_menuentries=$((1+$count_warning_menuentries))
+                done
+            fi
         done
     done
     entry  "}"
@@ -360,6 +392,7 @@ detect_initramfs()
             list_initramfs+=("$cinitramfs")
         done
     fi
+    if [ -z "${list_initramfs}" ]; then list_initramfs=(x); fi
 }
 
 ## Detect microcode in "/boot"
@@ -436,7 +469,6 @@ boot_bounded()
         detect_rootflags
         # Initramfs (Original + custom initramfs)
         detect_initramfs
-        if [ -z "${list_initramfs}" ]; then continue; fi
         name_initramfs=("${list_initramfs[@]##*"/"}")
         # microcode (auto-detect + custom microcode)
         detect_microcode
@@ -473,7 +505,6 @@ boot_separate()
     name_kernel=("${list_kernel[@]##*"/"}")
     # Initramfs (Original + custom initramfs)
     detect_initramfs
-    if [ -z "${list_initramfs}" ]; then print_error "Initramfs not found."; fi
     name_initramfs=("${list_initramfs[@]##*"/"}")
     # microcode (auto-detect + custom microcode)
     detect_microcode
