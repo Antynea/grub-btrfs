@@ -33,7 +33,7 @@ Refer to the [documentation](https://github.com/Antynea/grub-btrfs/blob/master/i
 ##
 ### Installation :
 #### Arch Linux
-
+The package is available in the community repository [grub-btrfs](https://archlinux.org/packages/community/any/grub-btrfs/)
 ```
 pacman -S grub-btrfs
 ```
@@ -41,10 +41,13 @@ pacman -S grub-btrfs
 #### Manual
 
 * Run `make install` or look into Makefile for instructions on where to put each file.
+* Dependencies:
+  * [btrfs-progs](https://archlinux.org/packages/core/x86_64/btrfs-progs/)
+  * [grub](https://archlinux.org/packages/core/x86_64/grub/)
 
 NOTE: Generate your Grub menu after installation for the changes to take effect.  
-On Arch Linux use `grub-mkconfig -o /boot/grub/grub.cfg`.
-
+On Arch Linux use `grub-mkconfig -o /boot/grub/grub.cfg`.  
+On Debian-like distribution `update-grub` is an alias to `grub-mkconfig ...`
 ##
 ### Customization :
 
