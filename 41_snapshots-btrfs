@@ -123,9 +123,9 @@ detect_rootflags()
 ## Error Handling
 print_error()
 {
-    local arg="$@"
-    local nothing_to_do="If you think an error has occurred , please file a bug report at \" https://github.com/Antynea/grub-btrfs \"\nNothing to do. Abort.\n"
-    printf "${arg}\n${nothing_to_do}" >&2 ;
+    local err_msg="$@"
+    local bug_report="If you think an error has occurred , please file a bug report at \" https://github.com/Antynea/grub-btrfs \""
+    printf "%s\n" "${err_msg}" "${bug_report}" >&2 ;
     exit 0
 }
 
@@ -239,14 +239,14 @@ snapshot_list()
     # Query info from snapper if it is installed
     if type snapper >/dev/null 2>&1; then
         if [ -s "/etc/snapper/configs/$snapper_config" ]; then
-            printf "Info: snapper detected, using config '$snapper_config'\n" >&2
+            printf "Info: snapper detected, using config: %s\n" "$snapper_config" >&2
             local snapper_ids=($(snapper --no-dbus -t 0 -c "$snapper_config" list --disable-used-space | tail -n +3 | cut -d'|' -f 1))
             local snapper_types=($(snapper --no-dbus -t 0 -c "$snapper_config" list --disable-used-space | tail -n +3 | cut -d'|' -f 2))
 
             IFS=$'\n'
             local snapper_descriptions=($(snapper --no-dbus -t 0 -c "$snapper_config" list --disable-used-space | tail -n +3 | rev | cut -d'|' -f 2 | rev))
         else
-            printf "Warning: snapper detected but config '$snapper_config' does not exist\n" >&2
+            printf "Warning: snapper detected but config: %s does not exist\n" "$snapper_config" >&2
         fi
     fi
 
@@ -559,11 +559,11 @@ fi
 # unmounting mount point
 umount $gbgmp
 # Show warn, menuentries exceeds 250 entries
-[[ $count_warning_menuentries -ge 250 ]] && printf "Generated ${count_warning_menuentries} total GRUB entries. You might experience issues loading snapshots menu in GRUB.\n" >&2 ;
+[[ $count_warning_menuentries -ge 250 ]] && printf "Generated %s total GRUB entries. You might experience issues loading snapshots menu in GRUB.\n" "${count_warning_menuentries}" >&2 ;
 # printf "menuentries = $count_warning_menuentries \n" >&2 ;
 # Show total found snapshots
 if [[ "${GRUB_BTRFS_SHOW_TOTAL_SNAPSHOTS_FOUND:-"true"}" = "true" && -n "${count_limit_snap}" && "${count_limit_snap}" != "0" ]]; then
-    printf "Found ${count_limit_snap} snapshot(s)\n" >&2 ;
+    printf "Found %s snapshot(s)\n" "${count_limit_snap}" >&2 ;
 fi
 # if no snapshot found, exit
 if [[ "${count_limit_snap}" = "0" || -z "${count_limit_snap}" ]]; then
