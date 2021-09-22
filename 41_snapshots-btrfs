@@ -245,8 +245,7 @@ trim() {
 snapshot_list()
 {
     # Query info from snapper if it is installed
-    type snapper >/dev/null 2>&1
-    if [ $? -eq 0 ]; then
+    if type snapper >/dev/null 2>&1; then
         if [ -s "/etc/snapper/configs/$snapper_config" ]; then
             printf "Info: snapper detected, using config '$snapper_config'\n" >&2
             local snapper_ids=($(snapper --no-dbus -t 0 -c "$snapper_config" list --disable-used-space | tail -n +3 | cut -d'|' -f 1))
