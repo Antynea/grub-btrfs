@@ -41,12 +41,23 @@ sysconfdir="/etc"
 grub_btrfs_config="${sysconfdir}/default/grub-btrfs/config"
 
 [[ -f "$grub_btrfs_config" ]] && . "$grub_btrfs_config"
-. "$datarootdir/grub/grub-mkconfig_lib"
-. "${sysconfdir}/default/grub"
+[[ -f "${sysconfdir}/default/grub" ]] && . "${sysconfdir}/default/grub"
 
-### Variables in /etc/default/grub-btrfs/config
-## Disable Grub-btrfs (default=active)
-[[ "${GRUB_BTRFS_DISABLE:-"false"}" == "true" ]] && exit 0
+## Exit the script, if:
+disable_script() {
+    # Disable Grub-btrfs is set to true (default=false)
+    [[ "${GRUB_BTRFS_DISABLE:-"false"}" == "true" ]] && return 1
+    # btrfs-progs isn't installed
+    if ! type btrfs >/dev/null 2>&1; then return 1; fi
+    # grub-mkconfig_lib couldn't be found
+    [[ -f "$datarootdir/grub/grub-mkconfig_lib" ]] && . "$datarootdir/grub/grub-mkconfig_lib" || return 1
+    # Root filesystem isn't btrfs
+    root_fs=$(${grub_probe} --target="fs" / 2>/dev/null)
+    [[ "$root_fs" != "btrfs" ]] && return 1
+    return 0
+}
+disable_script
+
 ## Submenu name
 distro=$(awk -F "=" '/^NAME=/ {gsub(/"/, "", $2); print $2}' /etc/os-release)
 submenuname=${GRUB_BTRFS_SUBMENUNAME:-"${distro:-Linux} snapshots"}
@@ -73,23 +84,16 @@ if [ -n "${GRUB_BTRFS_PROTECTION_AUTHORIZED_USERS}" ] ; then
     protection_authorized_users="--users ${GRUB_BTRFS_PROTECTION_AUTHORIZED_USERS} "
 fi
 
-### variables script
-## Probe info "Boot partition"
-# Boot device
-boot_device=$(${grub_probe} --target=device ${boot_directory})
-# hints string
-boot_hs=$(${grub_probe} --device ${boot_device} --target="hints_string" 2>/dev/null)
-# UUID of the boot partition
-boot_uuid=$(${grub_probe} --device ${boot_device} --target="fs_uuid" 2>/dev/null)
-# Type filesystem of boot partition
-boot_fs=$(${grub_probe} --device ${boot_device} --target="fs" 2>/dev/null)
-## Probe info "Root partition"
-# Type filesystem of root partition
-root_fs=$(${grub_probe} --target="fs" / 2>/dev/null)
-# Root device
-root_device=$(${grub_probe} --target=device /)
-# UUID of the root partition
-root_uuid=$(${grub_probe} --device ${root_device} --target="fs_uuid" 2>/dev/null)
+## Probe informations of Root and Boot devices
+# Probe info "Root partition"
+root_device=$(${grub_probe} --target=device /) # Root device
+root_uuid=$(${grub_probe} --device ${root_device} --target="fs_uuid" 2>/dev/null) # UUID of the root device
+# Probe info "Boot partition"
+boot_device=$(${grub_probe} --target=device ${boot_directory}) # Boot device
+boot_uuid=$(${grub_probe} --device ${boot_device} --target="fs_uuid" 2>/dev/null) # UUID of the boot device
+boot_hs=$(${grub_probe} --device ${boot_device} --target="hints_string" 2>/dev/null) # hints string
+boot_fs=$(${grub_probe} --device ${boot_device} --target="fs" 2>/dev/null) # Type filesystem of boot device
+
 ## Parameters passed to the kernel
 kernel_parameters="$GRUB_CMDLINE_LINUX $GRUB_CMDLINE_LINUX_DEFAULT"
 ## Mount point location
@@ -116,7 +120,7 @@ detect_rootflags()
     rootflags="rootflags=${fstabflags:+$fstabflags,}${GRUB_BTRFS_ROOTFLAGS:+$GRUB_BTRFS_ROOTFLAGS,}"
 }
 
-### Error Handling
+## Error Handling
 print_error()
 {
     local arg="$@"
@@ -125,18 +129,6 @@ print_error()
     exit 0
 }
 
-test_btrfs()
-{
-    [[ "$root_fs" != "btrfs" ]] && print_error "Root partition isn't a btrfs filesystem.\nThis script only supports snapshots of the btrfs filesystem."
-    set +e
-    type btrfs >/dev/null 2>&1
-    if [[ $? -ne 0 ]]; then
-        print_error "Unable to retrieve info from btrfs filesystem, make sure you have btrfs-progs on your system."
-    fi
-    set -e
-}
-
-### Script
 ## Create entry
 entry()
 {
@@ -170,7 +162,7 @@ make_menu_entries()
                     entry "
     menuentry '"${k}" & "${i}"' ${CLASS} "\$menuentry_id_option" 'gnulinux-snapshots-$boot_uuid' {"
                     fi
-                entry "\
+                    entry "\
         if [ x\$feature_all_video_module = xy ]; then
         insmod all_video
         fi
@@ -205,7 +197,7 @@ make_menu_entries()
                     entry "
     menuentry '"${k}"' ${CLASS} "\$menuentry_id_option" 'gnulinux-snapshots-$boot_uuid' {"
                     fi
-                entry "\
+                    entry "\
         if [ x\$feature_all_video_module = xy ]; then
         insmod all_video
         fi
@@ -489,6 +481,7 @@ boot_bounded()
     done
     IFS=$oldIFS
 }
+
 boot_separate()
 {
     boot_dir="${boot_directory}"
@@ -537,10 +530,7 @@ boot_separate()
     IFS=$oldIFS
 }
 
-### Start
 printf "Detecting snapshots ...\n" >&2 ;
-# Only support btrfs snapshots
-test_btrfs
 # Delete existing config
 #rm -f --preserve-root "$grub_directory/grub-btrfs.cfg"
 > "$grub_directory/grub-btrfs.cfg"
@@ -585,4 +575,3 @@ submenu '${submenuname}' ${protection_authorized_users}${unrestricted_access_sub
     configfile "\${prefix}/grub-btrfs.cfg"
 }
 EOF
-### End
