@@ -1,6 +1,5 @@
 #! /usr/bin/env bash
 #
-#
 # Written by: Antynea
 # BTC donation address: 1Lbvz244WA8xbpHek9W2Y12cakM6rDe5Rt
 # Github: https://github.com/Antynea/grub-btrfs
@@ -37,8 +36,6 @@
 
 set -e
 
-prefix="/usr"
-exec_prefix="/usr"
 datarootdir="/usr/share"
 sysconfdir="/etc"
 grub_btrfs_config="${sysconfdir}/default/grub-btrfs/config"
@@ -55,7 +52,7 @@ distro=$(awk -F "=" '/^NAME=/ {gsub(/"/, "", $2); print $2}' /etc/os-release)
 submenuname=${GRUB_BTRFS_SUBMENUNAME:-"${distro:-Linux} snapshots"}
 ## Prefix entry
 prefixentry=${GRUB_BTRFS_PREFIXENTRY:-"Snapshot:"}
-## Limit snapshots to show in the Grub menu
+## Limit snapshots to show in the Grub menu (default=50)
 limit_snap_show="${GRUB_BTRFS_LIMIT:-50}"
 ## How to sort snapshots list
 btrfssubvolsort=(--sort="${GRUB_BTRFS_SUBVOLUME_SORT:-"-rootid"}")
@@ -72,7 +69,7 @@ case "${GRUB_BTRFS_DISABLE_PROTECTION_SUBMENU:-"false"}" in
     *)      unrestricted_access_submenu=""
 esac
 # Authorized users (--users foo,bar)
-if [ ! -z "${GRUB_BTRFS_PROTECTION_AUTHORIZED_USERS}" ] ; then
+if [ -n "${GRUB_BTRFS_PROTECTION_AUTHORIZED_USERS}" ] ; then
     protection_authorized_users="--users ${GRUB_BTRFS_PROTECTION_AUTHORIZED_USERS} "
 fi
 
@@ -278,12 +275,12 @@ snapshot_list()
         [[ ${snap_path_name%%"/"*} == "<FS_TREE>" ]] && snap_path_name=${snap_path_name#*"/"}
 
         # ignore specific path during run "grub-mkconfig"
-        if [ ! -z "${GRUB_BTRFS_IGNORE_SPECIFIC_PATH}" ] ; then
+        if [ -n "${GRUB_BTRFS_IGNORE_SPECIFIC_PATH}" ] ; then
             for isp in ${GRUB_BTRFS_IGNORE_SPECIFIC_PATH[@]} ; do
                 [[ "${snap_path_name}" == "${isp}" ]] && continue 2;
             done
         fi
-        if [ ! -z "${GRUB_BTRFS_IGNORE_PREFIX_PATH}" ] ; then
+        if [ -n "${GRUB_BTRFS_IGNORE_PREFIX_PATH}" ] ; then
             for isp in ${GRUB_BTRFS_IGNORE_PREFIX_PATH[@]} ; do
                 [[ "${snap_path_name}" == "${isp}"/* ]] && continue 2;
             done
@@ -330,12 +327,12 @@ snapshot_list()
                 local snapper_description=$(trim "${snapper_descriptions[$j]}")
                 
                 # ignore snapper_type or snapper_description during run "grub-mkconfig"
-                if [ ! -z "${GRUB_BTRFS_IGNORE_SNAPPER_TYPE}" ] ; then
+                if [ -n "${GRUB_BTRFS_IGNORE_SNAPPER_TYPE}" ] ; then
                     for ist in ${GRUB_BTRFS_IGNORE_SNAPPER_TYPE[@]} ; do
                         [[ "${snapper_type}" == "${ist}" ]] && continue 3;
                     done
                 fi
-                if [ ! -z "${GRUB_BTRFS_IGNORE_SNAPPER_DESCRIPTION}" ] ; then
+                if [ -n "${GRUB_BTRFS_IGNORE_SNAPPER_DESCRIPTION}" ] ; then
                     for isd in ${GRUB_BTRFS_IGNORE_SNAPPER_DESCRIPTION[@]} ; do
                         [[ "${snapper_description}" == "${isd}" ]] && continue 3;
                     done
@@ -363,7 +360,7 @@ detect_kernel()
     done
 
     # Custom name kernel in GRUB_BTRFS_NKERNEL
-    if [ ! -z "${GRUB_BTRFS_NKERNEL}" ] ; then
+    if [ -n "${GRUB_BTRFS_NKERNEL}" ] ; then
         for ckernel in "${boot_dir}/${GRUB_BTRFS_NKERNEL[@]}" ; do
             [[ ! -f "${ckernel}" ]] && continue;
             list_kernel+=("$ckernel")
@@ -386,7 +383,7 @@ detect_initramfs()
     done
 
     # Custom name initramfs in GRUB_BTRFS_NINIT
-    if [ ! -z "${GRUB_BTRFS_NINIT}" ] ; then
+    if [ -n "${GRUB_BTRFS_NINIT}" ] ; then
         for cinitramfs in "${boot_dir}/${GRUB_BTRFS_NINIT[@]}" ; do
             [[ ! -f "${cinitramfs}" ]] && continue;
             list_initramfs+=("$cinitramfs")
@@ -412,7 +409,7 @@ detect_microcode()
     done
 
     # Custom name microcode in GRUB_BTRFS_CUSTOM_MICROCODE
-    if [ ! -z "${GRUB_BTRFS_CUSTOM_MICROCODE}" ] ; then
+    if [ -n "${GRUB_BTRFS_CUSTOM_MICROCODE}" ] ; then
         for cucode in "${boot_dir}/${GRUB_BTRFS_CUSTOM_MICROCODE[@]}" ; do
             [[ ! -f "${cucode}" ]] && continue
             list_ucode+=("$cucode")
@@ -576,7 +573,7 @@ umount $gbgmp
 [[ $count_warning_menuentries -ge 250 ]] && printf "Generated ${count_warning_menuentries} total GRUB entries. You might experience issues loading snapshots menu in GRUB.\n" >&2 ;
 # printf "menuentries = $count_warning_menuentries \n" >&2 ;
 # Show total found snapshots
-if [[ "${GRUB_BTRFS_SHOW_TOTAL_SNAPSHOTS_FOUND:-"true"}" = "true" && ! -z "${count_limit_snap}" && "${count_limit_snap}" != "0" ]]; then
+if [[ "${GRUB_BTRFS_SHOW_TOTAL_SNAPSHOTS_FOUND:-"true"}" = "true" && -n "${count_limit_snap}" && "${count_limit_snap}" != "0" ]]; then
     printf "Found ${count_limit_snap} snapshot(s)\n" >&2 ;
 fi
 # if no snapshot found, exit
