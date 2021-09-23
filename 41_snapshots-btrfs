@@ -97,7 +97,7 @@ boot_fs=$(${grub_probe} --device ${boot_device} --target="fs" 2>/dev/null) # Typ
 ## Parameters passed to the kernel
 kernel_parameters="$GRUB_CMDLINE_LINUX $GRUB_CMDLINE_LINUX_DEFAULT"
 ## Mount point location
-gbgmp=$(mktemp -d)
+gbgmp=$(mktemp -dt grub-btrfs.XXXXXXXXXX)
 ## Class for theme
 CLASS="--class snapshots --class gnu-linux --class gnu --class os"
 ## save IFS
@@ -127,6 +127,34 @@ print_error()
     local bug_report="If you think an error has occurred , please file a bug report at \" https://github.com/Antynea/grub-btrfs \""
     printf "%s\n" "${err_msg}" "${bug_report}" >&2 ;
     exit 0
+}
+
+unmount_gbgmp()
+{
+if [[ -d "$gbgmp" ]]; then
+    local wait=true
+    local wait_max=0
+    printf "Unmount %s .." "$gbgmp" >&2;
+    while $wait; do
+        if grep -qs "$gbgmp" /proc/mounts; then
+            wait_max=$((1+$wait_max))
+            if umount "$gbgmp" >/dev/null 2>&1; then
+                wait=false # umount successful
+                printf " Succes\n" >&2;
+            elif [[ $wait_max = 10 ]]; then 
+                printf "\nWarning: Unable to unmount %s in %s\n" "$root_device" "$gbgmp" >&2;
+                break;
+            else
+                printf "." >&2 ; # output to show that the script is alive
+                sleep 2 # wait 2 seconds before retry
+            fi
+        else
+            wait=false # not mounted
+            printf " Succes\n" >&2;
+        fi
+    done
+    [[ "$wait" != true ]] && rm -r "$gbgmp" # If mount point is empty or unmounted, delete residual folder. 
+fi
 }
 
 ## Create entry
@@ -535,8 +563,9 @@ printf "Detecting snapshots ...\n" >&2 ;
 #rm -f --preserve-root "$grub_directory/grub-btrfs.cfg"
 > "$grub_directory/grub-btrfs.cfg"
 # Create mount point then mounting
-[[ ! -d $gbgmp ]] && mkdir -p $gbgmp
-mount -o subvolid=5 /dev/disk/by-uuid/$root_uuid $gbgmp/
+[[ ! -d $gbgmp ]] && mkdir -p "$gbgmp"
+mount -o subvolid=5 /dev/disk/by-uuid/"$root_uuid" "$gbgmp/"
+trap "unmount_gbgmp" EXIT # unmounting mount point on EXIT signal
 # Count menuentries
 count_warning_menuentries=0
 # Count snapshots
@@ -556,8 +585,6 @@ else
         boot_bounded
     fi
 fi
-# unmounting mount point
-umount $gbgmp
 # Show warn, menuentries exceeds 250 entries
 [[ $count_warning_menuentries -ge 250 ]] && printf "Generated %s total GRUB entries. You might experience issues loading snapshots menu in GRUB.\n" "${count_warning_menuentries}" >&2 ;
 # printf "menuentries = $count_warning_menuentries \n" >&2 ;
