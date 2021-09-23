@@ -506,8 +506,6 @@ boot_bounded()
         ### Limit snapshots found during run "grub-mkconfig"
         count_limit_snap=$((1+$count_limit_snap))
         [[ $count_limit_snap -ge $limit_snap_show ]] && break;
-        # Limit generation of menuentries if exceeds 250
-        # [[ $count_warning_menuentries -ge 250 ]] && break;
     done
     IFS=$oldIFS
 }
@@ -554,8 +552,6 @@ boot_separate()
         # Limit snapshots found during run "grub-mkconfig"
         count_limit_snap=$((1+$count_limit_snap))
         [[ $count_limit_snap -ge $limit_snap_show ]] && break;
-        # Limit generation of menuentries if exceeds 250
-        # [[ $count_warning_menuentries -ge 250 ]] && break;
     done
     IFS=$oldIFS
 }
@@ -588,7 +584,6 @@ else
 fi
 # Show warn, menuentries exceeds 250 entries
 [[ $count_warning_menuentries -ge 250 ]] && printf "Generated %s total GRUB entries. You might experience issues loading snapshots menu in GRUB.\n" "${count_warning_menuentries}" >&2 ;
-# printf "menuentries = $count_warning_menuentries \n" >&2 ;
 # Show total found snapshots
 if [[ "${GRUB_BTRFS_SHOW_TOTAL_SNAPSHOTS_FOUND:-"true"}" = "true" && -n "${count_limit_snap}" && "${count_limit_snap}" != "0" ]]; then
     printf "Found %s snapshot(s)\n" "${count_limit_snap}" >&2 ;
