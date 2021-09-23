@@ -20,7 +20,7 @@
 # - Automatically generate grub.cfg if you use the provided systemd service.
 #
 # Installation:
-# - Run `make install` or look into Makefile for instructions on where to put each file.
+# - Refer to https://github.com/Antynea/grub-btrfs#installation-
 #
 # Customization:
 #  You have the possibility to modify many parameters in /etc/default/grub-btrfs/config.
