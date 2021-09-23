@@ -119,11 +119,13 @@ detect_rootflags()
                         | sed -E 's/^.*[[:space:]]([[:graph:]]+)$/\1/;s/,?subvol(id)?=[^,$]+//g;s/^,//')
     rootflags="rootflags=${fstabflags:+$fstabflags,}${GRUB_BTRFS_ROOTFLAGS:+$GRUB_BTRFS_ROOTFLAGS,}"
 }
+## Path to grub-script-check
+grub_script_check="${bindir}/grub-script-check"
 
 ## Error Handling
 print_error()
 {
-    local err_msg="$@"
+    local err_msg="$*"
     local bug_report="If you think an error has occurred , please file a bug report at \" https://github.com/Antynea/grub-btrfs \""
     printf "%s\n" "${err_msg}" "${bug_report}" >&2 ;
     exit 0
@@ -140,7 +142,7 @@ if [[ -d "$gbgmp" ]]; then
             wait_max=$((1+$wait_max))
             if umount "$gbgmp" >/dev/null 2>&1; then
                 wait=false # umount successful
-                printf " Succes\n" >&2;
+                printf " Success\n" >&2;
             elif [[ $wait_max = 10 ]]; then 
                 printf "\nWarning: Unable to unmount %s in %s\n" "$root_device" "$gbgmp" >&2;
                 break;
@@ -150,7 +152,7 @@ if [[ -d "$gbgmp" ]]; then
             fi
         else
             wait=false # not mounted
-            printf " Succes\n" >&2;
+            printf " Success\n" >&2;
         fi
     done
     [[ "$wait" != true ]] && rm -r "$gbgmp" # If mount point is empty or unmounted, delete residual folder. 
@@ -160,7 +162,7 @@ fi
 ## Create entry
 entry()
 {
-echo "$@" >> "$grub_directory/grub-btrfs.cfg"
+echo "$@" >> "$grub_directory/grub-btrfs.new"
 }
 
 ## menu entries
@@ -559,9 +561,8 @@ boot_separate()
 }
 
 printf "Detecting snapshots ...\n" >&2 ;
-# Delete existing config
-#rm -f --preserve-root "$grub_directory/grub-btrfs.cfg"
-> "$grub_directory/grub-btrfs.cfg"
+rm -f "$grub_directory/grub-btrfs.new"
+> "$grub_directory/grub-btrfs.new"
 # Create mount point then mounting
 [[ ! -d $gbgmp ]] && mkdir -p "$gbgmp"
 mount -o subvolid=5 /dev/disk/by-uuid/"$root_uuid" "$gbgmp/"
@@ -596,9 +597,15 @@ fi
 if [[ "${count_limit_snap}" = "0" || -z "${count_limit_snap}" ]]; then
     print_error "No snapshots found."
 fi
-# Make a submenu in GRUB (grub.cfg)
-cat << EOF
+# Make a submenu in GRUB (grub.cfg) and move "grub-btrfs.new" to "grub-btrfs.cfg"
+if ${grub_script_check} "$grub_directory/grub-btrfs.new"; then
+    cat "$grub_directory/grub-btrfs.new" > "$grub_directory/grub-btrfs.cfg"
+    rm -f "$grub_directory/grub-btrfs.new"
+    cat << EOF
 submenu '${submenuname}' ${protection_authorized_users}${unrestricted_access_submenu}{
     configfile "\${prefix}/grub-btrfs.cfg"
 }
 EOF
+else
+    print_error "Syntax errors are detected in generated grub-btrfs.cfg file."
+fi
