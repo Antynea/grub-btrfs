@@ -157,7 +157,7 @@ if [[ -d "$gbgmp" ]]; then
     done
     if [[ "$wait" != true ]]; then
         if ! rm -d "$gbgmp" >/dev/null 2>&1; then
-            printf "Unable to delete %s: Device or ressource is busy" "$gbgmp" >&2;
+            printf "Unable to delete %s: Device or ressource is busy\n" "$gbgmp" >&2;
         fi
     fi
 fi
