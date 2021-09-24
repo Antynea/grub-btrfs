@@ -565,7 +565,7 @@ rm -f "$grub_directory/grub-btrfs.new"
 > "$grub_directory/grub-btrfs.new"
 # Create mount point then mounting
 [[ ! -d $gbgmp ]] && mkdir -p "$gbgmp"
-mount -o subvolid=5 /dev/disk/by-uuid/"$root_uuid" "$gbgmp/"
+mount -o ro,subvolid=5 /dev/disk/by-uuid/"$root_uuid" "$gbgmp/"
 trap "unmount_gbgmp" EXIT # unmounting mount point on EXIT signal
 # Count menuentries
 count_warning_menuentries=0
