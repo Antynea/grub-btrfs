@@ -155,7 +155,11 @@ if [[ -d "$gbgmp" ]]; then
             printf " Success\n" >&2;
         fi
     done
-    [[ "$wait" != true ]] && rm -r "$gbgmp" # If mount point is empty or unmounted, delete residual folder. 
+    if [[ "$wait" != true ]]; then
+        if ! rm -d "$gbgmp" >/dev/null 2>&1; then
+            printf "Unable to delete %s: Device or ressource is busy" "$gbgmp" >&2;
+        fi
+    fi
 fi
 }
 
