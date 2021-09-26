@@ -187,6 +187,7 @@ make_menu_entries()
                 elif [ "${kversion}.img" = "${suffix_i}" ];             then i="${i}";
                 elif [ "${kversion}-fallback.img" = "${suffix_i}" ];    then i="${i}";
                 elif [ "${kversion}.gz" = "${suffix_i}" ];              then i="${i}";
+                else continue;
                 fi
                 for u in "${name_microcode[@]}"; do
                     if [[ "${name_microcode}" != "x" ]] ; then
