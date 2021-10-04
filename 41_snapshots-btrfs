@@ -68,7 +68,7 @@ printf "Detecting snapshots ...\n" >&2 ;
 
 ## Submenu name
 distro=$(awk -F "=" '/^NAME=/ {gsub(/"/, "", $2); print $2}' /etc/os-release)
-submenu_name=${GRUB_BTRFS_SUBMENUNAME:-"${distro:-Linux} snapshots"}
+submenuname=${GRUB_BTRFS_SUBMENUNAME:-"${distro:-Linux} snapshots"}
 ## Limit snapshots to show in the Grub menu (default=50)
 limit_snap_show="${GRUB_BTRFS_LIMIT:-50}"
 ## How to sort snapshots list
