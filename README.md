@@ -27,7 +27,7 @@ Refer to the [documentation](https://github.com/Antynea/grub-btrfs/blob/master/i
 * Automatically Detect if "/boot" is in separate partition.
 * Automatically Detect kernel, initramfs and intel/amd microcode in "/boot" directory on snapshots.
 * Automatically Create corresponding "menuentry" in `grub.cfg`
-* Automatically detect snapper and use snapper's snapshot description if available.
+* Automatically detect the type/tags and descriptions/comments of snapper/timeshift snapshots.
 * Automatically generate `grub.cfg` if you use the provided systemd service.
 
 ##
