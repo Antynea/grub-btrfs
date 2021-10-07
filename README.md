@@ -1,11 +1,11 @@
 [![GitHub release](https://img.shields.io/github/release/Antynea/grub-btrfs.svg)](https://github.com/Antynea/grub-btrfs/releases)
 ![](https://img.shields.io/github/license/Antynea/grub-btrfs.svg)
 
-## grub-btrfs
+## grub-btrfs 
 
 This is a version 4.xx of grub-btrfs
 ##### BTC donation address: `1Lbvz244WA8xbpHek9W2Y12cakM6rDe5Rt`
-##
+- - -
 ### Description :
 Improves Grub by adding "btrfs snapshots" to the Grub menu.
 
@@ -21,7 +21,7 @@ See [this ticket](https://github.com/Antynea/grub-btrfs/issues/92) for more info
 This project includes its own solution.  
 Refer to the [documentation](https://github.com/Antynea/grub-btrfs/blob/master/initramfs/readme.md).
 
-##
+- - -
 ### What does grub-btrfs v4.xx do :
 * Automatically List snapshots existing on root partition (btrfs).
 * Automatically Detect if "/boot" is in separate partition.
@@ -30,13 +30,25 @@ Refer to the [documentation](https://github.com/Antynea/grub-btrfs/blob/master/i
 * Automatically detect the type/tags and descriptions/comments of snapper/timeshift snapshots.
 * Automatically generate `grub.cfg` if you use the provided systemd service.
 
-##
+- - -
 ### Installation :
 #### Arch Linux
 The package is available in the community repository [grub-btrfs](https://archlinux.org/packages/community/any/grub-btrfs/)
 ```
 pacman -S grub-btrfs
 ```
+
+#### Gentoo
+grub-btrfs is only available in the Gentoo User Repository (GURU) and not in the official Gentoo repository.  
+If you have not activated the GURU yet, do so by running:
+```
+emerge -av app-eselect/eselect-repository 
+eselect repository enable guru 
+emerge --sync 
+```
+
+Now merge grub-btrfs via 
+`emerge app-backup/grub-btrfs`
 
 #### Manual
 
@@ -45,18 +57,22 @@ pacman -S grub-btrfs
   * [btrfs-progs](https://archlinux.org/packages/core/x86_64/btrfs-progs/)
   * [grub](https://archlinux.org/packages/core/x86_64/grub/)
 
-NOTE: Generate your Grub menu after installation for the changes to take effect.  
-On Arch Linux use `grub-mkconfig -o /boot/grub/grub.cfg`.  
-On Debian-like distribution `update-grub` is an alias to `grub-mkconfig ...`
-##
+#### NOTE: All distros
+Generate your Grub menu after installation for the changes to take effect.  
+For example:  
+On **Arch Linux** or **Gentoo** use `grub-mkconfig -o /boot/grub/grub.cfg`.  
+On **Fedora** use `grub2-mkconfig -o /boot/grub2/grub.cfg`  
+On **Debian-like** distribution `update-grub` is an alias to `grub-mkconfig ...`
+- - -
 ### Customization :
 
 You have the possibility to modify many parameters in `/etc/default/grub-btrfs/config`.  
 See [config file](https://github.com/Antynea/grub-btrfs/blob/master/config) for more information.
 
-##
-### Automatically update grub
-1- If you would like grub-btrfs menu to automatically update when a snapshot is created or deleted:
+- - -
+### Automatically update grub :
+#### Systemd
+1. If you would like grub-btrfs menu to automatically update when a snapshot is created or deleted:
 * Use `systemctl enable grub-btrfs.path`.
   * `grub-btrfs.path` automatically (re)generates `grub-btrfs.cfg` when a modification appears in `/.snapshots` mount point (by default).
   * If the `/.snapshots` mount point is already mounted, then use `systemctl start grub-btrfs.path` to start monitoring.  
@@ -91,15 +107,37 @@ use `systemctl list-units -t mount`.
 	* You can view your change to `systemctl cat grub-btrfs.path`.
 	* To revert change use `systemctl revert grub-btrfs.path`.
 
-2- If you would like grub-btrfs menu to automatically update on system restart/shutdown:  
+2. If you would like grub-btrfs menu to automatically update on system restart/shutdown:  
 [Look at this comment](https://github.com/Antynea/grub-btrfs/issues/138#issuecomment-766918328)  
-Currently not implemented  
+Currently not implemented
+##
+#### OpenRC
+* There is sadly no similar solution to the systemd service yet.  
+As a workaround it is possible to add a script to `/etc/local.d` to execute the snapshot menu update every time you shut down your system.  
+To do so just add the following script as `/etc/local.d/grub-btrfs-update.stop`
+	```
+	#!/bin/bash
+	
+	description="Update the grub btrfs snapshots menu"
+	name="grub-btrfs-update"
+	
+	depend()
+	{
+	  use localmount
+	}
+	
+	bash -c 'if [ -s "${GRUB_BTRFS_GRUB_DIRNAME:-/boot/grub}/grub-btrfs.cfg" ]; then /etc/grub.d/41_snapshots-btrfs; else {GRUB_BTRFS_MKCONFIG:-grub-mkconfig} -o {GRUB_BTRFS_GRUB_DIRNAME:-/boot/grub}/grub.cfg; fi' 
+	```
+	
+	If you want to run the menu update on startup instead, rename the file to `grub-btrfs-update.start`
+
 ##### Warning :
 by default, `grub-mkconfig` command is used.  
 Might be `grub2-mkconfig` on some systems (Fedora ...).   
 Edit `GRUB_BTRFS_MKCONFIG` variable in `/etc/default/grub-btrfs/config` file to reflect this.
-##
+- - -
 ### Special thanks for assistance and contributions
-* [maximbaz](https://github.com/maximbaz)
+* [Maxim Baz](https://github.com/maximbaz)
+* [Schievel1](https://github.com/Antynea/grub-btrfs/discussions/173#discussioncomment-1438790)
 * [All contributors](https://github.com/Antynea/grub-btrfs/graphs/contributors)
-##
+- - -
