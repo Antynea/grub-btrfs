@@ -111,6 +111,11 @@ GRUB_BTRFS_IGNORE_SNAPPER_DESCRIPTION=("")
 # Default: grub-mkconfig
 #GRUB_BTRFS_MKCONFIG=/usr/bin/grub2-mkconfig
 
+# Path of grub-script-check command, use by "grub-btrfs"
+# Might be 'grub2-script-check' on some systems (Fedora ...)
+# For example, on Fedora : "/sbin/grub2-script-check"
+#GRUB_BTRFS_SCRIPT_CHECK=/usr/bin/grub2-script-check
+
 # Snapper
 # Snapper's config name to use
 # Default: "root"
