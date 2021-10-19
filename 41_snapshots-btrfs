@@ -595,7 +595,7 @@ if [[ "${count_limit_snap}" = "0" || -z "${count_limit_snap}" ]]; then
     print_error "No snapshots found."
 fi
 # Make a submenu in GRUB (grub.cfg) and move "grub-btrfs.new" to "grub-btrfs.cfg"
-if ${grub_script_check} "$grub_directory/grub-btrfs.new"; then
+if ${GRUB_BTRFS_SCRIPT_CHECK:-"grub_script_check"} "$grub_directory/grub-btrfs.new"; then
     cat "$grub_directory/grub-btrfs.new" > "$grub_directory/grub-btrfs.cfg"
     rm -f "$grub_directory/grub-btrfs.new"
     cat << EOF
