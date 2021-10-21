@@ -355,12 +355,12 @@ snapshot_list()
         
         # ignore snapper/timeshift type or snapper/timeshift description during run "grub-mkconfig"
         if [ -n "${GRUB_BTRFS_IGNORE_SNAPSHOT_TYPE}" ] ; then
-            for ist in ${GRUB_BTRFS_IGNORE_SNAPSHOT_TYPE[@]} ; do
+            for ist in "${GRUB_BTRFS_IGNORE_SNAPSHOT_TYPE[@]}" ; do
                 [[ "${info_type}" == "${ist}" ]] && continue 2;
             done
         fi
         if [ -n "${GRUB_BTRFS_IGNORE_SNAPSHOT_DESCRIPTION}" ] ; then
-            for isd in ${GRUB_BTRFS_IGNORE_SNAPSHOT_DESCRIPTION[@]} ; do
+            for isd in "${GRUB_BTRFS_IGNORE_SNAPSHOT_DESCRIPTION[@]}" ; do
                 [[ "${info_description}" == "${isd}" ]] && continue 2;
             done
         fi
