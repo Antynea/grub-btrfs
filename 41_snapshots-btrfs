@@ -44,16 +44,12 @@ grub_btrfs_config="${sysconfdir}/default/grub-btrfs/config"
 [[ -f "${sysconfdir}/default/grub" ]] && . "${sysconfdir}/default/grub"
 
 ## Exit the script, if:
-disable_script() {
-    [[ "${GRUB_BTRFS_DISABLE:-"false"}" == "true" ]] && exit 0 # Disable Grub-btrfs is set to true (default=false)
-    if ! type btrfs >/dev/null 2>&1; then exit 0; fi # btrfs-progs isn't installed
-    [[ -f "$datarootdir/grub/grub-mkconfig_lib" ]] && . "$datarootdir/grub/grub-mkconfig_lib" || exit 0 # grub-mkconfig_lib couldn't be found
-    # Root filesystem isn't btrfs
-    root_fs=$(${grub_probe} --target="fs" / 2>/dev/null)
-    [[ "$root_fs" != "btrfs" ]] && exit 0
-    return 0
-}
-disable_script
+[[ "${GRUB_BTRFS_DISABLE,,}" == "true" ]] && exit 0 # Disable Grub-btrfs is set to true (default=false)
+if ! type btrfs >/dev/null 2>&1; then exit 0; fi # btrfs-progs isn't installed
+[[ -f "$datarootdir/grub/grub-mkconfig_lib" ]] && . "$datarootdir/grub/grub-mkconfig_lib" || exit 0 # grub-mkconfig_lib couldn't be found
+# Root filesystem isn't btrfs
+root_fs=$(${grub_probe} --target="fs" / 2>/dev/null)
+[[ "$root_fs" != "btrfs" ]] && exit 0
 
 ## Error Handling
 print_error()
@@ -79,7 +75,7 @@ grub_directory=${GRUB_BTRFS_GRUB_DIRNAME:-"/boot/grub"}
 boot_directory=${GRUB_BTRFS_BOOT_DIRNAME:-"/boot"}
 ## Password protection management for submenu
 # Protection support for submenu (--unrestricted)
-case "${GRUB_BTRFS_DISABLE_PROTECTION_SUBMENU:-"false"}" in
+case "${GRUB_BTRFS_DISABLE_PROTECTION_SUBMENU,,}" in
     true)   unrestricted_access_submenu="--unrestricted ";;
     *)      unrestricted_access_submenu=""
 esac
@@ -138,7 +134,7 @@ if [[ -d "$grub_btrfs_mount_point" ]]; then
     printf "Unmount %s .." "$grub_btrfs_mount_point" >&2;
     while $wait; do
         if grep -qs "$grub_btrfs_mount_point" /proc/mounts; then
-            wait_max=$((1+$wait_max))
+            wait_max=$((1+wait_max))
             if umount "$grub_btrfs_mount_point" >/dev/null 2>&1; then
                 wait=false # umount successful
                 printf " Success\n" >&2;
@@ -220,7 +216,7 @@ make_menu_entries()
         initrd \"${boot_dir_root_grub}/"${i}"\""
                     fi
                     entry "    }"
-                    count_warning_menuentries=$((1+$count_warning_menuentries))
+                    count_warning_menuentries=$((1+count_warning_menuentries))
                 done
             else 
                 for u in "${name_microcode[@]}"; do
@@ -251,7 +247,7 @@ make_menu_entries()
         initrd \"${boot_dir_root_grub}/"${u}"\""
                     fi
                     entry "    }"
-                    count_warning_menuentries=$((1+$count_warning_menuentries))
+                    count_warning_menuentries=$((1+count_warning_menuentries))
                 done
             fi
         done
@@ -533,7 +529,7 @@ boot_bounded()
             printf "Found snapshot: %s\n" "$item" >&2 ;
         fi
         # Limit snapshots found during run "grub-mkconfig"
-        count_limit_snap=$((1+$count_limit_snap))
+        count_limit_snap=$((1+count_limit_snap))
         [[ $count_limit_snap -ge $limit_snap_show ]] && break;
     done
     IFS=$oldIFS
@@ -565,7 +561,7 @@ boot_separate()
             printf "Found snapshot: %s\n" "$item" >&2 ;
         fi
         # Limit snapshots found during run "grub-mkconfig"
-        count_limit_snap=$((1+$count_limit_snap))
+        count_limit_snap=$((1+count_limit_snap))
         [[ $count_limit_snap -ge $limit_snap_show ]] && break;
     done
     IFS=$oldIFS
