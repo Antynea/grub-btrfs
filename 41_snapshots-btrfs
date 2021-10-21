@@ -502,7 +502,7 @@ boot_bounded()
         # Make menuentries
         make_menu_entries
         ### Limit snapshots found during run "grub-mkconfig"
-        count_limit_snap=$((1+$count_limit_snap))
+        count_limit_snap=$((1+count_limit_snap))
         [[ $count_limit_snap -ge $limit_snap_show ]] && break;
     done
     IFS=$oldIFS
@@ -548,7 +548,7 @@ boot_separate()
         # Make menuentries
         make_menu_entries
         # Limit snapshots found during run "grub-mkconfig"
-        count_limit_snap=$((1+$count_limit_snap))
+        count_limit_snap=$((1+count_limit_snap))
         [[ $count_limit_snap -ge $limit_snap_show ]] && break;
     done
     IFS=$oldIFS
