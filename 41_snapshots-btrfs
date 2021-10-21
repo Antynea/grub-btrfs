@@ -168,8 +168,8 @@ echo "$@" >> "$grub_directory/grub-btrfs.new"
 make_menu_entries()
 {
 ## \" required for snap,kernels,init,microcode with space in their name
-    entry "submenu '|${title_menu}' {
-    submenu '---> |${title_menu} <---' { echo }"
+    entry "submenu '${title_menu}' {
+    submenu '${title_submenu}' { echo }"
     for k in "${name_kernel[@]}"; do
         [[ ! -f "${boot_dir}"/"${k}" ]] && continue;
         kversion=${k#*"-"}
@@ -187,10 +187,10 @@ make_menu_entries()
                 for u in "${name_microcode[@]}"; do
                     if [[ "${name_microcode}" != "x" ]] ; then
                     entry "
-    menuentry '"${k}" & "${i}" & "${u}"' ${CLASS} "\$menuentry_id_option" 'gnulinux-snapshots-$boot_uuid' {"
+    menuentry '  "${k}" & "${i}" & "${u}"' ${CLASS} "\$menuentry_id_option" 'gnulinux-snapshots-$boot_uuid' {"
                     else
                     entry "
-    menuentry '"${k}" & "${i}"' ${CLASS} "\$menuentry_id_option" 'gnulinux-snapshots-$boot_uuid' {"
+    menuentry '  "${k}" & "${i}"' ${CLASS} "\$menuentry_id_option" 'gnulinux-snapshots-$boot_uuid' {"
                     fi
                     entry "\
         if [ x\$feature_all_video_module = xy ]; then
@@ -203,7 +203,7 @@ make_menu_entries()
         else
             search --no-floppy --fs-uuid  --set=root ${boot_uuid}
         fi
-        echo 'Loading Snapshot: "${snap_date_time_trim}" "${snap_dir_name_trim}"'
+        echo 'Loading Snapshot: "${snap_date_trim}" "${snap_dir_name_trim}"'
         echo 'Loading Kernel: "${k}" ...'
         linux \"${boot_dir_root_grub}/"${k}"\" root="${LINUX_ROOT_DEVICE}" ${kernel_parameters} ${rootflags}subvol=\""${snap_dir_name_trim}"\""
                     if [[ "${name_microcode}" != "x" ]] ; then
@@ -222,10 +222,10 @@ make_menu_entries()
                 for u in "${name_microcode[@]}"; do
                     if [[ "${name_microcode}" != "x" ]] ; then
                     entry "
-    menuentry '"${k}" & "${u}"' ${CLASS} "\$menuentry_id_option" 'gnulinux-snapshots-$boot_uuid' {"
+    menuentry '  "${k}" & "${u}"' ${CLASS} "\$menuentry_id_option" 'gnulinux-snapshots-$boot_uuid' {"
                     else
                     entry "
-    menuentry '"${k}"' ${CLASS} "\$menuentry_id_option" 'gnulinux-snapshots-$boot_uuid' {"
+    menuentry '  "${k}"' ${CLASS} "\$menuentry_id_option" 'gnulinux-snapshots-$boot_uuid' {"
                     fi
                     entry "\
         if [ x\$feature_all_video_module = xy ]; then
@@ -238,7 +238,7 @@ make_menu_entries()
         else
             search --no-floppy --fs-uuid  --set=root ${boot_uuid}
         fi
-        echo 'Loading Snapshot: "${snap_date_time_trim}" "${snap_dir_name_trim}"'
+        echo 'Loading Snapshot: "${snap_date_trim}" "${snap_dir_name_trim}"'
         echo 'Loading Kernel: "${k}" ...'
         linux \"${boot_dir_root_grub}/"${k}"\" root="${LINUX_ROOT_DEVICE}" ${kernel_parameters} ${rootflags}subvol=\""${snap_dir_name_trim}"\""
                     if [[ "${name_microcode}" != "x" ]] ; then
@@ -303,15 +303,15 @@ snapshot_list()
             local snapper_type=$(awk -F"<|>" 'match($2, /^type/) {print $3}' "$grub_btrfs_mount_point/${snap_path_name%"/"*}/$snapper_info") # search matching string beginning "type"
             [[ -z "$snapper_type" ]] && info_types+=("no_type") || info_types+=("$snapper_type")
             local snapper_description=$(awk -F"<|>" 'match($2, /^description/) {print $3}' "$grub_btrfs_mount_point/${snap_path_name%"/"*}/$snapper_info") # search matching string beginning "description"
-             [[ -z "$snapper_description" ]] && info_descriptions+=("N/A          ") || info_descriptions+=("$snapper_description")
+             [[ -z "$snapper_description" ]] && info_descriptions+=("N/A") || info_descriptions+=("$snapper_description")
         elif [[ -s "$grub_btrfs_mount_point/${snap_path_name%"/"*}/$timeshift_info" ]] ; then
             local timeshift_type=$(awk -F" : " 'match($1, /^[ \t]+"tags"/) {gsub(/"|,/,"");print $2}' "$grub_btrfs_mount_point/${snap_path_name%"/"*}/$timeshift_info") # search matching string beginning "tags"
             [[ -z "$timeshift_type" ]] && info_types+=("no_type") || info_types+=("$timeshift_type")
             local timeshift_description=$(awk -F" : " 'match($1, /^[ \t]+"comments"/) {gsub(/"|,/,"");print $2}' "$grub_btrfs_mount_point/${snap_path_name%"/"*}/$timeshift_info") # search matching string beginning "comments"
-            [[ -z "$timeshift_description" ]] && info_descriptions+=("N/A         ") || info_descriptions+=("$timeshift_description")
+            [[ -z "$timeshift_description" ]] && info_descriptions+=("N/A") || info_descriptions+=("$timeshift_description")
         else
             info_types+=("N/A")
-            info_descriptions+=("N/A         ")
+            info_descriptions+=("N/A")
         fi
     done
     
@@ -374,12 +374,16 @@ snapshot_list()
 ## Parse snapshots in snapshot_list
 parse_snapshot_list()
 {
-    snap_date_time=" $(echo "$item" | cut -d'|' -f1)"
-    snap_date_time_trim="$(trim "$snap_date_time")"
-    snap_dir_name="$(echo "$item" | cut -d'|' -f2)"
+    snap_date=" $(echo "$item" | cut -d'|' -f1)" # column_1, first space is necessary for pretty formatting
+    snap_date_trim="$(trim "$snap_date")"
+    
+    snap_dir_name="$(echo "$item" | cut -d'|' -f2)" # column_2
     snap_dir_name_trim="$(trim "$snap_dir_name")"
-    snap_type_info="$(echo "$item" | cut -d'|' -f3)"
-    snap_description_info="$(echo "$item" | cut -d'|' -f4)"
+    snap_snapshot="$snap_dir_name" # Used by "title_format" function
+    
+    snap_type="$(echo "$item" | cut -d'|' -f3)" # column_3
+    
+    snap_description="$(echo "$item" | cut -d'|' -f4)" # column_4
 }
 
 ## Detect kernels in "boot_directory"
@@ -453,54 +457,39 @@ detect_microcode()
     if [ -z "${list_ucode}" ]; then list_ucode=(x); fi
 }
 
-## Title format in grub-menu
+## Title format in Grub-menu
+declare -A title_column=( [date]=Date [snapshot]=Snapshot [type]=Type [description]=Description ) # Column title that appears in the header
 title_format()
 {
-    local date=snap_date_time
-    local snapshot=snap_dir_name
-    local type=snap_type_info
-    local description=snap_description_info
-    title_menu=()
-    if [ -n "${GRUB_BTRFS_TITLE_FORMAT}" ] ; then
-        for i in "${GRUB_BTRFS_TITLE_FORMAT[@]}" ; do
-            [[ ${i} = "date" ]] && title_menu+="${!date}|" && continue;
-            [[ ${i} = "snapshot" ]] && title_menu+="${!snapshot}|" && continue;
-            [[ ${i} = "type" ]] && title_menu+="${!type}|" && continue;
-            [[ ${i} = "description" ]] && title_menu+="${!description}|" && continue;
-        done
-    else title_menu="${!date}|${!snapshot}|${!type}|${!description}|" # "|" is for visuals only in Grub-menu
-    fi
+    title_menu="|" # "|" is for visuals only
+    title_submenu="|" # "|" is for visuals only
+    [[ -z "${GRUB_BTRFS_TITLE_FORMAT}" ]] && GRUB_BTRFS_TITLE_FORMAT=("date" "snapshot" "type" "description"); # Default parameters
+    for key in "${!GRUB_BTRFS_TITLE_FORMAT[@]}"; do
+            [[ ${GRUB_BTRFS_TITLE_FORMAT[$key],,} != "${title_column[${GRUB_BTRFS_TITLE_FORMAT[$key]}],,}" ]] && continue; # User used wrong parameter
+            declare -n var="snap_${GRUB_BTRFS_TITLE_FORMAT[$key],,}" # $var is a indirect variable
+            if [[ "${#var}" -lt "${#title_column[${GRUB_BTRFS_TITLE_FORMAT[$key],,}]}" ]]; then # Add extra spaces if length of $var is smaller than the length of column, needed for pretty formatting
+                printf -v var "%-$(((${#title_column[${GRUB_BTRFS_TITLE_FORMAT[$key],,}]}-${#var})+${#var}))s" "${var}";
+            fi
+            title_menu+="${var}|"
+            title_submenu+=" $(trim "${var}") |"
+    done
 }
-
-## Adds a header to the grub-btrfs.cfg file
-header_menu() {
-    local title_column_1="Date"
-    local lenght_title_column_1_left=$((((${#snap_date_time}-${#title_column_1})/2)+${#title_column_1}))
-    local lenght_title_column_1_right=$((((${#snap_date_time}-${#title_column_1})/2)+1));((lenght_title_column_1_right%2)) && lenght_title_column_1_right=$((lenght_title_column_1_right+1)) # If the result is an odd number, add an extra space
-    local title_column_1=$(printf "%${lenght_title_column_1_left}s%${lenght_title_column_1_right}s" "$title_column_1" "|") # "|" is for visuals only in Grub-menu
-    local title_column_2="Snapshot"
-    local lenght_title_column_2_left=$((((${#snap_dir_name}-${#title_column_2})/2)+${#title_column_2}))
-    local lenght_title_column_2_right=$((((${#snap_dir_name}-${#title_column_2})/2)+1));((lenght_title_column_2_right%2)) && lenght_title_column_2_right=$((lenght_title_column_2_right+1)) # If the result is an odd number, add an extra space
-    local title_column_2=$(printf "%${lenght_title_column_2_left}s%${lenght_title_column_2_right}s" "$title_column_2" "|") # "|" is for visuals only in Grub-menu
-    local title_column_3="Type"
-    local lenght_title_column_3_left=$((((${#snap_type_info}-${#title_column_3})/2)+${#title_column_3}))
-    local lenght_title_column_3_right=$((((${#snap_type_info}-${#title_column_3})/2)+1));((lenght_title_column_3_right%2)) && lenght_title_column_3_right=$((lenght_title_column_3_right+1)) # If the result is an odd number, add an extra space
-    local title_column_3=$(printf "%${lenght_title_column_3_left}s%${lenght_title_column_3_right}s" "$title_column_3" "|") # "|" is for visuals only in Grub-menu
-    local title_column_4="Description"
-    local lenght_title_column_4_left=$((((${#snap_description_info}-${#title_column_4})/2)+${#title_column_4}))
-    local lenght_title_column_4_right=$((((${#snap_description_info}-${#title_column_4})/2)+1));((lenght_title_column_4_right%2)) && lenght_title_column_4_right=$((lenght_title_column_4_right+1)) # If the result is an odd number, add an extra space
-    local title_column_4=$(printf "%${lenght_title_column_4_left}s%${lenght_title_column_4_right}s" "$title_column_4" "|") # "|" is for visuals only in Grub-menu
-    local header_entry=()
-    if [ -n "${GRUB_BTRFS_TITLE_FORMAT}" ] ; then
-        for i in "${GRUB_BTRFS_TITLE_FORMAT[@]}" ; do
-            [[ ${i} = "date" ]] && header_entry+="${title_column_1}" && continue;
-            [[ ${i} = "snapshot" ]] && header_entry+="${title_column_2}" && continue;
-            [[ ${i} = "type" ]] && header_entry+="${title_column_3}" && continue;
-            [[ ${i} = "description" ]] && header_entry+="${title_column_4}" && continue;
+# Adds a header to the grub-btrfs.cfg file
+header_menu()
+{
+    local header_entry=""
+    [[ -z "${GRUB_BTRFS_TITLE_FORMAT}" ]] && GRUB_BTRFS_TITLE_FORMAT=("date" "snapshot" "type" "description"); # Default parameters
+        for key in "${!GRUB_BTRFS_TITLE_FORMAT[@]}"; do
+            [[ ${GRUB_BTRFS_TITLE_FORMAT[$key],,} != "${title_column[${GRUB_BTRFS_TITLE_FORMAT[$key]}],,}" ]] && continue; # User used wrong parameter
+            declare -n var="snap_${GRUB_BTRFS_TITLE_FORMAT[$key],,}" # $var is a indirect variable
+            # Center alignment, needed for pretty formatting
+            local lenght_title_column_left=$((${#var}-${#title_column[${GRUB_BTRFS_TITLE_FORMAT[$key],,}]}))
+            ((lenght_title_column_left%2)) && lenght_title_column_left=$((lenght_title_column_left+1));  # If the difference is an odd number, add an extra space
+            lenght_title_column_left=$((((lenght_title_column_left/2)+${#title_column[${GRUB_BTRFS_TITLE_FORMAT[$key],,}]})));
+            local lenght_title_column_right=$(((${#var}-lenght_title_column_left)+1)) #+1 is necessary for extra "|" character
+            header_entry+=$(printf "%${lenght_title_column_left}s%${lenght_title_column_right}s" "${title_column[${GRUB_BTRFS_TITLE_FORMAT[$key],,}]}" "|") # Final "|" is for visuals only
         done
-    else header_entry="${title_column_1}${title_column_2}${title_column_3}${title_column_4}"
-    fi
-    sed -i "1imenuentry '|${header_entry[*]}' {\n    echo\"\"\n}" "$grub_directory/grub-btrfs.new" # "|" is for visuals only in Grub-menu
+    sed -i "1imenuentry '|${header_entry}' { echo }" "$grub_directory/grub-btrfs.new" # First "|" is for visuals only
 }
 
 ## List of kernels, initramfs and microcode in snapshots
