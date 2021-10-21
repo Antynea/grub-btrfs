@@ -214,7 +214,7 @@ make_menu_entries()
         initrd \"${boot_dir_root_grub}/"${i}"\""
                     fi
                     entry "    }"
-                    count_warning_menuentries=$((1+$count_warning_menuentries))
+                    count_warning_menuentries=$((1+count_warning_menuentries))
                 done
             else 
                 for u in "${name_microcode[@]}"; do
@@ -245,7 +245,7 @@ make_menu_entries()
         initrd \"${boot_dir_root_grub}/"${u}"\""
                     fi
                     entry "    }"
-                    count_warning_menuentries=$((1+$count_warning_menuentries))
+                    count_warning_menuentries=$((1+count_warning_menuentries))
                 done
             fi
         done
