@@ -173,9 +173,9 @@ make_menu_entries()
         kversion=${k#*"-"}
         for i in "${name_initramfs[@]}"; do
             if [[ "${name_initramfs}" != "x" ]] ; then
-                prefix_i=${i%%"-"*}
+                # prefix_i=${i%%"-"*}
                 suffix_i=${i#*"-"}
-                alt_suffix_i=${i##*"-"}
+                # alt_suffix_i=${i##*"-"}
                 if   [ "${kversion}" = "${suffix_i}" ];                 then i="${i}";
                 elif [ "${kversion}.img" = "${suffix_i}" ];             then i="${i}";
                 elif [ "${kversion}-fallback.img" = "${suffix_i}" ];    then i="${i}";
