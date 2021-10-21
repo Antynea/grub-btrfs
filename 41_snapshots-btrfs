@@ -577,8 +577,8 @@ count_warning_menuentries=0 # Count menuentries
 count_limit_snap=0 # Count snapshots
 check_uuid_required
 # Detects if /boot is a separate partition
-[[ "${GRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION:-"false"}" == "true" ]] && printf "Override boot partition detection : enable \n" >&2 && boot_separate;
-[[ "$root_uuid" != "$boot_uuid" ]] ||  [[ "$root_uuid_subvolume" != "$boot_uuid_subvolume" ]] && boot_separate || boot_bounded;
+[[ "${GRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION,,}" == "true" ]] && printf "Override boot partition detection : enable \n" >&2 && boot_separate;
+if [[ "$root_uuid" != "$boot_uuid" ]] || [[ "$root_uuid_subvolume" != "$boot_uuid_subvolume" ]]; then boot_separate ; else boot_bounded ; fi
 # Show warn, menuentries exceeds 250 entries
 [[ $count_warning_menuentries -ge 250 ]] && printf "Generated %s total GRUB entries. You might experience issues loading snapshots menu in GRUB.\n" "${count_warning_menuentries}" >&2 ;
 # Show total found snapshots
