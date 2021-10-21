@@ -68,7 +68,7 @@ submenuname=${GRUB_BTRFS_SUBMENUNAME:-"${distro:-Linux} snapshots"}
 ## Limit snapshots to show in the Grub menu (default=50)
 limit_snap_show="${GRUB_BTRFS_LIMIT:-50}"
 ## How to sort snapshots list
-btrfs_subvolume_sort=(--sort="${GRUB_BTRFS_SUBVOLUME_SORT:-"-rootid"}")
+btrfs_subvolume_sort="--sort=${GRUB_BTRFS_SUBVOLUME_SORT:-"-rootid"}"
 ## Customize GRUB directory, where "grub.cfg" file is saved
 grub_directory=${GRUB_BTRFS_GRUB_DIRNAME:-"/boot/grub"}
 ## Customize BOOT directory, where kernels/initrams/microcode is saved.
