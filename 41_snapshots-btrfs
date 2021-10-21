@@ -132,7 +132,7 @@ if [[ -d "$gbgmp" ]]; then
     printf "Unmount %s .." "$gbgmp" >&2;
     while $wait; do
         if grep -qs "$gbgmp" /proc/mounts; then
-            wait_max=$((1+$wait_max))
+            wait_max=$((1+wait_max))
             if umount "$gbgmp" >/dev/null 2>&1; then
                 wait=false # umount successful
                 printf " Success\n" >&2;
