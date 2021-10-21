@@ -44,16 +44,12 @@ grub_btrfs_config="${sysconfdir}/default/grub-btrfs/config"
 [[ -f "${sysconfdir}/default/grub" ]] && . "${sysconfdir}/default/grub"
 
 ## Exit the script, if:
-disable_script() {
-    [[ "${GRUB_BTRFS_DISABLE:-"false"}" == "true" ]] && exit 0 # Disable Grub-btrfs is set to true (default=false)
-    if ! type btrfs >/dev/null 2>&1; then exit 0; fi # btrfs-progs isn't installed
-    [[ -f "$datarootdir/grub/grub-mkconfig_lib" ]] && . "$datarootdir/grub/grub-mkconfig_lib" || exit 0 # grub-mkconfig_lib couldn't be found
-    # Root filesystem isn't btrfs
-    root_fs=$(${grub_probe} --target="fs" / 2>/dev/null)
-    [[ "$root_fs" != "btrfs" ]] && exit 0
-    return 0
-}
-disable_script
+[[ "${GRUB_BTRFS_DISABLE,,}" == "true" ]] && exit 0 # Disable Grub-btrfs is set to true (default=false)
+if ! type btrfs >/dev/null 2>&1; then exit 0; fi # btrfs-progs isn't installed
+[[ -f "$datarootdir/grub/grub-mkconfig_lib" ]] && . "$datarootdir/grub/grub-mkconfig_lib" || exit 0 # grub-mkconfig_lib couldn't be found
+# Root filesystem isn't btrfs
+root_fs=$(${grub_probe} --target="fs" / 2>/dev/null)
+[[ "$root_fs" != "btrfs" ]] && exit 0
 
 ## Submenu name
 distro=$(awk -F "=" '/^NAME=/ {gsub(/"/, "", $2); print $2}' /etc/os-release)
