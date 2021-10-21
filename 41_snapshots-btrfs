@@ -282,12 +282,12 @@ snapshot_list()
 
         # ignore specific path during run "grub-mkconfig"
         if [ -n "${GRUB_BTRFS_IGNORE_SPECIFIC_PATH}" ] ; then
-            for isp in ${GRUB_BTRFS_IGNORE_SPECIFIC_PATH[@]} ; do
+            for isp in "${GRUB_BTRFS_IGNORE_SPECIFIC_PATH[@]}" ; do
                 [[ "${snap_path_name}" == "${isp}" ]] && continue 2;
             done
         fi
         if [ -n "${GRUB_BTRFS_IGNORE_PREFIX_PATH}" ] ; then
-            for isp in ${GRUB_BTRFS_IGNORE_PREFIX_PATH[@]} ; do
+            for isp in "${GRUB_BTRFS_IGNORE_PREFIX_PATH[@]}" ; do
                 [[ "${snap_path_name}" == "${isp}"/* ]] && continue 2;
             done
         fi
