@@ -68,7 +68,7 @@ grub_directory=${GRUB_BTRFS_GRUB_DIRNAME:-"/boot/grub"}
 boot_directory=${GRUB_BTRFS_BOOT_DIRNAME:-"/boot"}
 ## Password protection management for submenu
 # Protection support for submenu (--unrestricted)
-case "${GRUB_BTRFS_DISABLE_PROTECTION_SUBMENU:-"false"}" in
+case "${GRUB_BTRFS_DISABLE_PROTECTION_SUBMENU,,}" in
     true)   unrestricted_access_submenu="--unrestricted ";;
     *)      unrestricted_access_submenu=""
 esac
