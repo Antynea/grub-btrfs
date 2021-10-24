@@ -48,16 +48,14 @@ uninstall:
 	@rm -f "$(DESTDIR)/etc/default/grub-btrfs/config"
 	@rm -f "$(DESTDIR)/etc/grub.d/41_snapshots-btrfs"
 	@if [[ $(SYSTEMD) = true ]]; then \
-		rm -f "$(LIB_DIR)/systemd/system/" grub-btrfs.path; \
-		rm -f "$(LIB_DIR)/systemd/system/" grub-btrfs.service; \
+		rm -f "$(LIB_DIR)/systemd/system/grub-btrfs.path; \
+		rm -f "$(LIB_DIR)/systemd/system/grub-btrfs.service; \
         fi
 	@# OpenRC detected on system, install OpenRC daemon
 	@if [[ $(OPENRC) = true ]]; then \
-		rm -f "$(BIN_DIR)" grub-btrfs.openrcbin; \
-		rm -f "$(SYSCONFDIR)/init.d/" grub-btrfs.openrc; \
+		rm -f "$(BIN_DIR)/grub-btrfs.openrcbin; \
+		rm -f "$(SYSCONFDIR)/init.d/grub-btrfs.openrc; \
         fi
-	@rm -f "$(LIB_DIR)/systemd/system/grub-btrfs.service"
-	@rm -f "$(LIB_DIR)/systemd/system/grub-btrfs.path"
 	@rm -f "$(LIB_DIR)/initcpio/install/grub-btrfs-overlayfs"
 	@rm -f "$(LIB_DIR)/initcpio/hooks/grub-btrfs-overlayfs"
 	@# Arch Linux UNlike distros only :
