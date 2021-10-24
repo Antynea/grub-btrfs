@@ -26,7 +26,7 @@ install:
 	@# OpenRC detected on system, install OpenRC daemon
 	@if [[ $(OPENRC) = true ]]; then \
 		install -Dm744 -t "$(BIN_DIR)/" grub-btrfs-openrc; \
-		install -Dm744 -t "$(DESTDIR)/init.d/" grub-btrfsd; \
+		install -Dm744 -t "$(DESTDIR)/etc/init.d/" grub-btrfsd; \
         fi
 	@# Arch Linux like distros only :
 	@if test "$(INITCPIO)" = true; then \
@@ -53,7 +53,7 @@ uninstall:
 	@# OpenRC detected on system, install OpenRC daemon
 	@if [[ $(OPENRC) = true ]]; then \
 		rm -f "$(BIN_DIR)/grub-btrfs.openrcbin; \
-		rm -f "$(DESTDIR)/init.d/grub-btrfs.openrc; \
+		rm -f "$(DESTDIR)/etc/init.d/grub-btrfs.openrc; \
         fi
 	@rm -f "$(LIB_DIR)/initcpio/install/grub-btrfs-overlayfs"
 	@rm -f "$(LIB_DIR)/initcpio/hooks/grub-btrfs-overlayfs"
