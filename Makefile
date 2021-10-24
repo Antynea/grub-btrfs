@@ -5,6 +5,10 @@ INITCPIO ?= false
 
 SHARE_DIR = $(DESTDIR)$(PREFIX)/share
 LIB_DIR = $(DESTDIR)$(PREFIX)/lib
+BIN_DIR = $(DESTDIR)$(PREFIX)/bin
+SYSCONFDIR=$(DESTDIR)/etc
+OPENRC =  $(shell strings /sbin/init | grep -q "sysvinit" && echo true || echo false)
+SYSTEMD = $(shell test -d /run/systemd/system && echo true || echo false)
 
 .PHONY: install uninstall help
 
@@ -15,14 +19,22 @@ install:
 	fi
 	@install -Dm755 -t "$(DESTDIR)/etc/grub.d/" 41_snapshots-btrfs
 	@install -Dm644 -t "$(DESTDIR)/etc/default/grub-btrfs/" config
-	@install -Dm644 -t "$(LIB_DIR)/systemd/system/" grub-btrfs.service
-	@install -Dm644 -t "$(LIB_DIR)/systemd/system/" grub-btrfs.path
-	@install -Dm644 -t "$(SHARE_DIR)/licenses/$(PKGNAME)/" LICENSE
+	@# Systemd detected on system, install systemd service
+	@if [[ $(SYSTEMD) = true ]]; then \
+		install -Dm644 -t "$(LIB_DIR)/systemd/system/" grub-btrfs.path; \
+		install -Dm644 -t "$(LIB_DIR)/systemd/system/" grub-btrfs.service; \
+        fi
+	@# OpenRC detected on system, install OpenRC daemon
+	@if [[ $(OPENRC) = true ]]; then \
+		install -Dm744 -t "$(BIN_DIR)/" grub-btrfs-openrc; \
+		install -Dm744 -t "$(SYSCONFDIR)/init.d/" grub-btrfsd; \
+        fi
 	@# Arch Linux like distros only :
 	@if test "$(INITCPIO)" = true; then \
 		install -Dm644 "initramfs/Arch Linux/overlay_snap_ro-install" "$(LIB_DIR)/initcpio/install/grub-btrfs-overlayfs"; \
 		install -Dm644 "initramfs/Arch Linux/overlay_snap_ro-hook" "$(LIB_DIR)/initcpio/hooks/grub-btrfs-overlayfs"; \
 	 fi
+	@install -Dm644 -t "$(SHARE_DIR)/licenses/$(PKGNAME)/" LICENSE 
 	@install -Dm644 -t "$(SHARE_DIR)/doc/$(PKGNAME)/" README.md
 	@install -Dm644 "initramfs/readme.md" "$(SHARE_DIR)/doc/$(PKGNAME)/initramfs-overlayfs.md"
 
@@ -35,6 +47,15 @@ uninstall:
 	 rm -f "$${grub_dirname:-/boot/grub}/grub-btrfs.cfg"
 	@rm -f "$(DESTDIR)/etc/default/grub-btrfs/config"
 	@rm -f "$(DESTDIR)/etc/grub.d/41_snapshots-btrfs"
+	@if [[ $(SYSTEMD) = true ]]; then \
+		rm -f "$(LIB_DIR)/systemd/system/" grub-btrfs.path; \
+		rm -f "$(LIB_DIR)/systemd/system/" grub-btrfs.service; \
+        fi
+	@# OpenRC detected on system, install OpenRC daemon
+	@if [[ $(OPENRC) = true ]]; then \
+		rm -f "$(BIN_DIR)" grub-btrfs.openrcbin; \
+		rm -f "$(SYSCONFDIR)/init.d/" grub-btrfs.openrc; \
+        fi
 	@rm -f "$(LIB_DIR)/systemd/system/grub-btrfs.service"
 	@rm -f "$(LIB_DIR)/systemd/system/grub-btrfs.path"
 	@rm -f "$(LIB_DIR)/initcpio/install/grub-btrfs-overlayfs"
