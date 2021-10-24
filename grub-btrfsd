@@ -1,0 +1,14 @@
+#!/sbin/openrc-run
+# Copyright 1999-2021 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+
+name="grub-btrfs daemon"
+command="/usr/bin/grub-btrfs-openrc"
+pidfile="/run/{RC_SVCNAME}.pid"
+command_background=true
+
+depend() {
+   use localmount
+}
+
+
