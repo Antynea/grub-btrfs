@@ -135,6 +135,8 @@ Just add the following script as `/etc/local.d/grub-btrfs-update.stop`
 	bash -c 'if [ -s "${GRUB_BTRFS_GRUB_DIRNAME:-/boot/grub}/grub-btrfs.cfg" ]; then /etc/grub.d/41_snapshots-btrfs; else {GRUB_BTRFS_MKCONFIG:-grub-mkconfig} -o {GRUB_BTRFS_GRUB_DIRNAME:-/boot/grub}/grub.cfg; fi' 
 	```
 	
+	Make your script executeable with `chmod a+x /etc/local.d/grub-btrfs-update.stop`.
+
 * The extension ".stop" at the end of the filename indicates to locald that this script should be run at shutdown. 
  If you want to run the menu update on startup instead, rename the file to `grub-btrfs-update.start`
 * Works for snapper and timeshift
