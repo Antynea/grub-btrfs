@@ -2,12 +2,14 @@ PKGNAME ?= grub-btrfs
 PREFIX ?= /usr
 
 INITCPIO ?= false
+SYSTEMD ?= true
+OPENRC ?= false
+
 
 SHARE_DIR = $(DESTDIR)$(PREFIX)/share
 LIB_DIR = $(DESTDIR)$(PREFIX)/lib
 BIN_DIR = $(DESTDIR)$(PREFIX)/bin
-OPENRC =  $(shell strings /sbin/init | grep -q "sysvinit" && echo true || echo false)
-SYSTEMD = $(shell test -d /run/systemd/system && echo true || echo false)
+
 
 .PHONY: install uninstall help
 
@@ -18,16 +20,16 @@ install:
 	fi
 	@install -Dm755 -t "$(DESTDIR)/etc/grub.d/" 41_snapshots-btrfs
 	@install -Dm644 -t "$(DESTDIR)/etc/default/grub-btrfs/" config
-	@# Systemd detected on system, install systemd service
-	@if [[ $(SYSTEMD) = true ]]; then \
+	@# Systemd init system
+	@if test "$(SYSTEMD)" = true; then \
 		install -Dm644 -t "$(LIB_DIR)/systemd/system/" grub-btrfs.path; \
 		install -Dm644 -t "$(LIB_DIR)/systemd/system/" grub-btrfs.service; \
-        fi
-	@# OpenRC detected on system, install OpenRC daemon
-	@if [[ $(OPENRC) = true ]]; then \
+	 fi
+	@# OpenRC init system
+	@if test "$(OPENRC)" = true; then \
 		install -Dm744 -t "$(BIN_DIR)/" grub-btrfs-openrc; \
 		install -Dm744 -t "$(DESTDIR)/etc/init.d/" grub-btrfsd; \
-        fi
+	 fi
 	@# Arch Linux like distros only :
 	@if test "$(INITCPIO)" = true; then \
 		install -Dm644 "initramfs/Arch Linux/overlay_snap_ro-install" "$(LIB_DIR)/initcpio/install/grub-btrfs-overlayfs"; \
@@ -46,15 +48,10 @@ uninstall:
 	 rm -f "$${grub_dirname:-/boot/grub}/grub-btrfs.cfg"
 	@rm -f "$(DESTDIR)/etc/default/grub-btrfs/config"
 	@rm -f "$(DESTDIR)/etc/grub.d/41_snapshots-btrfs"
-	@if [[ $(SYSTEMD) = true ]]; then \
-		rm -f "$(LIB_DIR)/systemd/system/grub-btrfs.path; \
-		rm -f "$(LIB_DIR)/systemd/system/grub-btrfs.service; \
-        fi
-	@# OpenRC detected on system, install OpenRC daemon
-	@if [[ $(OPENRC) = true ]]; then \
-		rm -f "$(BIN_DIR)/grub-btrfs.openrcbin; \
-		rm -f "$(DESTDIR)/etc/init.d/grub-btrfs.openrc; \
-        fi
+	@rm -f "$(LIB_DIR)/systemd/system/grub-btrfs.path;
+	@rm -f "$(LIB_DIR)/systemd/system/grub-btrfs.service;
+	@rm -f "$(BIN_DIR)/grub-btrfs.openrcbin;
+	@rm -f "$(DESTDIR)/etc/init.d/grub-btrfs.openrc;
 	@rm -f "$(LIB_DIR)/initcpio/install/grub-btrfs-overlayfs"
 	@rm -f "$(LIB_DIR)/initcpio/hooks/grub-btrfs-overlayfs"
 	@# Arch Linux UNlike distros only :
@@ -86,4 +83,6 @@ help:
 	@echo "  LIB_DIR   | path | system libraries location      | '\$$(DESTDIR)\$$(PREFIX)/lib'"
 	@echo "  PKGNAME   | name | name of the ditributed package | 'grub-btrfs'"
 	@echo "  INITCPIO  | bool | include mkinitcpio hook        | false"
+	@echo "  SYSTEMD   | bool | include unit files             | true"
+	@echo "  OPENRC    | bool | include OpenRc daemon          | false"
 	@echo
