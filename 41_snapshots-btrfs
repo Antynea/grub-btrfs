@@ -138,7 +138,7 @@ if [[ -d "$grub_btrfs_mount_point" ]]; then
             if umount "$grub_btrfs_mount_point" >/dev/null 2>&1; then
                 wait=false # umount successful
                 printf " Success\n" >&2;
-            elif [[ $wait_max = 10 ]]; then 
+            elif [[ $wait_max = 10 ]]; then
                 printf "\nWarning: Unable to unmount %s in %s\n" "$root_device" "$grub_btrfs_mount_point" >&2;
                 break;
             else
@@ -218,7 +218,7 @@ make_menu_entries()
                     entry "    }"
                     count_warning_menuentries=$((1+count_warning_menuentries))
                 done
-            else 
+            else
                 for u in "${name_microcode[@]}"; do
                     if [[ "${name_microcode}" != "x" ]] ; then
                     entry "
@@ -269,102 +269,92 @@ snapshot_list()
     local snapper_info="info.xml"
     local timeshift_info="info.json"
     local date_snapshots=()
-    local name_snapshots=()
-    local info_types=()
-    local info_descriptions=()
+    local path_snapshots=()
+    local type_snapshots=()
+    local description_snapshots=()
     IFS=$'\n'
     for snap in $(btrfs subvolume list -sa "${btrfs_subvolume_sort}" /); do # Parse btrfs snapshots
         IFS=$oldIFS
         snap=($snap)
-        local snap_path_name=${snap[@]:13:${#snap[@]}}
-        if [ "$snap_path_name" = "DELETED" ]; then continue; fi # Discard deleted snapshots
-        [[ ${snap_path_name%%"/"*} == "<FS_TREE>" ]] && snap_path_name=${snap_path_name#*"/"} # Remove the "<FS_TREE>" string at the beginning of the path
+        local path_snapshot=${snap[@]:13:${#snap[@]}}
+        if [ "$path_snapshot" = "DELETED" ]; then continue; fi # Discard deleted snapshots
+        [[ ${path_snapshot%%"/"*} == "<FS_TREE>" ]] && path_snapshot=${path_snapshot#*"/"} # Remove the "<FS_TREE>" string at the beginning of the path
 
         # ignore specific path during run "grub-mkconfig"
         if [ -n "${GRUB_BTRFS_IGNORE_SPECIFIC_PATH}" ] ; then
             for isp in "${GRUB_BTRFS_IGNORE_SPECIFIC_PATH[@]}" ; do
-                [[ "${snap_path_name}" == "${isp}" ]] && continue 2;
+                [[ "${path_snapshot}" == "${isp}" ]] && continue 2;
             done
         fi
         if [ -n "${GRUB_BTRFS_IGNORE_PREFIX_PATH}" ] ; then
             for isp in "${GRUB_BTRFS_IGNORE_PREFIX_PATH[@]}" ; do
-                [[ "${snap_path_name}" == "${isp}"/* ]] && continue 2;
+                [[ "${path_snapshot}" == "${isp}"/* ]] && continue 2;
             done
         fi
-        [[ ! -d "$grub_btrfs_mount_point/$snap_path_name/boot" ]] && continue; # Discard snapshots without /boot folder
+        [[ ! -d "$grub_btrfs_mount_point/$path_snapshot/boot" ]] && continue; # Discard snapshots without /boot folder
 
-        local date_snapshot="${snap[@]:10:2}"
-        date_snapshots+=("$date_snapshot")
-        local name_snapshot="${snap_path_name}"
-        name_snapshots+=("$name_snapshot")
-        
         # Parse Snapper & timeshift informations
-        if [[ -s "$grub_btrfs_mount_point/${snap_path_name%"/"*}/$snapper_info" ]] ; then
-            local snapper_type=$(awk -F"<|>" 'match($2, /^type/) {print $3}' "$grub_btrfs_mount_point/${snap_path_name%"/"*}/$snapper_info") # search matching string beginning "type"
-            [[ -z "$snapper_type" ]] && info_types+=("no_type") || info_types+=("$snapper_type")
-            local snapper_description=$(awk -F"<|>" 'match($2, /^description/) {print $3}' "$grub_btrfs_mount_point/${snap_path_name%"/"*}/$snapper_info") # search matching string beginning "description"
-             [[ -z "$snapper_description" ]] && info_descriptions+=("N/A") || info_descriptions+=("$snapper_description")
-        elif [[ -s "$grub_btrfs_mount_point/${snap_path_name%"/"*}/$timeshift_info" ]] ; then
-            local timeshift_type=$(awk -F" : " 'match($1, /^[ \t]+"tags"/) {gsub(/"|,/,"");print $2}' "$grub_btrfs_mount_point/${snap_path_name%"/"*}/$timeshift_info") # search matching string beginning "tags"
-            [[ -z "$timeshift_type" ]] && info_types+=("no_type") || info_types+=("$timeshift_type")
-            local timeshift_description=$(awk -F" : " 'match($1, /^[ \t]+"comments"/) {gsub(/"|,/,"");print $2}' "$grub_btrfs_mount_point/${snap_path_name%"/"*}/$timeshift_info") # search matching string beginning "comments"
-            [[ -z "$timeshift_description" ]] && info_descriptions+=("N/A") || info_descriptions+=("$timeshift_description")
-        else
-            info_types+=("N/A")
-            info_descriptions+=("N/A")
+        local type_snapshot="N/A"
+        local description_snapshot="N/A"
+        if [[ -s "$grub_btrfs_mount_point/${path_snapshot%"/"*}/$snapper_info" ]] ; then
+            type_snapshot=$(awk -F"<|>" 'match($2, /^type/) {print $3}' "$grub_btrfs_mount_point/${path_snapshot%"/"*}/$snapper_info") # search matching string beginning "type"
+            description_snapshot=$(awk -F"<|>" 'match($2, /^description/) {print $3}' "$grub_btrfs_mount_point/${path_snapshot%"/"*}/$snapper_info") # search matching string beginning "description"
+        elif [[ -s "$grub_btrfs_mount_point/${path_snapshot%"/"*}/$timeshift_info" ]] ; then
+            type_snapshot=$(awk -F" : " 'match($1, /^[ \t]+"tags"/) {gsub(/"|,/,"");print $2}' "$grub_btrfs_mount_point/${path_snapshot%"/"*}/$timeshift_info") # search matching string beginning "tags"
+            description_snapshot=$(awk -F" : " 'match($1, /^[ \t]+"comments"/) {gsub(/"|,/,"");print $2}' "$grub_btrfs_mount_point/${path_snapshot%"/"*}/$timeshift_info") # search matching string beginning "comments"
         fi
-    done
-    
-    # Find max length of a snapshot date, needed for pretty formatting
-    local max_date_length=0
-    for i in "${date_snapshots[@]}"; do
-        local date_snapshot=$(trim "${i}")
-        local length="${#i}"
-        [[ "$length" -gt "$max_date_length" ]] && max_date_length=$length
-    done
-        
-    # Find max length of a snapshot name, needed for pretty formatting
-    local max_name_snapshot_length=0
-    for i in "${name_snapshots[@]}"; do
-        local name_snapshot=$(trim "${i}")
-        local length="${#i}"
-        [[ "$length" -gt "$max_name_snapshot_length" ]] && max_name_snapshot_length=$length
-    done
+        [[ -z "$type_snapshot" ]] && type_snapshot=("N/A")
+        [[ -z "$description_snapshot" ]] && description_snapshot=("N/A")
 
-    # Find max length of a snapshot type, needed for pretty formatting
-    local max_type_length=0
-    for i in "${info_types[@]}"; do
-        local info_type=$(trim "${i}")
-        local length="${#i}"
-        [[ "$length" -gt "$max_type_length" ]] && max_type_length=$length
-    done
-    
-    # Find max length of a snapshot description, needed for pretty formatting
-    local max_description_length=0
-    for i in "${info_descriptions[@]}"; do
-        local info_description=$(trim "${i}")
-        local length="${#i}"
-        [[ "$length" -gt "$max_description_length" ]] && max_description_length=$length
-    done
-    
-    for i in "${!name_snapshots[@]}"; do
-        local date_snapshot=$(trim "${date_snapshots[$i]}")
-        local name_snapshot=$(trim "${name_snapshots[$i]}")
-        local info_type=$(trim "${info_types[$i]}")
-        local info_description=$(trim "${info_descriptions[$i]}")
-        
-        # ignore snapper/timeshift type or snapper/timeshift description during run "grub-mkconfig"
+        # ignore specific {type,tag,description} of snapshot during run "grub-mkconfig"
         if [ -n "${GRUB_BTRFS_IGNORE_SNAPSHOT_TYPE}" ] ; then
             for ist in "${GRUB_BTRFS_IGNORE_SNAPSHOT_TYPE[@]}" ; do
-                [[ "${info_type}" == "${ist}" ]] && continue 2;
+                [[ "${type_snapshot}" == "${ist}" ]] && continue 2;
             done
         fi
         if [ -n "${GRUB_BTRFS_IGNORE_SNAPSHOT_DESCRIPTION}" ] ; then
             for isd in "${GRUB_BTRFS_IGNORE_SNAPSHOT_DESCRIPTION[@]}" ; do
-                [[ "${info_description}" == "${isd}" ]] && continue 2;
+                [[ "${description_snapshot}" == "${isd}" ]] && continue 2;
             done
         fi
-        printf -v entry "%-${max_date_length}s | %-${max_name_snapshot_length}s | %-${max_type_length}s | %-${max_description_length}s |" "$date_snapshot" "$name_snapshot" "$info_type" "$info_description"
+
+        local date_snapshot="${snap[@]:10:2}"
+        date_snapshots+=("$date_snapshot")
+        path_snapshots+=("$path_snapshot")
+        type_snapshots+=("$type_snapshot")
+        description_snapshots+=("$description_snapshot")
+    done
+
+    # Find max length of a snapshot date, needed for pretty formatting
+    local max_date_length=0
+    for i in "${date_snapshots[@]}"; do
+        local length="${#i}"
+        [[ "$length" -gt "$max_date_length" ]] && max_date_length=$length
+    done
+
+    # Find max length of a snapshot name, needed for pretty formatting
+    local max_path_length=0
+    for i in "${path_snapshots[@]}"; do
+        local length="${#i}"
+        [[ "$length" -gt "$max_path_length" ]] && max_path_length=$length
+    done
+
+    # Find max length of a snapshot type, needed for pretty formatting
+    local max_type_length=0
+    for i in "${type_snapshots[@]}"; do
+        local length="${#i}"
+        [[ "$length" -gt "$max_type_length" ]] && max_type_length=$length
+    done
+
+    # Find max length of a snapshot description, needed for pretty formatting
+    local max_description_length=0
+    for i in "${description_snapshots[@]}"; do
+        local length="${#i}"
+        [[ "$length" -gt "$max_description_length" ]] && max_description_length=$length
+    done
+
+    for i in "${!path_snapshots[@]}"; do
+        printf -v entry "%-${max_date_length}s | %-${max_path_length}s | %-${max_type_length}s | %-${max_description_length}s |" "${date_snapshots[$i]}" "${path_snapshots[$i]}" "${type_snapshots[$i]}" "${description_snapshots[$i]}"
         echo "$entry"
     done
 
@@ -376,13 +366,13 @@ parse_snapshot_list()
 {
     snap_date=" $(echo "$item" | cut -d'|' -f1)" # column_1, first space is necessary for pretty formatting
     snap_date_trim="$(trim "$snap_date")"
-    
+
     snap_dir_name="$(echo "$item" | cut -d'|' -f2)" # column_2
     snap_dir_name_trim="$(trim "$snap_dir_name")"
     snap_snapshot="$snap_dir_name" # Used by "title_format" function
-    
+
     snap_type="$(echo "$item" | cut -d'|' -f3)" # column_3
-    
+
     snap_description="$(echo "$item" | cut -d'|' -f4)" # column_4
 }
 
@@ -500,7 +490,7 @@ boot_bounded()
     for item in $(snapshot_list); do
         [[ ${limit_snap_show} -le 0 ]] && break; # fix: limit_snap_show=0
         IFS=$oldIFS
-        parse_snapshot_list  
+        parse_snapshot_list
         boot_dir="$grub_btrfs_mount_point/$snap_dir_name_trim$boot_directory"
         detect_kernel
         if [ -z "${list_kernel}" ]; then continue; fi
