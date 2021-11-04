@@ -56,6 +56,8 @@ Now merge grub-btrfs via
 * Dependencies:
   * [btrfs-progs](https://archlinux.org/packages/core/x86_64/btrfs-progs/)
   * [grub](https://archlinux.org/packages/core/x86_64/grub/)
+  * [bash >4](https://archlinux.org/packages/core/x86_64/bash/)
+  * [gawk ](https://archlinux.org/packages/core/x86_64/gawk/)
 
 #### NOTE: All distros
 Generate your Grub menu after installation for the changes to take effect.  
