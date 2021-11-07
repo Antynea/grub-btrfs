@@ -27,7 +27,7 @@ Refer to the [documentation](https://github.com/Antynea/grub-btrfs/blob/master/i
 * Automatically Detect if "/boot" is in separate partition.
 * Automatically Detect kernel, initramfs and intel/amd microcode in "/boot" directory on snapshots.
 * Automatically Create corresponding "menuentry" in `grub.cfg`
-* Automatically detect snapper and use snapper's snapshot description if available.
+* Automatically detect the type/tags and descriptions/comments of snapper/timeshift snapshots.
 * Automatically generate `grub.cfg` if you use the provided systemd service.
 
 - - -
@@ -56,6 +56,8 @@ Now merge grub-btrfs via
 * Dependencies:
   * [btrfs-progs](https://archlinux.org/packages/core/x86_64/btrfs-progs/)
   * [grub](https://archlinux.org/packages/core/x86_64/grub/)
+  * [bash >4](https://archlinux.org/packages/core/x86_64/bash/)
+  * [gawk ](https://archlinux.org/packages/core/x86_64/gawk/)
 
 #### NOTE: All distros
 Generate your Grub menu after installation for the changes to take effect.  
@@ -107,14 +109,20 @@ use `systemctl list-units -t mount`.
 	* You can view your change to `systemctl cat grub-btrfs.path`.
 	* To revert change use `systemctl revert grub-btrfs.path`.
 
-2. If you would like grub-btrfs menu to automatically update on system restart/shutdown:  
+2. If you would like grub-btrfs menu to automatically update on system restart/ shutdown:  
 [Look at this comment](https://github.com/Antynea/grub-btrfs/issues/138#issuecomment-766918328)  
 Currently not implemented
 ##
 #### OpenRC
-* There is sadly no similar solution to the systemd service yet.  
-As a workaround it is possible to add a script to `/etc/local.d` to execute the snapshot menu update every time you shut down your system.  
-To do so just add the following script as `/etc/local.d/grub-btrfs-update.stop`
+1. If you would like grub-btrfs menu to automatically update when a snapshot is created or deleted:
+* Use `rc-config add grub-btrfsd default`, to start the grub-btrfsd daemon the next time the system boots. 
+	* To start `grub-btrfsd` right now, run `rc-service grub-btrfsd start`
+	* `grub-btrfsd` automatically watches the snapshot directory of timeshift (/run/timeshift/backup/timeshift-btrfs/snapshots)
+	and updates the grub-menu when a change occurs.
+* Currently untested for snapper
+
+2. If you would like grub-btrfs menu to automatically update on system restart/ shutdown:
+Just add the following script as `/etc/local.d/grub-btrfs-update.stop`
 	```
 	#!/bin/bash
 	
@@ -129,7 +137,11 @@ To do so just add the following script as `/etc/local.d/grub-btrfs-update.stop`
 	bash -c 'if [ -s "${GRUB_BTRFS_GRUB_DIRNAME:-/boot/grub}/grub-btrfs.cfg" ]; then /etc/grub.d/41_snapshots-btrfs; else {GRUB_BTRFS_MKCONFIG:-grub-mkconfig} -o {GRUB_BTRFS_GRUB_DIRNAME:-/boot/grub}/grub.cfg; fi' 
 	```
 	
-	If you want to run the menu update on startup instead, rename the file to `grub-btrfs-update.start`
+	Make your script executeable with `chmod a+x /etc/local.d/grub-btrfs-update.stop`.
+
+* The extension ".stop" at the end of the filename indicates to locald that this script should be run at shutdown. 
+ If you want to run the menu update on startup instead, rename the file to `grub-btrfs-update.start`
+* Works for snapper and timeshift
 
 ##### Warning :
 by default, `grub-mkconfig` command is used.  
