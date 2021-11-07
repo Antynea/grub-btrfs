@@ -106,6 +106,12 @@ GRUB_BTRFS_IGNORE_PREFIX_PATH=("var/lib/docker" "@var/lib/docker" "@/var/lib/doc
 # Default: grub-mkconfig
 #GRUB_BTRFS_MKCONFIG=/usr/bin/grub2-mkconfig
 
+# Name of grub-script-check command, use by "grub-btrfs"
+# Might be 'grub2-script-check' on some systems (Fedora ...)
+# For example, on Fedora : "grub2-script-check"
+# Default: grub-script-check
+#GRUB_BTRFS_SCRIPT_CHECK=grub2-script-check
+
 # Password protection management for submenu,snapshots
 # Refer to the Grub documentation https://www.gnu.org/software/grub/manual/grub/grub.html#Authentication-and-authorisation
 # and this comment https://github.com/Antynea/grub-btrfs/issues/95#issuecomment-682295660

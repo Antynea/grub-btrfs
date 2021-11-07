@@ -123,8 +123,6 @@ detect_rootflags()
                         | sed -E 's/^.*[[:space:]]([[:graph:]]+)$/\1/;s/,?subvol(id)?=[^,$]+//g;s/^,//')
     rootflags="rootflags=${fstabflags:+$fstabflags,}${GRUB_BTRFS_ROOTFLAGS:+$GRUB_BTRFS_ROOTFLAGS,}"
 }
-## Path to grub-script-check
-grub_script_check="${bindir}/grub-script-check"
 
 unmount_grub_btrfs_mount_point()
 {
@@ -570,7 +568,7 @@ if [[ "${count_limit_snap}" = "0" || -z "${count_limit_snap}" ]]; then
 fi
 # Make a submenu in GRUB (grub.cfg) and move "grub-btrfs.new" to "grub-btrfs.cfg"
 header_menu
-if ${grub_script_check} "$grub_directory/grub-btrfs.new"; then
+if "${bindir}/${GRUB_BTRFS_SCRIPT_CHECK:-grub-script-check}" "$grub_directory/grub-btrfs.new"; then
     cat "$grub_directory/grub-btrfs.new" > "$grub_directory/grub-btrfs.cfg"
     rm -f "$grub_directory/grub-btrfs.new"
     cat << EOF
