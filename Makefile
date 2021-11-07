@@ -5,11 +5,9 @@ INITCPIO ?= false
 SYSTEMD ?= true
 OPENRC ?= false
 
-
 SHARE_DIR = $(DESTDIR)$(PREFIX)/share
 LIB_DIR = $(DESTDIR)$(PREFIX)/lib
 BIN_DIR = $(DESTDIR)$(PREFIX)/bin
-
 
 .PHONY: install uninstall help
 
@@ -35,7 +33,7 @@ install:
 		install -Dm644 "initramfs/Arch Linux/overlay_snap_ro-install" "$(LIB_DIR)/initcpio/install/grub-btrfs-overlayfs"; \
 		install -Dm644 "initramfs/Arch Linux/overlay_snap_ro-hook" "$(LIB_DIR)/initcpio/hooks/grub-btrfs-overlayfs"; \
 	 fi
-	@install -Dm644 -t "$(SHARE_DIR)/licenses/$(PKGNAME)/" LICENSE 
+	@install -Dm644 -t "$(SHARE_DIR)/licenses/$(PKGNAME)/" LICENSE
 	@install -Dm644 -t "$(SHARE_DIR)/doc/$(PKGNAME)/" README.md
 	@install -Dm644 "initramfs/readme.md" "$(SHARE_DIR)/doc/$(PKGNAME)/initramfs-overlayfs.md"
 
@@ -48,10 +46,10 @@ uninstall:
 	 rm -f "$${grub_dirname:-/boot/grub}/grub-btrfs.cfg"
 	@rm -f "$(DESTDIR)/etc/default/grub-btrfs/config"
 	@rm -f "$(DESTDIR)/etc/grub.d/41_snapshots-btrfs"
-	@rm -f "$(LIB_DIR)/systemd/system/grub-btrfs.path;
-	@rm -f "$(LIB_DIR)/systemd/system/grub-btrfs.service;
-	@rm -f "$(BIN_DIR)/grub-btrfs.openrcbin;
-	@rm -f "$(DESTDIR)/etc/init.d/grub-btrfs.openrc;
+	@rm -f "$(LIB_DIR)/systemd/system/grub-btrfs.path"
+	@rm -f "$(LIB_DIR)/systemd/system/grub-btrfs.service"
+	@rm -f "$(BIN_DIR)/grub-btrfs-openrc;"
+	@rm -f "$(DESTDIR)/etc/init.d/grub-btrfsd;"
 	@rm -f "$(LIB_DIR)/initcpio/install/grub-btrfs-overlayfs"
 	@rm -f "$(LIB_DIR)/initcpio/hooks/grub-btrfs-overlayfs"
 	@# Arch Linux UNlike distros only :
