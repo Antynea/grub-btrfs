@@ -36,7 +36,6 @@
 
 set -e
 
-datarootdir="/usr/share"
 sysconfdir="/etc"
 grub_btrfs_config="${sysconfdir}/default/grub-btrfs/config"
 
@@ -46,7 +45,7 @@ grub_btrfs_config="${sysconfdir}/default/grub-btrfs/config"
 ## Exit the script, if:
 [[ "${GRUB_BTRFS_DISABLE,,}" == "true" ]] && exit 0 # Disable Grub-btrfs is set to true (default=false)
 if ! type btrfs >/dev/null 2>&1; then exit 0; fi # btrfs-progs isn't installed
-[[ -f "$datarootdir/grub/grub-mkconfig_lib" ]] && . "$datarootdir/grub/grub-mkconfig_lib" || exit 0 # grub-mkconfig_lib couldn't be found
+[[ -f "${GRUB_BTRFS_MKCONFIG_LIB:-/usr/share/grub/grub-mkconfig_lib}" ]] && . "${GRUB_BTRFS_MKCONFIG_LIB:-/usr/share/grub/grub-mkconfig_lib}" || exit 0 # grub-mkconfig_lib couldn't be found
 # Root filesystem isn't btrfs
 root_fs=$(${grub_probe} --target="fs" / 2>/dev/null)
 [[ "$root_fs" != "btrfs" ]] && exit 0
