@@ -400,10 +400,8 @@ detect_initramfs()
     list_initramfs=()
     # Original initramfs (auto-detect)
     for oinitramfs in   "${boot_dir}"/initrd.img-* \
-                        "${boot_dir}"/initrd-*.img \
-                        "${boot_dir}"/initrd-*.gz \
-                        "${boot_dir}"/initramfs-*.img \
-                        "${boot_dir}"/initramfs-*.gz ; do
+                        "${boot_dir}"/initramfs-* \
+                        "${boot_dir}"/initrd-* ; do
         [[ ! -f "${oinitramfs}" ]] && continue;
         list_initramfs+=("$oinitramfs")
     done
