@@ -162,8 +162,16 @@ echo "$@" >> "$grub_directory/grub-btrfs.new"
 }
 
 ## menu entries
+old_kernel_parameters=${kernel_parameters}
 make_menu_entries()
 {
+    kernel_parameters="${old_kernel_parameters}"
+    if [[ "${GRUB_BTRFS_SYSTEMD_VOLATILE}" == true ]] ; then
+        if [[ $(strings -n7 "$grub_btrfs_mount_point/$snap_dir_name_trim/usr/bin/init" | grep -aEiom1 'upstart|systemd|sysvinit') == systemd ]] \
+           || [[ $(strings -n7 "$grub_btrfs_mount_point/$snap_dir_name_trim/sbin/init" | grep -aEiom1 'upstart|systemd|sysvinit') == systemd ]]; then
+                [[ $(btrfs property get "$grub_btrfs_mount_point/$snap_dir_name_trim" ro) != "ro=false" ]] && kernel_parameters="${kernel_parameters} systemd.volatile=state";
+        fi
+    fi
 ## \" required for snap,kernels,init,microcode with space in their name
     entry "submenu '${title_menu}' {
     submenu '${title_submenu}' { echo }"
