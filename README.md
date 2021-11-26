@@ -19,8 +19,8 @@ Otherwise, make sure your snapshots are writeable.
 See [this ticket](https://github.com/Antynea/grub-btrfs/issues/92) for more info.
 
 This project includes its own solution.  
-Refer to the [documentation](https://github.com/Antynea/grub-btrfs/blob/master/initramfs/readme.md).
-
+* Refer to the [documentation](https://github.com/Antynea/grub-btrfs/blob/master/initramfs/readme.md).  
+* Or used `GRUB_BTRFS_SYSTEMD_VOLATILE=true` in config file. (experimental, See [config file](https://github.com/Antynea/grub-btrfs/blob/master/config) for more information.)
 - - -
 ### What does grub-btrfs v4.xx do :
 * Automatically List snapshots existing on root partition (btrfs).
@@ -51,13 +51,14 @@ Now merge grub-btrfs via
 `emerge app-backup/grub-btrfs`
 
 #### Manual
-
 * Run `make install` or look into Makefile for instructions on where to put each file.
+* Run `make help` to check what options are available.
 * Dependencies:
   * [btrfs-progs](https://archlinux.org/packages/core/x86_64/btrfs-progs/)
   * [grub](https://archlinux.org/packages/core/x86_64/grub/)
   * [bash >4](https://archlinux.org/packages/core/x86_64/bash/)
   * [gawk ](https://archlinux.org/packages/core/x86_64/gawk/)
+  * [strings](https://archlinux.org/packages/core/x86_64/binutils/)
 
 #### NOTE: All distros
 Generate your Grub menu after installation for the changes to take effect.  
