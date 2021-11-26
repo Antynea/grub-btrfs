@@ -60,7 +60,7 @@
 # The snapshot will boot in read-only mode but "/var" will be writable using a "tmpfs" mount point (which means, folder mounted in RAM)
 # This should make it easier to rollback.
 # Note to all: Detecting "systemd" as the default init on the snapshot is automatic, if don't, file a bug report at https://github.com/Antynea/grub-btrfs.
-# Note to Arch Linux users: If you use the "grub-btrfs-overlayfs" option on Arch Lunix, "GRUB_BTRFS_SYSTEMD_VOLATILE" will do nothing.
+# Note to Arch Linux users: If you use the "grub-btrfs-overlayfs" option on Arch Linux, "GRUB_BTRFS_SYSTEMD_VOLATILE" will do nothing.
 # Default: "false"
 #GRUB_BTRFS_SYSTEMD_VOLATILE=true
 
