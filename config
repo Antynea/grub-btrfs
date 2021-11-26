@@ -54,6 +54,16 @@
 # Default: ""
 #GRUB_BTRFS_ROOTFLAGS="space_cache,commit=10,norecovery"
 
+# Booting on read-only snapshots can be tricky. (See https://github.com/Antynea/grub-btrfs#warning-booting-on-read-only-snapshots-can-be-tricky)
+# Based on several reports, "/var" must be writable to start properly.
+# Systemd can do this for you. (not compatible with OpenRC)
+# The snapshot will boot in read-only mode but "/var" will be writable using a "tmpfs" mount point (which means, folder mounted in RAM)
+# This should make it easier to rollback.
+# Note to all: Detecting "systemd" as the default init on the snapshot is automatic, if don't, file a bug report at https://github.com/Antynea/grub-btrfs.
+# Note to Arch Linux users: If you use the "grub-btrfs-overlayfs" option on Arch Lunix, "GRUB_BTRFS_SYSTEMD_VOLATILE" will do nothing.
+# Default: "false"
+#GRUB_BTRFS_SYSTEMD_VOLATILE=true
+
 # Ignore specific path during run "grub-mkconfig".
 # Only exact paths are ignored.
 # e.g : if `specific path` = @, only `@` snapshot will be ignored.
