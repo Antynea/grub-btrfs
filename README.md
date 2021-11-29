@@ -51,8 +51,8 @@ Now merge grub-btrfs via
 `emerge app-backup/grub-btrfs`
 
 #### Manual
-
 * Run `make install` or look into Makefile for instructions on where to put each file.
+* Run `make help` to check what options are available. 
 * Dependencies:
   * [btrfs-progs](https://archlinux.org/packages/core/x86_64/btrfs-progs/)
   * [grub](https://archlinux.org/packages/core/x86_64/grub/)
