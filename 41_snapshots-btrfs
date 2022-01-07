@@ -54,7 +54,7 @@ root_fs=$(${grub_probe} --target="fs" / 2>/dev/null)
 print_error()
 {
     local err_msg="$*"
-    local bug_report="If you think an error has occurred, please file a bug report at \" https://github.com/Antynea/grub-btrfs \""
+    local bug_report="If you think an error has occurred, please file a bug report at \"https://github.com/Antynea/grub-btrfs\""
     printf "%s\n" "${err_msg}" "${bug_report}" >&2 ;
     exit 0
 }
