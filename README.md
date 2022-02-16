@@ -50,6 +50,13 @@ emerge --sync
 Now merge grub-btrfs via 
 `emerge app-backup/grub-btrfs`
 
+#### Kali Linux
+[grub-btrfs](http://pkg.kali.org/pkg/grub-btrfs) is available in the Kali Linux repository and can be installed with:  
+```
+apt install grub-btrfs
+```
+Booting into read-only snapshots is fully supported when choosing "btrfs" as file system during a standard Kali Linux installation following [this walk-through](https://www.kali.org/docs/installation/btrfs/).  
+
 #### Manual
 * Run `make install` or look into Makefile for instructions on where to put each file.
 * Run `make help` to check what options are available. 
