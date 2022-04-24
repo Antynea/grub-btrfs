@@ -9,4 +9,4 @@ BindsTo=\x2esnapshots.mount
 PathModified=/.snapshots
 
 [Install]
-WantedBy=\x2esnapshots.mount
+WantedBy=multi-user.target
