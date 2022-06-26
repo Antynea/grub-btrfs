@@ -1,6 +1,7 @@
 #!/bin/sh
 echo $$ > /run/grub-btrfsd.pid
+snapshots="${1:-/run/timeshift/backup/timeshift-btrfs/snapshots}"
 
-while true; do sleep 1 && inotifywait -e create -e delete /run/timeshift/backup/timeshift-btrfs/snapshots && sleep 5 && if [ -s "${GRUB_BTRFS_GRUB_DIRNAME:-/boot/grub}/grub-btrfs.cfg" ]; then /etc/grub.d/41_snapshots-btrfs; else ${GRUB_BTRFS_MKCONFIG:-grub-mkconfig} -o ${GRUB_BTRFS_GRUB_DIRNAME:-/boot/grub}/grub.cfg; fi  ; done
+while true; do sleep 1 && inotifywait -e create -e delete "$snapshots" && sleep 5 && if [ -s "${GRUB_BTRFS_GRUB_DIRNAME:-/boot/grub}/grub-btrfs.cfg" ]; then /etc/grub.d/41_snapshots-btrfs; else ${GRUB_BTRFS_MKCONFIG:-grub-mkconfig} -o ${GRUB_BTRFS_GRUB_DIRNAME:-/boot/grub}/grub.cfg; fi  ; done
 
 

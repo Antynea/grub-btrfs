@@ -26,7 +26,8 @@ install:
 	@# OpenRC init system
 	@if test "$(OPENRC)" = true; then \
 		install -Dm744 -t "$(BIN_DIR)/" grub-btrfs-openrc; \
-		install -Dm744 -t "$(DESTDIR)/etc/init.d/" grub-btrfsd; \
+		install -Dm744 grub-btrfsd.initd "$(DESTDIR)/etc/init.d/grub-btrfsd"; \
+		install -Dm644 grub-btrfsd.confd "$(DESTDIR)/etc/conf.d/grub-btrfsd"; \
 	 fi
 	@# Arch Linux like distros only :
 	@if test "$(INITCPIO)" = true; then \

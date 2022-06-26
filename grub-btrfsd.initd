@@ -4,6 +4,7 @@
 
 name="grub-btrfs daemon"
 command="/usr/bin/grub-btrfs-openrc"
+command_args="${snapshots}"
 pidfile="/run/{RC_SVCNAME}.pid"
 command_background=true
 
