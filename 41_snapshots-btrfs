@@ -42,14 +42,6 @@ grub_btrfs_config="${sysconfdir}/default/grub-btrfs/config"
 [[ -f "$grub_btrfs_config" ]] && . "$grub_btrfs_config"
 [[ -f "${sysconfdir}/default/grub" ]] && . "${sysconfdir}/default/grub"
 
-## Exit the script, if:
-[[ "${GRUB_BTRFS_DISABLE,,}" == "true" ]] && exit 0 # Disable Grub-btrfs is set to true (default=false)
-if ! type btrfs >/dev/null 2>&1; then exit 0; fi # btrfs-progs isn't installed
-[[ -f "${GRUB_BTRFS_MKCONFIG_LIB:-/usr/share/grub/grub-mkconfig_lib}" ]] && . "${GRUB_BTRFS_MKCONFIG_LIB:-/usr/share/grub/grub-mkconfig_lib}" || exit 0 # grub-mkconfig_lib couldn't be found
-# Root filesystem isn't btrfs
-root_fs=$(${grub_probe} --target="fs" / 2>/dev/null)
-[[ "$root_fs" != "btrfs" ]] && exit 0
-
 ## Error Handling
 print_error()
 {
@@ -58,6 +50,14 @@ print_error()
     printf "%s\n" "${err_msg}" "${bug_report}" >&2 ;
     exit 0
 }
+
+## Exit the script, if:
+[[ "${GRUB_BTRFS_DISABLE,,}" == "true" ]] && print_error "GRUB_BTRFS_DISABLE is set to true (default=false)"
+if ! type btrfs >/dev/null 2>&1; then print_error "btrfs-progs isn't installed"; fi
+[[ -f "${GRUB_BTRFS_MKCONFIG_LIB:-/usr/share/grub/grub-mkconfig_lib}" ]] && . "${GRUB_BTRFS_MKCONFIG_LIB:-/usr/share/grub/grub-mkconfig_lib}" || print_error "grub-mkconfig_lib couldn't be found"
+root_fs=$(${grub_probe} --target="fs" / 2>/dev/null)
+[[ "$root_fs" != "btrfs" ]] && print_error "Root filesystem isn't btrfs"
+
 
 printf "Detecting snapshots ...\n" >&2 ;
 
