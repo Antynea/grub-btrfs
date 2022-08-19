@@ -3,7 +3,11 @@
 
 ## grub-btrfs 
 
-This is a version 4.xx of grub-btrfs
+[![GitHub release](https://img.shields.io/github/release/Antynea/grub-btrfs.svg)](https://github.com/Antynea/grub-btrfs/releases)
+![](https://img.shields.io/github/license/Antynea/grub-btrfs.svg)
+
+## grub-btrfs 
+
 ##### BTC donation address: `1Lbvz244WA8xbpHek9W2Y12cakM6rDe5Rt`
 - - -
 ### Description:
@@ -22,7 +26,7 @@ This project includes its own solution.
 Refer to the [documentation](https://github.com/Antynea/grub-btrfs/blob/master/initramfs/readme.md).
 
 - - -
-### What features does grub-btrfs v4.xx have?
+### What features does grub-btrfs have?
 * Automatically list snapshots existing on root partition (btrfs).
 * Automatically detect if `/boot` is in separate partition.
 * Automatically detect kernel, initramfs and intel/amd microcode in `/boot` directory on snapshots.
@@ -47,8 +51,12 @@ eselect repository enable guru
 emerge --sync 
 ```
 
+
 Now merge grub-btrfs via 
 `emerge app-backup/grub-btrfs`
+
+If you are using SystemD on Gentoo, make sure the USE-Flag `systemD` is set. (Either globally in make.conf or in package.use for the package app-backup/grub-btrfs)
+Without systemD USE-Flag the OpenRC-Daemon of grub-btrfs will be installed.
 
 #### Kali Linux
 [grub-btrfs](http://pkg.kali.org/pkg/grub-btrfs) is available in the Kali Linux repository and can be installed with:  
@@ -64,7 +72,7 @@ Booting into read-only snapshots is fully supported when choosing "btrfs" as fil
   * [btrfs-progs](https://archlinux.org/packages/core/x86_64/btrfs-progs/)
   * [grub](https://archlinux.org/packages/core/x86_64/grub/)
   * [bash >4](https://archlinux.org/packages/core/x86_64/bash/)
-  * [gawk ](https://archlinux.org/packages/core/x86_64/gawk/)
+  * [gawk](https://archlinux.org/packages/core/x86_64/gawk/)
 
 #### NOTE: All distros
 Generate your grub menu after installation for the changes to take effect.  
@@ -128,11 +136,12 @@ Currently not implemented
 ##
 #### OpenRC
 1. If you would like grub-btrfs menu to automatically update when a snapshot is created or deleted:
+* If you are using Timeshift, newer versions of it mount their snapshots to `/run/timeshift/$pidofthecurrentlyrunnigtimeshift/backup/timeshift-btrfs`. The OpenRC-Daemon can automatically take care of the detection of the correct PID and directory if you set the variable `timeshift_auto` to `true` in `etc/conf.d/grub-btrfsd`. In this case the variable `snapshots` has no influence.
+* If you don't want to use `timeshift_auto`, set the variable `snapshots` in the file `/etc/conf.d/grub-btrfsd` to the path of your snapshot directory. By default this is set to snappers default directory,  `./snapper`.
+For Timeshift keep in mind, that newer versions of Timeshift will not work with the `/run/timeshift/backup/timeshift-btrfs/snapshots` path. However there is a [workaround](https://www.lorenzobettini.it/2022/07/timeshift-and-grub-btrfs-in-linux-arch/) that works for now. 
 * Use `rc-config add grub-btrfsd default`, to start the grub-btrfsd daemon the next time the system boots. 
 	* To start `grub-btrfsd` right now, run `rc-service grub-btrfsd start`
-	* `grub-btrfsd` automatically watches the snapshot directory of timeshift (/run/timeshift/backup/timeshift-btrfs/snapshots)
-	and updates the grub-menu when a change occurs.
-* Currently untested for snapper
+	* `grub-btrfsd` automatically watches the snapshot directory and updates the grub-menu when a change occurs
 
 2. If you would like grub-btrfs menu to automatically update on system restart/ shutdown:
 Just add the following script as `/etc/local.d/grub-btrfs-update.stop`
@@ -150,7 +159,7 @@ Just add the following script as `/etc/local.d/grub-btrfs-update.stop`
 	bash -c 'if [ -s "${GRUB_BTRFS_GRUB_DIRNAME:-/boot/grub}/grub-btrfs.cfg" ]; then /etc/grub.d/41_snapshots-btrfs; else {GRUB_BTRFS_MKCONFIG:-grub-mkconfig} -o {GRUB_BTRFS_GRUB_DIRNAME:-/boot/grub}/grub.cfg; fi' 
 	```
 	
-	Make your script executeable with `chmod a+x /etc/local.d/grub-btrfs-update.stop`.
+	Make your script executable with `chmod a+x /etc/local.d/grub-btrfs-update.stop`.
 
 * The extension ".stop" at the end of the filename indicates to locald that this script should be run at shutdown. 
  If you want to run the menu update on startup instead, rename the file to `grub-btrfs-update.start`

@@ -1,7 +1,43 @@
 #!/bin/sh
-echo $$ > /run/grub-btrfsd.pid
-snapshots="${1:-/run/timeshift/backup/timeshift-btrfs/snapshots}"
+# Copyright 2022 Pascal Jaeger
+# Distributed under the terms of the GNU General Public License v3
+# Update GRUB when new BTRFS snapshots are created.
 
-while true; do sleep 1 && inotifywait -e create -e delete "$snapshots" && sleep 5 && if [ -s "${GRUB_BTRFS_GRUB_DIRNAME:-/boot/grub}/grub-btrfs.cfg" ]; then /etc/grub.d/41_snapshots-btrfs; else ${GRUB_BTRFS_MKCONFIG:-grub-mkconfig} -o ${GRUB_BTRFS_GRUB_DIRNAME:-/boot/grub}/grub.cfg; fi  ; done
+timeshift_pid
+watchtime=0
 
+snapshots="${1}"
+timeshift_auto="${2}"
 
+if  ! [ "${#snapshots}" -gt 0 ] && ! [ ${timeshift_auto} ]; then
+    echo "Please specify the snapshots directory" >&2
+    exit 1
+fi
+if [ ${timeshift_auto} ]; then
+    watchtime=15
+else
+    watchtime=0
+fi
+
+while true; do
+    if [ ${timeshift_auto} == "true" ] && ! [ "${#timeshift_pid}" -gt 0 ] ; then
+        inotifywait -e create -e delete /run/timeshift && {
+            sleep 1
+            timeshift_pid=$(ps ax | awk '{sub(/.*\//, "", $5)} $5 ~ /timeshift/ {print $1}')
+            snapshots="/run/timeshift/${timeshift_pid}/backup/timeshift-btrfs/snapshots"
+        }
+    else
+        while [ -d "$snapshots" ]; do
+            sleep 1
+            inotifywait -e create -e delete -e unmount -t "$watchtime" "$snapshots" && {
+                sleep 5
+                if [ -s "${GRUB_BTRFS_GRUB_DIRNAME:-/boot/grub}/grub-btrfs.cfg" ]; then
+                    /etc/grub.d/41_snapshots-btrfs
+                else
+                    ${GRUB_BTRFS_MKCONFIG:-grub-mkconfig} -o ${GRUB_BTRFS_GRUB_DIRNAME:-/boot/grub}/grub.cfg
+                fi
+            }
+        done
+        timeshift_pid=""
+    fi
+done

@@ -1,3 +1,10 @@
-# Where to locate the root snapshots
-#snapshots="/.snapshots" # Snapper in the root directory
-snapshots="/run/timeshift/backup/timeshift-btrfs/snapshots" # Timeshift
+# Copyright 2022 Pascal Jaeger
+# Distributed under the terms of the GNU General Public License v3
+
+## Where to locate the root snapshots
+snapshots="/.snapshots" # Snapper in the root directory
+#snapshots="/run/timeshift/backup/timeshift-btrfs/snapshots" # Timeshift < v22.06
+
+## Autodetect timeshift snapshot directory. If this it set to true, variable snapshots is not taken into account. Use this for Timeshift >= v22.06
+timeshift_auto=true # Timeshift >= v22.06
+#timeshift_auto=false # snapper

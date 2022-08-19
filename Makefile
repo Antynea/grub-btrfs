@@ -69,6 +69,7 @@ uninstall:
 help:
 	@echo
 	@echo "Usage: $(MAKE) [ <parameter>=<value> ... ] [ <action> ]"
+	@echo "Example: $(MAKE) OPENRC=true SYSTEMD=false install"
 	@echo
 	@echo "  actions: install"
 	@echo "           uninstall"
