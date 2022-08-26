@@ -1,1 +1,46 @@
 #+title: grub-btrfs
+#+MAN_CLASS_OPTIONS: :sectionid 7
+* Name
+    grub-btrfs - Automatically add btrfs-Snapshots as a Grub submenu
+
+* Description
+Improves grub by adding "btrfs snapshots" to the grub menu.
+
+You can boot your system on a "snapshot" from the grub menu.
+Supports manual snapshots, snapper and timeshift.
+
+* Configuration
+grub-btrfs is configured via the file ~/etc/default/grub-btrfs/config.
+Possible options are:
+** GRUB_BTRFS_DISABLE
+Disable grub-btrfs if true.
+Default: "false"
+Example: GRUB_BTRFS_DISABLE="true"
+** GRUB_BTRFS_TITLE_FORMAT
+The snapshot entries submenu in Grub are added according to this line. It is possible to change to order of the fields.
+Default: ("date" "snapshot" "type" "description")
+Example: GRUB_BTRFS_TITLE_FORMAT=("date" "snapshot" "type" "description")
+** GRUB_BTRFS_LIMIT
+Maximum number of snapshots in the GRUB snapshots sub menu.
+Default: "50"
+Example: GRUB_BTRFS_LIMIT="50"
+** TODO GRUB_BTRFS_SUBVOLUME_SORT # insert link to manpage von btrfs-subvolume?
+Sort the found subvolumes by "ogeneration" or "generation" or "path" or "rootid".
+See Sorting section to https://btrfs.wiki.kernel.org/index.php/Manpage/btrfs-subvolume#SUBCOMMAND
+"-rootid" means list snapshot by new ones first.
+Default: "-rootid"
+Example: GRUB_BTRFS_SUBVOLUME_SORT="+ogen,-gen,path,rootid"
+
+
+
+* COPYING
+Copyright (c) 2022 Pascal Jaeger
+Permission is granted to make and distribute verbatim copies of this manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+Permission is granted to copy and distribute modified versions of this manual under the conditions for verbatim copying, provided that  the
+entire resulting derived work is distributed under the terms of a permission notice identical to this one.
+
+Permission is granted to  copy and distribute translations of this manual into another language, under the above conditions for modified
+versions, except that this permission notice may be included in translations approved by the copyright bearer instead of in the
+original English.
