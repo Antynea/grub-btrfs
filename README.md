@@ -76,7 +76,7 @@ On **Debian-like** distribution `update-grub` is an alias to `grub-mkconfig ...`
 ### Customization:
 
 You have the possibility to modify many parameters in `/etc/default/grub-btrfs/config`.  
-See [config file](https://github.com/Antynea/grub-btrfs/blob/master/config) for more information.
+For further information see [config file](https://github.com/Antynea/grub-btrfs/blob/master/config) or `man grub-btrfs`
 
 - - -
 ### Automatically update grub upon snapshot:

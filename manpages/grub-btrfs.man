@@ -1,1 +1,0 @@
-.TH "grub-btrfs" "1" 

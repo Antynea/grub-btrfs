@@ -8,10 +8,25 @@ OPENRC ?= false
 SHARE_DIR = $(DESTDIR)$(PREFIX)/share
 LIB_DIR = $(DESTDIR)$(PREFIX)/lib
 BIN_DIR = $(DESTDIR)$(PREFIX)/bin
+MAN_DIR = $(SHARE_DIR)/man
 
-.PHONY: install uninstall help
+TEMP_DIR = ./temp
+
+.PHONY: install uninstall clean help
 
 install:
+	@echo "					     	   Installing "
+	@echo
+	@echo "       ::::::::  :::::::::  :::    ::: :::::::::               ::::::::: ::::::::::: :::::::::  :::::::::: ::::::::      "
+	@echo "      :+:    :+: :+:    :+: :+:    :+: :+:    :+:              :+:    :+:    :+:     :+:    :+: :+:       :+:    :+:     "
+	@echo "     +:+        +:+    +:+ +:+    +:+ +:+    +:+              +:+    +:+    +:+     +:+    +:+ +:+       +:+             "
+	@echo "    :#:        +#++:++#:  +#+    +:+ +#++:++#+ +#++:++#++:++ +#++:++#+     +#+     +#++:++#:  :#::+::#  +#++:++#++       "
+	@echo "   +#+   +#+# +#+    +#+ +#+    +#+ +#+    +#+              +#+    +#+    +#+     +#+    +#+ +#+              +#+        "
+	@echo "  #+#    #+# #+#    #+# #+#    #+# #+#    #+#              #+#    #+#    #+#     #+#    #+# #+#       #+#    #+#         "
+	@echo "  ########  ###    ###  ########  #########               #########     ###     ###    ### ###        ########           "
+	@echo
+	@echo " For further information visit https://github.com/Antynea/grub-btrfs or read the man page: 'man grub-btrfs'"
+	@echo
 	@if test "$(shell id -u)" != 0; then \
 		echo "You are not root, run this target as root please."; \
 		exit 1; \
@@ -36,6 +51,14 @@ install:
 	@install -Dm644 -t "$(SHARE_DIR)/licenses/$(PKGNAME)/" LICENSE
 	@install -Dm644 -t "$(SHARE_DIR)/doc/$(PKGNAME)/" README.md
 	@install -Dm644 "initramfs/readme.md" "$(SHARE_DIR)/doc/$(PKGNAME)/initramfs-overlayfs.md"
+	@mkdir ${TEMP_DIR}
+	@chmod 777 ${TEMP_DIR}
+	@cp manpages/grub-btrfs.8.man ${TEMP_DIR}/grub-btrfs.8
+	@bzip2 ${TEMP_DIR}/grub-btrfs.8
+	@install -Dm644 -t "${MAN_DIR}/man8" "${TEMP_DIR}/grub-btrfs.8.bz2"
+	@cp manpages/grub-btrfsd.8.man ${TEMP_DIR}/grub-btrfsd.8
+	@bzip2 ${TEMP_DIR}/grub-btrfsd.8
+	@install -Dm644 -t "${MAN_DIR}/man8" "${TEMP_DIR}/grub-btrfsd.8.bz2"
 
 uninstall:
 	@if test "$(shell id -u)" != 0; then \
@@ -52,6 +75,8 @@ uninstall:
 	@rm -f "$(DESTDIR)/etc/init.d/grub-btrfsd;"
 	@rm -f "$(LIB_DIR)/initcpio/install/grub-btrfs-overlayfs"
 	@rm -f "$(LIB_DIR)/initcpio/hooks/grub-btrfs-overlayfs"
+	@rm -f "$(MAN_DIR)/man8/grub-btrfs.8.bz2
+	@rm -f "$(MAN_DIR)/man8/grub-btrfsd.8.bz2
 	@# Arch Linux UNlike distros only :
 	@if test "$(INITCPIO)" != true && test -d "$(LIB_DIR)/initcpio"; then \
 		rmdir --ignore-fail-on-non-empty "$(LIB_DIR)/initcpio/install" || :; \
@@ -65,9 +90,13 @@ uninstall:
 	@rmdir --ignore-fail-on-non-empty "$(SHARE_DIR)/licenses/$(PKGNAME)/" || :
 	@rmdir --ignore-fail-on-non-empty "$(DESTDIR)/etc/default/grub-btrfs" || :
 
+clean:
+	@rm -rf "${TEMP_DIR}"
+
 help:
 	@echo
 	@echo "Usage: $(MAKE) [ <parameter>=<value> ... ] [ <action> ]"
+	@echo "Example: $(MAKE) OPENRC=true SYSTEMD=false install"
 	@echo
 	@echo "  actions: install"
 	@echo "           uninstall"

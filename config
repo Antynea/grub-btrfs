@@ -86,18 +86,18 @@ GRUB_BTRFS_IGNORE_PREFIX_PATH=("var/lib/docker" "@var/lib/docker" "@/var/lib/doc
 #GRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION="true"
 
 # Location of the folder containing the "grub.cfg" file.
-# Use by grub-btrfs to save the file "grub-btrfs.cfg".
+# Used by grub-btrfs to save the file "grub-btrfs.cfg".
 # Might be grub2 on some systems.
 # For example, on Fedora with EFI : "/boot/efi/EFI/fedora"
 # Default: "/boot/grub"
 #GRUB_BTRFS_GRUB_DIRNAME="/boot/grub2"
 
-# Location of kernels/initramfs/microcode.
-# Use by "grub-btrfs" to detect the boot partition and the location of kernels/initrafms/microcodes.
+# Location of kernels, initramfs and microcode.
+# Used by "grub-btrfs" to detect the boot partition and the location of kernels, initrafms and microcodes.
 # Default: "/boot"
 #GRUB_BTRFS_BOOT_DIRNAME="/boot"
 
-# Name/path of grub-mkconfig command, use by "grub-btrfs.service"
+# Name/path of grub-mkconfig command, used by "grub-btrfs.service"
 # Might be 'grub2-mkconfig' on some systems (Fedora ...)
 # Default paths are /sbin:/bin:/usr/sbin:/usr/bin,
 # if your path is missing, report it on the upstream project.
@@ -106,13 +106,13 @@ GRUB_BTRFS_IGNORE_PREFIX_PATH=("var/lib/docker" "@var/lib/docker" "@/var/lib/doc
 # Default: grub-mkconfig
 #GRUB_BTRFS_MKCONFIG=/usr/bin/grub2-mkconfig
 
-# Name of grub-script-check command, use by "grub-btrfs"
+# Name of grub-script-check command, used by "grub-btrfs"
 # Might be 'grub2-script-check' on some systems (Fedora ...)
 # For example, on Fedora : "grub2-script-check"
 # Default: grub-script-check
 #GRUB_BTRFS_SCRIPT_CHECK=grub2-script-check
 
-# Path of grub-mkconfig_lib file, use by "grub-btrfs"
+# Path of grub-mkconfig_lib file, used by "grub-btrfs"
 # Might be '/usr/share/grub2/grub-mkconfig_lib' on some systems (Opensuse ...)
 # Default: /usr/share/grub/grub-mkconfig_lib
 #GRUB_BTRFS_MKCONFIG_LIB=/usr/share/grub2/grub-mkconfig_lib
