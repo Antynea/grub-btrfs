@@ -1,15 +1,14 @@
 #+title: grub-btrfs
 #+author: Pascal Jaeger
 #+man_class_option: :sectionid 8
-#+export_file_name: grub-btrfs.8
 
-* Name
+* NAME
     grub-btrfs - Automatically add btrfs-Snapshots as a Grub submenu
 
-* Synopsis
+* SYNOPSIS
 /etc/grub.d/41_snapshots-btrfs
 
-* Description
+* DESCRIPTION
 Improves grub by adding "btrfs snapshots" to the grub menu.
 
 You can boot your system on a "snapshot" from the grub menu.
@@ -22,11 +21,12 @@ Features of grub-btrfs:
 - Automatically detect the type/tags and descriptions/comments of snapper/timeshift snapshots.
 - Automatically generate grub.cfg if you use the provided systemd service.
 
-* Configuration
+* CONFIGURATION
 grub-btrfs is configured via the file ~/etc/default/grub-btrfs/config~.
 Possible options are:
 
-** General
+** GENERAL
+
 *** ~GRUB_BTRFS_DISABLE~
 Disable grub-btrfs if true.
 - Default: "false"
@@ -73,7 +73,8 @@ Change to "true" if your boot partition is not detected as separate.
 - Default: "false"
 -Example: ~GRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION="true"~
 
-** Custom kernels
+** CUSTOM KERNELS
+
 *** ~GRUB_BTRFS_NKERNEL~ / ~GRUB_BTRFS_NINIT~ / ~GRUB_BTRFS_CUSTOM_MICROCODE~
 By default, "grub-btrfs" automatically detects most existing kernels, initramfs and microcode.
 Customs kernel, initramfs and microcodes that are not detected can be added in these variables.
@@ -82,7 +83,8 @@ Customs kernel, initramfs and microcodes that are not detected can be added in t
           ~GRUB_BTRFS_NINIT=("initramfs-5.19.4-custom.img" "initrd-5.19.4-custom.img" "otherinit-5.19.4-custom.gz")~
           ~GRUB_BTRFS_CUSTOM_MICROCODE=("custom-ucode.img" "custom-uc.img "custom_ucode.cpio")~
 
-** Snapshot filtering
+** SNAPSHOT FILTERING
+
 *** ~GRUB_BTRFS_IGNORE_SPECIFIC_PATH~
 Ignore specific path during run "grub-mkconfig".
 Only exact paths are ignored.
@@ -111,7 +113,8 @@ Ignore specific description of snapshot during run "grub-mkconfig".
 - Default: ("")
 -Example: ~GRUB_BTRFS_IGNORE_SNAPSHOT_DESCRIPTION=("timeline")~
 
-** Distribution dependent settings
+** DISTRIBUTION DEPENDENT SETTINGS
+
 *** ~GRUB_BTRFS_BOOT_DIRNAME~
 Location of kernels/initramfs/microcode.
 Used by "grub-btrfs" to detect the boot partition and the location of kernels, initramfs and microcodes.
@@ -146,15 +149,15 @@ Might be '/usr/share/grub2/grub-mkconfig_lib' on some systems (e.g. Opensuse)
 - Default: /usr/share/grub/grub-mkconfig_lib
 - Example: ~GRUB_BTRFS_MKCONFIG_LIB=/usr/share/grub2/grub-mkconfig_lib~
 
-** Security
+** SECURITY
+
 *** ~GRUB_BTRFS_PROTECTION_AUTHORIZED_USERS~
 Password protection management for submenu, snapshots
 Refer to the Grub documentation https://www.gnu.org/software/grub/manual/grub/grub.html#Authentication-and-authorisation
 and this comment https://github.com/Antynea/grub-btrfs/issues/95#issuecomment-682295660
 Add authorized usernames separate by comma (userfoo,userbar).
 When Grub's password protection is enabled, the superuser is authorized by default, it is not necessary to add it
-- Default: ""
-- Example: ~GRUB_BTRFS_PROTECTION_AUTHORIZED_USERS="userfoo,userbar"~
+- Default: "- Example: ~GRUB_BTRFS_PROTECTION_AUTHORIZED_USERS="userfoo,userbar"~
 
 *** ~GRUB_BTRFS_DISABLE_PROTECTION_SUBMENU~
 Disable authentication support for submenu of Grub-btrfs only (--unrestricted)
@@ -162,8 +165,16 @@ does not work if GRUB_BTRFS_PROTECTION_AUTHORIZED_USERS is not empty
 - Default: "false"
 - Example: ~GRUB_BTRFS_DISABLE_PROTECTION_SUBMENU="true"~
 
-* Files
+* FILES
 /etc/default/grub-btrfs/config
+
+* SEE ALSO
+#+BEGIN_MAN
+.IR btrfs (8)
+.IR btrfs-subvolume (8)
+.IR grub-btrfsd (8)
+.IR grub-mkconfig (8)
+#+END_MAN
 
 * COPYRIGHT
 Copyright (c) 2022 Pascal Jäger

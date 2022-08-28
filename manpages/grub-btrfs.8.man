@@ -1,14 +1,14 @@
 .TH "grub-btrfs" "8"
 
-.SH "Name"
+.SH "NAME"
 .PP
 grub-btrfs - Automatically add btrfs-Snapshots as a Grub submenu
 
-.SH "Synopsis"
+.SH "SYNOPSIS"
 .PP
 /etc/grub.d/41\d\s-2snapshots\s+2\u-btrfs
 
-.SH "Description"
+.SH "DESCRIPTION"
 .PP
 Improves grub by adding “btrfs snapshots” to the grub menu.
 
@@ -29,12 +29,12 @@ Automatically detect the type/tags and descriptions/comments of snapper/timeshif
 .IP \(em 4
 Automatically generate grub.cfg if you use the provided systemd service.
 
-.SH "Configuration"
+.SH "CONFIGURATION"
 .PP
 grub-btrfs is configured via the file \fC/etc/default/grub\-btrfs/config\fP.
 Possible options are:
 
-.SS "General"
+.SS "GENERAL"
 .SS "\fCGRUB_BTRFS_DISABLE\fP"
 .PP
 Disable grub-btrfs if true.
@@ -102,7 +102,7 @@ Default: “false”
 .PP
 -Example: \fCGRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION="true"\fP
 
-.SS "Custom kernels"
+.SS "CUSTOM KERNELS"
 .SS "\fCGRUB_BTRFS_NKERNEL\fP / \fCGRUB_BTRFS_NINIT\fP / \fCGRUB_BTRFS_CUSTOM_MICROCODE\fP"
 .PP
 By default, “grub-btrfs” automatically detects most existing kernels, initramfs and microcode.
@@ -114,7 +114,7 @@ Default: (“”)
           \fCGRUB_BTRFS_NINIT=("initramfs\-5.19.4\-custom.img" "initrd\-5.19.4\-custom.img" "otherinit\-5.19.4\-custom.gz")\fP
           \fCGRUB_BTRFS_CUSTOM_MICROCODE=("custom\-ucode.img" "custom\-uc.img "custom_ucode.cpio")\fP
 
-.SS "Snapshot filtering"
+.SS "SNAPSHOT FILTERING"
 .SS "\fCGRUB_BTRFS_IGNORE_SPECIFIC_PATH\fP"
 .PP
 Ignore specific path during run “grub-mkconfig”.
@@ -155,7 +155,7 @@ Default: (“”)
 .PP
 -Example: \fCGRUB_BTRFS_IGNORE_SNAPSHOT_DESCRIPTION=("timeline")\fP
 
-.SS "Distribution dependent settings"
+.SS "DISTRIBUTION DEPENDENT SETTINGS"
 .SS "\fCGRUB_BTRFS_BOOT_DIRNAME\fP"
 .PP
 Location of kernels/initramfs/microcode.
@@ -205,7 +205,7 @@ Default: /usr/share/grub/grub-mkconfig\d\s-2lib\s+2\u
 .IP \(em 4
 Example: \fCGRUB_BTRFS_MKCONFIG_LIB=/usr/share/grub2/grub\-mkconfig_lib\fP
 
-.SS "Security"
+.SS "SECURITY"
 .SS "\fCGRUB_BTRFS_PROTECTION_AUTHORIZED_USERS\fP"
 .PP
 Password protection management for submenu, snapshots
@@ -214,9 +214,7 @@ and this comment \fIhttps://github.com/Antynea/grub-btrfs/issues/95#issuecomment
 Add authorized usernames separate by comma (userfoo,userbar).
 When Grub’s password protection is enabled, the superuser is authorized by default, it is not necessary to add it
 .IP \(em 4
-Default: “”
-.IP \(em 4
-Example: \fCGRUB_BTRFS_PROTECTION_AUTHORIZED_USERS="userfoo,userbar"\fP
+Default: “- Example: \fCGRUB_BTRFS_PROTECTION_AUTHORIZED_USERS="userfoo,userbar"\fP
 
 .SS "\fCGRUB_BTRFS_DISABLE_PROTECTION_SUBMENU\fP"
 .PP
@@ -227,9 +225,15 @@ Default: “false”
 .IP \(em 4
 Example: \fCGRUB_BTRFS_DISABLE_PROTECTION_SUBMENU="true"\fP
 
-.SH "Files"
+.SH "FILES"
 .PP
 /etc/default/grub-btrfs/config
+
+.SH "SEE ALSO"
+.IR btrfs (8)
+.IR btrfs-subvolume (8)
+.IR grub-btrfsd (8)
+.IR grub-mkconfig (8)
 
 .SH "COPYRIGHT"
 .PP

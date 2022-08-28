@@ -25,8 +25,15 @@ install:
 	@echo "  #+#    #+# #+#    #+# #+#    #+# #+#    #+#              #+#    #+#    #+#     #+#    #+# #+#       #+#    #+#         "
 	@echo "  ########  ###    ###  ########  #########               #########     ###     ###    ### ###        ########           "
 	@echo
-	@echo " For further information visit https://github.com/Antynea/grub-btrfs or read the man page: 'man grub-btrfs'"
+	@echo "  For further information visit https://github.com/Antynea/grub-btrfs or read the man page: 'man grub-btrfs'"
 	@echo
+	@mkdir "${TEMP_DIR}"
+	@chmod 777 ${TEMP_DIR}
+	@cp manpages/grub-btrfs.8.man ${TEMP_DIR}/grub-btrfs.8
+	@bzip2 ${TEMP_DIR}/grub-btrfs.8
+	@install -Dm644 -t "${MAN_DIR}/man8" "${TEMP_DIR}/grub-btrfs.8.bz2"
+	@cp manpages/grub-btrfsd.8.man ${TEMP_DIR}/grub-btrfsd.8
+	@bzip2 ${TEMP_DIR}/grub-btrfsd.8
 	@if test "$(shell id -u)" != 0; then \
 		echo "You are not root, run this target as root please."; \
 		exit 1; \
@@ -35,32 +42,30 @@ install:
 	@install -Dm644 -t "$(DESTDIR)/etc/default/grub-btrfs/" config
 	@# Systemd init system
 	@if test "$(SYSTEMD)" = true; then \
+		echo "Installing systemd service"; \
 		install -Dm644 -t "$(LIB_DIR)/systemd/system/" grub-btrfs.path; \
 		install -Dm644 -t "$(LIB_DIR)/systemd/system/" grub-btrfs.service; \
 	 fi
 	@# OpenRC init system
 	@if test "$(OPENRC)" = true; then \
+		echo "Installing openRC daemon"; \
 		install -Dm744 -t "$(BIN_DIR)/" grub-btrfs-openrc; \
 		install -Dm744 -t "$(DESTDIR)/etc/init.d/" grub-btrfsd; \
+		install -Dm644 -t "${MAN_DIR}/man8" "${TEMP_DIR}/grub-btrfsd.8.bz2"; \
 	 fi
 	@# Arch Linux like distros only :
 	@if test "$(INITCPIO)" = true; then \
+		echo "Installing initcpio hook"; \
 		install -Dm644 "initramfs/Arch Linux/overlay_snap_ro-install" "$(LIB_DIR)/initcpio/install/grub-btrfs-overlayfs"; \
 		install -Dm644 "initramfs/Arch Linux/overlay_snap_ro-hook" "$(LIB_DIR)/initcpio/hooks/grub-btrfs-overlayfs"; \
 	 fi
 	@install -Dm644 -t "$(SHARE_DIR)/licenses/$(PKGNAME)/" LICENSE
 	@install -Dm644 -t "$(SHARE_DIR)/doc/$(PKGNAME)/" README.md
 	@install -Dm644 "initramfs/readme.md" "$(SHARE_DIR)/doc/$(PKGNAME)/initramfs-overlayfs.md"
-	@mkdir ${TEMP_DIR}
-	@chmod 777 ${TEMP_DIR}
-	@cp manpages/grub-btrfs.8.man ${TEMP_DIR}/grub-btrfs.8
-	@bzip2 ${TEMP_DIR}/grub-btrfs.8
-	@install -Dm644 -t "${MAN_DIR}/man8" "${TEMP_DIR}/grub-btrfs.8.bz2"
-	@cp manpages/grub-btrfsd.8.man ${TEMP_DIR}/grub-btrfsd.8
-	@bzip2 ${TEMP_DIR}/grub-btrfsd.8
-	@install -Dm644 -t "${MAN_DIR}/man8" "${TEMP_DIR}/grub-btrfsd.8.bz2"
+	@rm -rf "${TEMP_DIR}"
 
 uninstall:
+	@echo "Uninstalling grub-btrfs"
 	@if test "$(shell id -u)" != 0; then \
 		echo "You are not root, run this target as root please."; \
 		exit 1; \
@@ -75,8 +80,8 @@ uninstall:
 	@rm -f "$(DESTDIR)/etc/init.d/grub-btrfsd;"
 	@rm -f "$(LIB_DIR)/initcpio/install/grub-btrfs-overlayfs"
 	@rm -f "$(LIB_DIR)/initcpio/hooks/grub-btrfs-overlayfs"
-	@rm -f "$(MAN_DIR)/man8/grub-btrfs.8.bz2
-	@rm -f "$(MAN_DIR)/man8/grub-btrfsd.8.bz2
+	@rm -f "$(MAN_DIR)/man8/grub-btrfs.8.bz2"
+	@rm -f "$(MAN_DIR)/man8/grub-btrfsd.8.bz2"
 	@# Arch Linux UNlike distros only :
 	@if test "$(INITCPIO)" != true && test -d "$(LIB_DIR)/initcpio"; then \
 		rmdir --ignore-fail-on-non-empty "$(LIB_DIR)/initcpio/install" || :; \
@@ -91,6 +96,7 @@ uninstall:
 	@rmdir --ignore-fail-on-non-empty "$(DESTDIR)/etc/default/grub-btrfs" || :
 
 clean:
+	@echo "Deleting ./temp"
 	@rm -rf "${TEMP_DIR}"
 
 help:

@@ -1,0 +1,51 @@
+#+title: grub-btrfsd
+#+author: Pascal Jaeger
+#+man_class_option: :sectionid 8
+
+* NAME
+grub-btrfsd - An OpenRC daemon to automatically update the grub menu with
+#+BEGIN_MAN
+.BR grub-btrfs (8)
+#+END_MAN
+when a new btrfs snapshot is created.
+
+* SYNOPSIS
+grub-btrfs-openrc <snapshot-path> <timeshift-auto>
+
+
+* DESCRIPTION
+Grub-btrfs-openrc is a shell script which is meant to be run as a daemon for openrc.
+Grub-btrfsd watches a directory where a snapshot is created via inotifywait and runs grub-mkconfig (if grub-mkconfig never ran before since grub-btrfs was installed) or ~/etc/grub.d/41_snapshots-btrfs~ (when grub-mkconfig ran before with grub-btrfs installed) when something in that directory changes.
+
+* OPTIONS
+** ~snapshot-path~
+This argument specifies the path where grub-btrfd looks for newly created snapshots and snapshot deletions. It is usually defined by the program used to make snapshots.
+E.g. for Snapper this would be ~/.snapshots~
+
+** ~timeshift-auto~
+This is as boolean variable to activate the auto detection of the path where Timeshift stores snapshots. Newer versions of Timeshift mount their snapshots to ~/run/timeshift/$PID/backup/timeshift-btrfs~. Where ~$PID~ is the process ID of the currently running Timeshift session. The PID is changing every time Timeshift opened. grub-btrfsd can automatically take care of the detection of the correct PID and directory if this argument ~timeshift_auto~ is set to true ~true~. In this case the argument ~snapshots~ has no influence.
+
+* CONFIGURATION
+The daemon is configured via the file ~/etc/conf.d/grub-btrfsd~. In this file the arguments (See OPTIONS) that OpenRC passes to the daemon when it is started can be configured.
+
+** NOTES
+A common configuration for Snapper would be to set ~snapshots~ to ~/.snapshots~ and ~timeshift_auto~ to ~false~.
+For Timeshift ~timeshift_auto~ is set to true and ~snapshots~ can be left as is.
+
+* FILES
+~/etc/conf.d/grub-btrfsd~
+
+* SEE ALSO
+#+BEGIN_MAN
+.IR btrfs (8)
+.IR btrfs-subvolume (8)
+.IR grub-btrfsd (8)
+.IR grub-mkconfig (8)
+.IR inotifywait (1)
+.IR openrc (8)
+.IR rc-service (8)
+.IR timeshift (1)
+#+END_MAN
+
+* COPYRIGHT
+Copyright (c) 2022 Pascal Jäger
