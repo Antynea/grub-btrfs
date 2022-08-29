@@ -5,6 +5,9 @@
 snapshots="/.snapshots" # Snapper in the root directory
 #snapshots="/run/timeshift/backup/timeshift-btrfs/snapshots" # Timeshift < v22.06
 
-## Autodetect timeshift snapshot directory. If this it set to true, variable snapshots is not taken into account. Use this for Timeshift >= v22.06
-timeshift_auto=true # Timeshift >= v22.06
-#timeshift_auto=false # snapper
+## Optional arguments to run with the daemon
+# Possible options are:
+# -t, --timeshift-auto  Automatically detect Timeshifts snapshot directory for timeshift >= 22.06
+# -l, --log-file        Specify a logfile to write to
+#optional_args+="--timeshift-auto "
+#optional_args+="--log-file /var/log/grub-btrfsd.log "

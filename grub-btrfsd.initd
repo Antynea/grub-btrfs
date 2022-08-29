@@ -3,8 +3,8 @@
 # Distributed under the terms of the GNU General Public License v3
 
 name="grub-btrfs daemon"
-command="/usr/bin/grub-btrfs-openrc"
-command_args="${snapshots} ${timeshift_auto}"
+command="/usr/bin/grub-btrfsd"
+command_args="$optional_args ${snapshots}"
 pidfile="/run/{RC_SVCNAME}.pid"
 command_background=true
 

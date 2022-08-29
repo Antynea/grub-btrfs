@@ -1,0 +1,151 @@
+#!/bin/sh
+# Copyright 2022 Pascal Jaeger
+# Distributed under the terms of the GNU General Public License v3
+# Update GRUB when new BTRFS snapshots are created.
+
+# init
+timeshift_pid=-1
+watchtime=0
+logfile=0
+snapshots=-1
+timeshift_auto=false
+
+# helper functions
+GREEN=$'\033[0;32m'
+RED=$'\033[0;31m'
+CYAN=$'\033[;36m'
+RESET=$'\033[0m'
+
+print_help() {
+            echo "${CYAN}[?] Usage:"
+            echo "${0##*/} [-h, --help] [-t, --timeshift-auto] [-l, --log-file LOG_FILE] SNAPSHOTS_DIR"
+            echo
+            echo "SNAPSHOTS_DIR         Snapshot directory to watch, without effect when --timeshift-auto"
+            echo
+            echo "Optional arguments:"
+            echo "-t, --timeshift-auto  Automatically detect Timeshifts snapshot directory"
+            echo "-l, --log-file        Specify a logfile to write to"
+            echo "-h, --help            Display this message${RESET}"
+}
+
+log() {
+    if [ ${#logfile} -gt 1  ]; then
+        echo "$(date) ${1}" | tee -a ${logfile}
+    else
+        echo "$(date) ${1}"
+    fi
+}
+
+# parse arguments
+while getopts :l:th-: opt; do
+    case "$opt" in
+        -)
+            case "${OPTARG}" in
+                log-file)
+                    logfile="${!OPTIND}"; OPTIND=$(( $OPTIND + 1 ))
+                    ;;
+                timeshift-auto)
+                    timeshift_auto=true
+                    ;;
+                *)
+                    if [ "$OPTERR" = 1 ] && [ "${optspec:0:1}" != ":" ]; then
+                        echo "${RED}[!] Unknown option --${OPTARG} ${RESET}" >&2
+                        echo
+                    fi
+                    print_help
+                    exit 1
+                    ;;
+            esac;;
+        l)
+            logfile="${OPTARG}"
+            ;;
+        t)
+            timeshift_auto=true
+            ;;
+        h)
+            print_help
+            exit 0
+            ;;
+        *)
+            if [ "$OPTERR" = 1 ] || [ "${optspec:0:1}" = ":" ]; then
+                echo "${RED}[!] Non-option argument: '-${OPTARG}'${RESET}" >&2
+                echo
+            fi
+            print_help
+            exit 1
+            ;;
+    esac
+done
+shift $(( OPTIND - 1 ))
+
+snapshots="${1}"
+
+if [ ${#logfile} -gt 1  ]; then
+    echo  "${GREEN}$(date) grub-btrfsd starting up...${RESET}" | tee ${logfile}
+else
+    echo  "${GREEN}$(date) grub-btrfsd starting up...${RESET}"
+fi
+
+log "Arguments:"
+log "Snapshot directory: $snapshots"
+log "Timestift autodetection: $timeshift_auto"
+log "Logfile: $logfile"
+
+if ! [ -d "$snapshots" ] && ! [ ${timeshift_auto} = true ]; then
+    log "${RED}[!] No directory found at ${snapshots} ${RESET}" >&2
+    log "${RED}[!] Please specify a valid snapshot directory ${RESET}" >&2
+    exit 1
+fi
+
+if [ ${timeshift_auto} = true ]; then
+    watchtime=15
+else
+    watchtime=0
+fi
+
+# start the actual daemon
+log "Snapshot dir watchtimeout: $watchtime"
+log "${GREEN}Entering infinite while${RESET}"
+while true; do
+    if [ ${timeshift_auto} = true ] && ! [ "${timeshift_pid}" -gt 0 ] ; then
+        # watch the timeshift folder for a folder that is created when timeshift starts up
+        if [ "${timeshift_pid}" -eq -2 ]; then
+            log "detected timeshift shutdown"
+        fi
+        timeshift_pid=$(ps ax | awk '{sub(/.*\//, "", $5)} $5 ~ /timeshift/ {print $1}')
+        if [ "${#timeshift_pid}" -gt 0 ]; then
+            snapshots="/run/timeshift/${timeshift_pid}/backup/timeshift-btrfs/snapshots"
+            log "detected running Timeshift at daemon startup, PID is: $timeshift_pid"
+            log "new snapshots directory is $snapshots"
+        else
+            log "Watching /run/timeshift for timeshift to start"
+            inotifywait -q -q -e create -e delete /run/timeshift && {
+                sleep 1
+                timeshift_pid=$(ps ax | awk '{sub(/.*\//, "", $5)} $5 ~ /timeshift/ {print $1}')
+                snapshots="/run/timeshift/${timeshift_pid}/backup/timeshift-btrfs/snapshots"
+                log "${CYAN}detected Timeshift startup, PID is: $timeshift_pid ${RESET}"
+                log "${CYAN}new snapshots directory is $snapshots ${RESET}"
+            }
+        fi
+    else
+        while [ -d "$snapshots" ]; do
+            # watch the actual snapshots folder for a new snapshot or a deletion of a snapshot
+            log "Watching $snapshots for new snapshots..."
+            sleep 1
+            inotifywait -q -q -e create -e delete -e unmount -t "$watchtime" "$snapshots" && {
+                log "${CYAN}Detected snapshot creation/ deletion, (re)creating grub menu${RESET}"
+                sleep 5
+                if [ -s "${GRUB_BTRFS_GRUB_DIRNAME:-/boot/grub}/grub-btrfs.cfg" ]; then
+                    /etc/grub.d/41_snapshots-btrfs
+                else
+                    ${GRUB_BTRFS_MKCONFIG:-grub-mkconfig} -o ${GRUB_BTRFS_GRUB_DIRNAME:-/boot/grub}/grub.cfg
+                fi
+                log "${GREEN}Grub menu created${RESET}"
+            }
+        done
+        timeshift_pid=-2
+    fi
+    sleep 1 # leave this here for safety reasons
+done
+
+exit 0 # tradition is tradition
