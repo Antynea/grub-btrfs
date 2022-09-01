@@ -9,6 +9,8 @@ watchtime=0
 logfile=0
 snapshots=-1
 timeshift_auto=false
+verbose=false
+syslog=false
 
 # helper functions
 GREEN=$'\033[0;32m'
@@ -18,26 +20,52 @@ RESET=$'\033[0m'
 
 print_help() {
             echo "${CYAN}[?] Usage:"
-            echo "${0##*/} [-h, --help] [-t, --timeshift-auto] [-l, --log-file LOG_FILE] SNAPSHOTS_DIR"
+            echo "${0##*/} [-h, --help] [-t, --timeshift-auto] [-l, --log-file LOG_FILE] [-v, --verbose] [-s, --syslog] SNAPSHOTS_DIR"
             echo
             echo "SNAPSHOTS_DIR         Snapshot directory to watch, without effect when --timeshift-auto"
             echo
             echo "Optional arguments:"
             echo "-t, --timeshift-auto  Automatically detect Timeshifts snapshot directory"
             echo "-l, --log-file        Specify a logfile to write to"
+            echo "-v, --verbose         Let the log of the daemon be more verbose"
+            echo "-s, --syslog          Write to syslog"
             echo "-h, --help            Display this message${RESET}"
 }
 
 log() {
+    echo "${2}"$1"${RESET}"
+    if [ ${syslog} = true ]; then
+        logger -p user.notice -t ${0##*/}"["$$"]" "$1"
+    fi
     if [ ${#logfile} -gt 1  ]; then
-        echo "$(date) ${1}" | tee -a ${logfile}
-    else
-        echo "$(date) ${1}"
+        echo "$(date) ${1}" >> ${logfile}
     fi
 }
 
+vlog() {
+    if [ ${verbose} = true ]; then
+       echo "${2}"$1"${RESET}"
+       if [ ${syslog} = true ]; then
+           logger -p user.notice -t ${0##*/} "$1"
+       fi
+       if [ ${#logfile} -gt 1  ]; then
+        echo "$(date) ${1}" >> ${logfile}
+       fi
+    fi
+}
+
+err() {
+  echo "${2}"${1}"${RESET}" >&2
+  if [ ${syslog} = true ]; then
+      logger -p user.error -t ${0##*/} "$1"
+  fi
+  if [ ${#logfile} -gt 1  ]; then
+      echo "$(date) error: ${1}" >> ${logfile}
+  fi
+}
+
 # parse arguments
-while getopts :l:th-: opt; do
+while getopts :l:tvsh-: opt; do
     case "$opt" in
         -)
             case "${OPTARG}" in
@@ -47,9 +75,15 @@ while getopts :l:th-: opt; do
                 timeshift-auto)
                     timeshift_auto=true
                     ;;
+                verbose)
+                    verbose=true
+                    ;;
+                syslog)
+                    syslog=true
+                    ;;
                 *)
                     if [ "$OPTERR" = 1 ] && [ "${optspec:0:1}" != ":" ]; then
-                        echo "${RED}[!] Unknown option --${OPTARG} ${RESET}" >&2
+                        err "[!] Unknown option --${OPTARG}" "${RED}" >&2
                         echo
                     fi
                     print_help
@@ -62,13 +96,19 @@ while getopts :l:th-: opt; do
         t)
             timeshift_auto=true
             ;;
+        v)
+            verbose=true
+            ;;
+        s)
+            syslog=true
+            ;;
         h)
             print_help
             exit 0
             ;;
         *)
             if [ "$OPTERR" = 1 ] || [ "${optspec:0:1}" = ":" ]; then
-                echo "${RED}[!] Non-option argument: '-${OPTARG}'${RESET}" >&2
+                err "[!] Non-option argument: '-${OPTARG}'" "${RED}" >&2
                 echo
             fi
             print_help
@@ -81,19 +121,26 @@ shift $(( OPTIND - 1 ))
 snapshots="${1}"
 
 if [ ${#logfile} -gt 1  ]; then
-    echo  "${GREEN}$(date) grub-btrfsd starting up...${RESET}" | tee ${logfile}
-else
-    echo  "${GREEN}$(date) grub-btrfsd starting up...${RESET}"
+    touch "${logfile}"
+    echo "GRUB-BTRFSD log $(date)" >> "${logfile}"
 fi
 
-log "Arguments:"
-log "Snapshot directory: $snapshots"
-log "Timestift autodetection: $timeshift_auto"
-log "Logfile: $logfile"
+log  "grub-btrfsd starting up..." "${GREEN}"
+
+if [ ${verbose} = true ]; then
+    inotify_qiet_flag=""
+else
+    inotify_qiet_flag=" -q -q "
+fi
+
+vlog "Arguments:"
+vlog "Snapshot directory: $snapshots"
+vlog "Timestift autodetection: $timeshift_auto"
+vlog "Logfile: $logfile"
 
 if ! [ -d "$snapshots" ] && ! [ ${timeshift_auto} = true ]; then
-    log "${RED}[!] No directory found at ${snapshots} ${RESET}" >&2
-    log "${RED}[!] Please specify a valid snapshot directory ${RESET}" >&2
+    err "[!] No directory found at ${snapshots}" "${RED}" >&2
+    err "[!] Please specify a valid snapshot directory" "${RED}" >&2
     exit 1
 fi
 
@@ -104,9 +151,10 @@ else
 fi
 
 # start the actual daemon
-log "Snapshot dir watchtimeout: $watchtime"
-log "${GREEN}Entering infinite while${RESET}"
+vlog "Snapshot dir watchtimeout: $watchtime"
+vlog "Entering infinite while" "${GREEN}"
 while true; do
+    runs=false
     if [ ${timeshift_auto} = true ] && ! [ "${timeshift_pid}" -gt 0 ] ; then
         # watch the timeshift folder for a folder that is created when timeshift starts up
         if [ "${timeshift_pid}" -eq -2 ]; then
@@ -116,32 +164,39 @@ while true; do
         if [ "${#timeshift_pid}" -gt 0 ]; then
             snapshots="/run/timeshift/${timeshift_pid}/backup/timeshift-btrfs/snapshots"
             log "detected running Timeshift at daemon startup, PID is: $timeshift_pid"
-            log "new snapshots directory is $snapshots"
+            vlog "new snapshots directory is $snapshots"
         else
             log "Watching /run/timeshift for timeshift to start"
-            inotifywait -q -q -e create -e delete /run/timeshift && {
-                sleep 1
+            inotifywait ${inotify_qiet_flag} -e create -e delete /run/timeshift && {
+                sleep 3
                 timeshift_pid=$(ps ax | awk '{sub(/.*\//, "", $5)} $5 ~ /timeshift/ {print $1}')
                 snapshots="/run/timeshift/${timeshift_pid}/backup/timeshift-btrfs/snapshots"
-                log "${CYAN}detected Timeshift startup, PID is: $timeshift_pid ${RESET}"
-                log "${CYAN}new snapshots directory is $snapshots ${RESET}"
+                log "detected Timeshift startup, PID is: $timeshift_pid" "${CYAN}"
+                vlog "new snapshots directory is $snapshots" "${CYAN}"
             }
         fi
+        runs=false
     else
         while [ -d "$snapshots" ]; do
             # watch the actual snapshots folder for a new snapshot or a deletion of a snapshot
-            log "Watching $snapshots for new snapshots..."
-            sleep 1
-            inotifywait -q -q -e create -e delete -e unmount -t "$watchtime" "$snapshots" && {
-                log "${CYAN}Detected snapshot creation/ deletion, (re)creating grub menu${RESET}"
+            if [ ${runs} = false ] && [ ${verbose} = false ]; then
+                log "Watching $snapshots for new snapshots..." "${CYAN}"
+            else
+                vlog "Watching $snapshots for new snapshots..." "${CYAN}"
+            fi
+            runs=true
+            inotifywait ${inotify_qiet_flag}  -e create -e delete -e unmount -t "$watchtime" "$snapshots" && {
+                log "Detected snapshot creation/ deletion, recreating Grub menu" "${CYAN}"
                 sleep 5
                 if [ -s "${GRUB_BTRFS_GRUB_DIRNAME:-/boot/grub}/grub-btrfs.cfg" ]; then
                     /etc/grub.d/41_snapshots-btrfs
+                    log "Grub submenu recreated" "${GREEN}"
                 else
                     ${GRUB_BTRFS_MKCONFIG:-grub-mkconfig} -o ${GRUB_BTRFS_GRUB_DIRNAME:-/boot/grub}/grub.cfg
+                    log "Grub menu recreated" "${GREEN}"
                 fi
-                log "${GREEN}Grub menu created${RESET}"
             }
+            sleep 1
         done
         timeshift_pid=-2
     fi
