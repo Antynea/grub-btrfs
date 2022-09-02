@@ -1,0 +1,3 @@
+# Where to locate the root snapshots
+#snapshots="/.snapshots" # Snapper in the root directory
+snapshots="/run/timeshift/backup/timeshift-btrfs/snapshots" # Timeshift
