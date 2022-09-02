@@ -146,6 +146,7 @@ fi
 
 if [ ${timeshift_auto} = true ]; then
     watchtime=15
+    [ -d /run/timeshift ] || mkdir /run/timeshift
 else
     watchtime=0
 fi
