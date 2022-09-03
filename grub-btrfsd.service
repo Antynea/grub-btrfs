@@ -3,6 +3,7 @@ Description=Regenerate grub-btrfs.cfg
 
 [Service]
 Type=simple
+LogLevelMax=notice
 # Set the possible paths for `grub-mkconfig`
 Environment="PATH=/sbin:/bin:/usr/sbin:/usr/bin"
 # Load environment variables from the configuration
@@ -14,9 +15,8 @@ EnvironmentFile=/etc/default/grub-btrfs/config
 # -t, --timeshift-auto  Automatically detect Timeshifts snapshot directory
 # -l, --log-file        Specify a logfile to write to
 # -v, --verbose         Let the log of the daemon be more verbose
-# -s, --syslog          Write to syslog, this usually not needed for systemd systems, because systemd
-# is logging service output to the syslog anyway
-ExecStart=/usr/bin/grub-btrfsd /.snapshots
+# -s, --syslog          Write to syslog
+ExecStart=/usr/bin/grub-btrfsd /.snapshots --syslog
 
 [Install]
 WantedBy=multi-user.target
