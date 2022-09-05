@@ -151,6 +151,24 @@ else
     watchtime=0
 fi
 
+create_grub_menu() {
+    #  create the grub submenu of the whole grub menu, depending on wether the submenu already exists
+    #  and gives feedback if it worked
+    if [ -s "${GRUB_BTRFS_GRUB_DIRNAME:-/boot/grub}/grub-btrfs.cfg" ]; then
+        if /etc/grub.d/41_snapshots-btrfs; then
+			log "Grub submenu recreated" "${GREEN}"
+        else
+			err "[!] Error during grub submenu creation (grub-btrfs error)" "${RED}"
+        fi
+    else
+        if ${GRUB_BTRFS_MKCONFIG:-grub-mkconfig} -o ${GRUB_BTRFS_GRUB_DIRNAME:-/boot/grub}/grub.cfg; then
+            log "Grub menu recreated" "${GREEN}"
+        else
+            err "[!] Error during grub menu creation (grub/ grub-btrfs error)" "${RED}"
+        fi
+    fi
+}
+
 # start the actual daemon
 vlog "Snapshot dir watchtimeout: $watchtime"
 vlog "Entering infinite while" "${GREEN}"
@@ -158,6 +176,7 @@ while true; do
     runs=false
     if [ ${timeshift_auto} = true ] && ! [ "${timeshift_pid}" -gt 0 ] ; then
         # watch the timeshift folder for a folder that is created when timeshift starts up
+        sleep 1 # for safety so the outer while is not going crazy
         if [ "${timeshift_pid}" -eq -2 ]; then
             log "detected timeshift shutdown"
         fi
@@ -169,11 +188,12 @@ while true; do
         else
             log "Watching /run/timeshift for timeshift to start"
             inotifywait ${inotify_qiet_flag} -e create -e delete /run/timeshift && {
-                sleep 3
+                sleep 1
                 timeshift_pid=$(ps ax | awk '{sub(/.*\//, "", $5)} $5 ~ /timeshift/ {print $1}')
                 snapshots="/run/timeshift/${timeshift_pid}/backup/timeshift-btrfs/snapshots"
                 log "detected Timeshift startup, PID is: $timeshift_pid" "${CYAN}"
                 vlog "new snapshots directory is $snapshots" "${CYAN}"
+                (create_grub_menu) # create the grub menu once immidiatly in a forking process. Snapshots from commandline using timeshift --create need this
             }
         fi
         runs=false
@@ -189,25 +209,15 @@ while true; do
             inotifywait ${inotify_qiet_flag}  -e create -e delete -e unmount -t "$watchtime" "$snapshots" && {
                 log "Detected snapshot creation/ deletion, recreating Grub menu" "${CYAN}"
                 sleep 5
-                if [ -s "${GRUB_BTRFS_GRUB_DIRNAME:-/boot/grub}/grub-btrfs.cfg" ]; then
-                    if /etc/grub.d/41_snapshots-btrfs; then
-						log "Grub submenu recreated" "${GREEN}"
-                    else
-						err "[!] Error during grub submenu creation (grub-btrfs error)" "${RED}"
-                    fi
-                else
-                    if ${GRUB_BTRFS_MKCONFIG:-grub-mkconfig} -o ${GRUB_BTRFS_GRUB_DIRNAME:-/boot/grub}/grub.cfg; then
-                        log "Grub menu recreated" "${GREEN}"
-                    else
-                        err "[!] Error during grub menu creation (grub/ grub-btrfs error)" "${RED}"
-                    fi
-                fi
+                create_grub_menu
             }
             sleep 1
         done
         timeshift_pid=-2
     fi
-    sleep 1 # leave this here for safety reasons
+    if ! [ ${timeshift_auto} = true ] && ! [ -d "${snapshots}" ] ; then # in case someone deletes the snapshots folder (in snapper mode) to prevent the while loop from going wild
+        break
+    fi
 done
 
 exit 0 # tradition is tradition
