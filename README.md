@@ -81,9 +81,12 @@ You have the possibility to modify many parameters in `/etc/default/grub-btrfs/c
 For further information see [config file](https://github.com/Antynea/grub-btrfs/blob/master/config) or `man grub-btrfs`
 
 #### Warning:
-by default, `grub-mkconfig` command is used.  
-Might be `grub2-mkconfig` on some systems (Fedora ...).   
-Edit `GRUB_BTRFS_MKCONFIG` variable in `/etc/default/grub-btrfs/config` file to reflect this.
+Some file locations and command names differ from distribution to distribution. Initially the configuration is set up to work with Arch and Gentoo (and many other distributions) out of the box, which are using the `grub-mkconfig` command. 
+However, Fedora for example uses a different command, `grub2-mkconfig`.
+Edit `GRUB_BTRFS_MKCONFIG` variable in `/etc/default/grub-btrfs/config` file to reflect this. (e.g. `GRUB_BTRFS_MKCONFIG=/sbin/grub2-mkconfig` for Fedora)
+
+On most distributions and installs, the grub installation resides in `/boot/grub`. If grub is installed in a different place, change the variable `GRUB_BTRFS_MKCONFIG` in the config file accordingly. For Fedora this is `GRUB_BTRFS_GRUB_DIRNAME="/boot/grub2"`. Also the command to check the grub scripts is different on some system, for Fedora it is `GRUB_BTRFS_SCRIPT_CHECK=grub2-script-check`
+
 #### grub-btrfsd daemon
 
 Grub-btrfs comes with a daemon script that automatically updates the grub menu when it sees a snapshot being created or deleted in a directory it is given via command line.
