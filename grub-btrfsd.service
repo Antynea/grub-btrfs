@@ -1,0 +1,22 @@
+[Unit]
+Description=Regenerate grub-btrfs.cfg
+
+[Service]
+Type=simple
+LogLevelMax=notice
+# Set the possible paths for `grub-mkconfig`
+Environment="PATH=/sbin:/bin:/usr/sbin:/usr/bin"
+# Load environment variables from the configuration
+EnvironmentFile=/etc/default/grub-btrfs/config
+# Start the daemon, usage of it is:
+# grub-btrfsd [-h, --help] [-t, --timeshift-auto] [-l, --log-file LOG_FILE] SNAPSHOTS_DIR
+# SNAPSHOTS_DIR         Snapshot directory to watch, without effect when --timeshift-auto
+# Optional arguments:
+# -t, --timeshift-auto  Automatically detect Timeshifts snapshot directory
+# -l, --log-file        Specify a logfile to write to
+# -v, --verbose         Let the log of the daemon be more verbose
+# -s, --syslog          Write to syslog
+ExecStart=/usr/bin/grub-btrfsd --syslog /.snapshots
+
+[Install]
+WantedBy=multi-user.target
