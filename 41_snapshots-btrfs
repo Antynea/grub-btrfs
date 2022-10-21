@@ -47,8 +47,7 @@ grub_btrfs_config="${sysconfdir}/default/grub-btrfs/config"
 if ! type btrfs >/dev/null 2>&1; then exit 0; fi # btrfs-progs isn't installed
 [[ -f "${GRUB_BTRFS_MKCONFIG_LIB:-/usr/share/grub/grub-mkconfig_lib}" ]] && . "${GRUB_BTRFS_MKCONFIG_LIB:-/usr/share/grub/grub-mkconfig_lib}" || exit 0 # grub-mkconfig_lib couldn't be found
 # Root filesystem isn't btrfs
-root_fs=$(${grub_probe} --target="fs" / 2>/dev/null)
-[[ "$root_fs" != "btrfs" ]] && exit 0
+[[ "$(${grub_probe} --target="fs" / 2>/dev/null)" != "btrfs" ]] && exit 0
 
 ## Error Handling
 print_error()
