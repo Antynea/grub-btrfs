@@ -156,7 +156,7 @@ fi
 ## Create entry
 entry()
 {
-echo "$@" >> "$grub_directory/grub-btrfs.new"
+    echo "$@" >> "$grub_directory/grub-btrfs.new"
 }
 
 ## menu entries
@@ -453,6 +453,7 @@ title_format()
             if [[ "${#var}" -lt "${#title_column[${GRUB_BTRFS_TITLE_FORMAT[$key],,}]}" ]]; then # Add extra spaces if length of $var is smaller than the length of column, needed for pretty formatting
                 printf -v var "%-$(((${#title_column[${GRUB_BTRFS_TITLE_FORMAT[$key],,}]}-${#var})+${#var}))s" "${var}";
             fi
+		    var="$(sed  "s/'//g"  <(echo "${var}"))"
             title_menu+="${var}|"
             title_submenu+=" $(trim "${var}") |"
     done
