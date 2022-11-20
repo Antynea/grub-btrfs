@@ -69,7 +69,7 @@ Booting into read-only snapshots is fully supported when choosing "btrfs" as fil
   * (optional for the daemon)[inotify-tools](https://archlinux.org/packages/community/x86_64/inotify-tools/)
 
 - - -
-### Usage
+### 📚 Usage
 After installation the grub main menu needs to be generated to make a menuentry for the snapshots sub menu. Depending on the Linux distribution the commands for that are different:
 * On **Arch Linux** or **Gentoo** use `grub-mkconfig -o /boot/grub/grub.cfg`.  
 * On **Fedora** use `grub2-mkconfig -o /boot/grub2/grub.cfg`  
