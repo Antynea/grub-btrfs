@@ -68,13 +68,16 @@ Booting into read-only snapshots is fully supported when choosing "btrfs" as fil
   * [gawk](https://archlinux.org/packages/core/x86_64/gawk/)
   * (optional for the daemon)[inotify-tools](https://archlinux.org/packages/community/x86_64/inotify-tools/)
 
-#### NOTE: All distros
-Generate your grub menu after installation for the changes to take effect.  
-For example:  
-On **Arch Linux** or **Gentoo** use `grub-mkconfig -o /boot/grub/grub.cfg`.  
-On **Fedora** use `grub2-mkconfig -o /boot/grub2/grub.cfg`  
-On **Debian-like** distribution `update-grub` is an alias to `grub-mkconfig ...`
 - - -
+### Usage
+After installation the grub main menu needs to be generated to make a menuentry for the snapshots sub menu. Depending on the Linux distribution the commands for that are different:
+* On **Arch Linux** or **Gentoo** use `grub-mkconfig -o /boot/grub/grub.cfg`.  
+* On **Fedora** use `grub2-mkconfig -o /boot/grub2/grub.cfg`  
+* On **Debian-like** distribution `update-grub` is an alias to `grub-mkconfig ...`
+
+Once the entry for the sub menu was generated grub-btrfs puts the actual sub menu into the file grub-btrfs.cfg. So to generate snapshot entries in the sub menu it is usually enough to run only the script with `sudo /etc/grub.d/41_snapshots-btrfs`.
+Read further below on how to automate this process. 
+
 ### ⚙️ Customization:
 
 You have the possibility to modify many parameters in `/etc/default/grub-btrfs/config`.  
