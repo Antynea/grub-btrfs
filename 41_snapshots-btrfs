@@ -51,6 +51,27 @@ print_error()
     exit 0
 }
 
+# parse arguments
+while getopts :V-: opt; do
+    case "$opt" in
+        -)
+            case "${OPTARG}" in
+                version)
+                    printf "Version %s\n" "${GRUB_BTRFS_VERSION}" >&2 ;
+                    exit 0
+                    ;;
+            esac;;
+        V)
+            printf "Version %s\n" "${GRUB_BTRFS_VERSION}" >&2 ;
+            exit 0
+            ;;
+        *)
+            printf "Unknown flag, exiting...\n"
+            exit 0
+            ;;
+    esac
+done
+
 ## Exit the script, if:
 [[ "${GRUB_BTRFS_DISABLE,,}" == "true" ]] && print_error "GRUB_BTRFS_DISABLE is set to true (default=false)"
 if ! type btrfs >/dev/null 2>&1; then print_error "btrfs-progs isn't installed"; fi

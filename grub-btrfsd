@@ -18,6 +18,12 @@ RED=$'\033[0;31m'
 CYAN=$'\033[;36m'
 RESET=$'\033[0m'
 
+sysconfdir="/etc"
+grub_btrfs_config="${sysconfdir}/default/grub-btrfs/config"
+# source config file
+[[ -f "$grub_btrfs_config" ]] && . "$grub_btrfs_config"
+[[ -f "${sysconfdir}/default/grub" ]] && . "${sysconfdir}/default/grub"
+
 print_help() {
             echo "${CYAN}[?] Usage:"
             echo "${0##*/} [-h, --help] [-t, --timeshift-auto] [-l, --log-file LOG_FILE] [-v, --verbose] [-s, --syslog] SNAPSHOTS_DIR"
@@ -29,7 +35,9 @@ print_help() {
             echo "-l, --log-file        Specify a logfile to write to"
             echo "-v, --verbose         Let the log of the daemon be more verbose"
             echo "-s, --syslog          Write to syslog"
-            echo "-h, --help            Display this message${RESET}"
+            echo "-h, --help            Display this message"
+            echo
+            echo "Version ${GRUB_BTRFS_VERSION}${RESET}"
 }
 
 log() {
@@ -80,6 +88,10 @@ while getopts :l:tvsh-: opt; do
                     ;;
                 syslog)
                     syslog=true
+                    ;;
+                help)
+                    print_help
+                    exit 0
                     ;;
                 *)
                     if [ "$OPTERR" = 1 ] && [ "${optspec:0:1}" != ":" ]; then
