@@ -594,7 +594,7 @@ submenu '${submenuname}' ${protection_authorized_users}${unrestricted_access_sub
 }
 EOF
 else
-    print_error "Syntax errors are detected in generated grub-btrfs.cfg file."
+    print_error "Syntax errors were detected in generated ${grub_directory}/grub-btrfs.new file. Old grub-btrfs.cfg (if present) was not replaced."
 fi
 
 # warn when this script is run but there is no entry in grub.cfg
