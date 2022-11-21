@@ -36,6 +36,9 @@
 
 set -e
 
+# increase date every time this script is changed and pushed to github. Remove date for tag/ release.
+VERSION="4.11-20221121"
+
 sysconfdir="/etc"
 grub_btrfs_config="${sysconfdir}/default/grub-btrfs/config"
 
@@ -50,6 +53,27 @@ print_error()
     printf "%s\n" "${err_msg}" "${bug_report}" >&2 ;
     exit 0
 }
+
+# parse arguments
+while getopts :V-: opt; do
+    case "$opt" in
+        -)
+            case "${OPTARG}" in
+                version)
+                    printf "Version %s\n" "${VERSION}" >&2 ;
+                    exit 0
+                    ;;
+            esac;;
+        V)
+            printf "Version %s\n" "${VERSION}" >&2 ;
+            exit 0
+            ;;
+        *)
+            printf "Unknown flag, exiting...\n"
+            exit 0
+            ;;
+    esac
+done
 
 ## Exit the script, if:
 [[ "${GRUB_BTRFS_DISABLE,,}" == "true" ]] && print_error "GRUB_BTRFS_DISABLE is set to true (default=false)"

@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+GRUB_BTRFS_VERSION=4.11-20221121
+
 # Disable grub-btrfs.
 # Default: "false"
 #GRUB_BTRFS_DISABLE="true"

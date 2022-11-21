@@ -29,7 +29,9 @@ print_help() {
             echo "-l, --log-file        Specify a logfile to write to"
             echo "-v, --verbose         Let the log of the daemon be more verbose"
             echo "-s, --syslog          Write to syslog"
-            echo "-h, --help            Display this message${RESET}"
+            echo "-h, --help            Display this message"
+            echo
+            echo "Version ${GRUB_BTRFS_VERSION}${RESET}"
 }
 
 log() {
@@ -80,6 +82,10 @@ while getopts :l:tvsh-: opt; do
                     ;;
                 syslog)
                     syslog=true
+                    ;;
+                help)
+                    print_help
+                    exit 0
                     ;;
                 *)
                     if [ "$OPTERR" = 1 ] && [ "${optspec:0:1}" != ":" ]; then
