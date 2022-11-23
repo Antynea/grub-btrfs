@@ -14,7 +14,7 @@ Supports manual snapshots, snapper, timeshift ...
 ##### Warning: booting on read-only snapshots can be tricky
 
 If you choose to do it, `/var/log` or even `/var` must be on a separate subvolume.  
-Otherwise, make sure your snapshots are writeable.  
+Otherwise, make sure your snapshots are writable.  
 See [this ticket](https://github.com/Antynea/grub-btrfs/issues/92) for more info.
 
 This project includes its own solution.  
@@ -24,10 +24,10 @@ Refer to the [documentation](https://github.com/Antynea/grub-btrfs/blob/master/i
 ### ✨ What features does grub-btrfs have?
 * Automatically list snapshots existing on root partition (btrfs).
 * Automatically detect if `/boot` is in separate partition.
-* Automatically detect kernel, initramfs and intel/amd microcode in `/boot` directory on snapshots.
+* Automatically detect kernel, initramfs and Intel/AMD microcode in `/boot` directory on snapshots.
 * Automatically create corresponding "menuentry" in `grub.cfg`
-* Automatically detect the type/tags and descriptions/comments of snapper/timeshift snapshots.
-* Automatically generate `grub.cfg` if you use the provided systemd/ openRC service.
+* Automatically detect the type/tags and descriptions/comments of Snapper/Timeshift snapshots.
+* Automatically generate `grub.cfg` if you use the provided Systemd/ OpenRC service.
 
 - - -
 ### 🛠️ Installation:
@@ -46,7 +46,7 @@ eselect repository enable guru
 emaint sync -r guru 
 ```
 If you are using Systemd on Gentoo, make sure the USE-Flag `systemd` is set. (Either globally in make.conf or in package.use for the package app-backup/grub-btrfs)
-Without systemd USE-Flag the OpenRC-daemon of grub-btrfs will be installed.
+Without Systemd USE-Flag the OpenRC-daemon of grub-btrfs will be installed.
 
 Emerge grub-btrfs via 
 `emerge app-backup/grub-btrfs`
@@ -66,7 +66,7 @@ Booting into read-only snapshots is fully supported when choosing "btrfs" as fil
   * [grub](https://archlinux.org/packages/core/x86_64/grub/)
   * [bash >4](https://archlinux.org/packages/core/x86_64/bash/)
   * [gawk](https://archlinux.org/packages/core/x86_64/gawk/)
-  * (optional for the daemon)[inotify-tools](https://archlinux.org/packages/community/x86_64/inotify-tools/)
+  * (only when using the daemon)[inotify-tools](https://archlinux.org/packages/community/x86_64/inotify-tools/)
 
 - - -
 ### 📚 Usage
@@ -90,62 +90,63 @@ Edit `GRUB_BTRFS_MKCONFIG` variable in `/etc/default/grub-btrfs/config` file to 
 
 On most distributions and installs, the grub installation resides in `/boot/grub`. If grub is installed in a different place, change the variable `GRUB_BTRFS_MKCONFIG` in the config file accordingly. For Fedora this is `GRUB_BTRFS_GRUB_DIRNAME="/boot/grub2"`. Also the command to check the grub scripts is different on some system, for Fedora it is `GRUB_BTRFS_SCRIPT_CHECK=grub2-script-check`
 
-#### grub-btrfsd daemon
+#### Customization of the grub-btrfsd daemon
 
 Grub-btrfs comes with a daemon script that automatically updates the grub menu when it sees a snapshot being created or deleted in a directory it is given via command line.
 
-The daemon can be configured by passing different command line arguments to it. This can be change by either running  
+The daemon can be configured by passing different command line arguments to it. 
+
+##### Systemd instructions
+To edit the arguments that are passed to the daemon, use 
 ```bash
 sudo systemctl edit --full grub-btrfsd
 ```
-(when using systemd) or by editing `/etc/conf.d/grub-btrfsd` (when using openRC). In either case the daemon must be restarted for the changes to take effect with
+after that the Daemon must be restarted with
 ```bash
-sudo systemctl restart grub-btrfsd # for systemd
-```
-or
-```
-sudo rc-service grub-btrfsd restart # for openRC
+sudo systemctl restart grub-btrfsd 
 ```
 
-It is also possible to start the daemon without systemd or openRC. If you want to do this, the daemon should be stopped with
+It is also possible to start the daemon without using systemd for troubleshooting purposes for example. If you want to do this, a running daemon should be stopped with
 ```bash
-sudo systemctl stop grub-btrfsd # for systemd
+sudo systemctl stop grub-btrfsd 
 ```
-or
+Then the daemon can be manually run and played around with using the command `/usr/bin/grub-btrfsd`. 
+For additional information on the daemon script and its arguments, run `grub-btrfsd -h` and see `man grub-btrfsd`
+
+##### OpenRC instructions
+To edit the arguments that are passed to the daemon edit the file `/etc/conf.d/grub-btrfsd`.  
+After that restart the daemon with
+```
+sudo rc-service grub-btrfsd restart 
+```
+
+It is also possible to start the daemon without using OpenRC for troubleshooting purposes for example. If you want to do this, a running daemon should be stopped with
 ```bash
-sudo rc-service grub-btrfsd stop # for openRC
+sudo rc-service grub-btrfsd stop 
 ```
-Then the daemon can be manually run and played around with with the command `grub-btrfsd`. 
+Then the daemon can be manually run and played around with using the command `grub-btrfsd`. 
 For additional information on daemon script and its arguments, run `grub-btrfsd -h` and see `man grub-btrfsd`
 
-- - -
+- - - 
 ### 🪀 Automatically update grub upon snapshot
-Grub-btrfs comes with its own daemon, that watches the snapshot directory for you and updates the grub menu automatically every time a snapshot is created or deleted. 
-By default this daemon watches the directory `/.snapshots` for changes (new snapshots or deletion of snapshots) and triggers the grub menu creation if a snapshot is found. 
-Therefore, if Snapper is used with its default directory, the daemon can just be started and nothing needs to be configured. For configuration like Timeshift, or Snapper with a different directory, see further below. 
+Grub-btrfsd is a daemon daemon that watches the snapshot directory for you and updates the grub menu automatically every time a snapshot is created or deleted. 
+By default this daemon watches the directory `/.snapshots` for changes (creation or deletion of snapshots) and triggers the grub menu creation if a snapshot is found. 
+Therefore, if Snapper is used with its default directory, the daemon can just be started and nothing needs to be configured. For other configurations like Timeshift, or Snapper with a different directory, see further below. 
 
-To start it now, run 
+#### SystemD instructions
+To start the daemon run 
 ```bash
-sudo systemctl start grub-btrfsd # for systemd
-```
-or
-```bash
-sudo rc-service grub-btrfsd start # for openRC
+sudo systemctl start grub-btrfsd
 ```
 
 To activate it during system startup, run 
 ```bash
-sudo systemctl enable grub-btrfsd # for systemd
-```
-or
-```bash
-sudo rc-config add grub-btrfsd default # for openRC
+sudo systemctl enable grub-btrfsd
 ```
 
-#### 💼 Snapshots not in `/.snapshots`
+##### 💼 Snapshots not in `/.snapshots`
 NOTE: This works also for Timeshift versions < 22.06, the path to watch would be `/run/timeshift/backup/timeshift-btrfs/snapshots`.
 
-##### Systemd
 By default the daemon is watching the directory `/.snapshots`. If the daemon should watch a different directory, it can be edited with
 ```bash
 sudo systemctl edit --full grub-btrfsd # for systemd
@@ -179,48 +180,16 @@ WantedBy=multi-user.target
 
 When done, the service should be restarted with
 ``` bash
-sudo systemctl restart grub-btrfsd # for systemd
+sudo systemctl restart grub-btrfsd 
 ```
 
-##### OpenRC
-Arguments are passed to grub-btrfsd via the file `/etc/conf.d/grub-btrfsd`. 
-The variable `snapshots` defines, where the daemon will watch for snapshots. 
-
-After editing, the file should looks like this:
-``` bash
-# Copyright 2022 Pascal Jaeger
-# Distributed under the terms of the GNU General Public License v3
-
-## Where to locate the root snapshots
-#snapshots="/.snapshots" # Snapper in the root directory
-#snapshots="/run/timeshift/backup/timeshift-btrfs/snapshots" # Timeshift < v22.06
-snapshots="/path/to/your/snapshot/directory"
-
-## Optional arguments to run with the daemon
-# Possible options are:
-# -t, --timeshift-auto  Automatically detect Timeshifts snapshot directory for timeshift >= 22.06
-# -l, --log-file        Specify a logfile to write to
-# -v, --verbose         Let the log of the daemon be more verbose
-# -s, --syslog          Write to syslog
-# Uncomment the line to activate the option
-optional_args+="--syslog " # write to syslog by default
-#optional_args+="--timeshift-auto "
-#optional_args+="--log-file /var/log/grub-btrfsd.log "
-#optional_args+="--verbose "
-```
-
-After that, the daemon should be restarted with
-``` bash
-sudo rc-service grub-btrfsd restart # for openRC
-```
-
-#### 🌟 Timeshift >= version 22.06
+##### 🌟 Timeshift >= version 22.06
 Newer Timeshift versions create a new directory named after their process ID in `/run/timeshift` every time they are started. The PID is going to be different every time. 
 Therefore the daemon can not simply watch a directory, it watches `/run/timeshift` first, if a directory is created it gets Timeshifts current PID, then watches a directory in that newly created directory from Timeshift. 
 Anyhow, to activate this mode of the daemon, `--timeshift-auto` must be passed to the daemon as a command line argument. 
 
 ##### Systemd
-To pass `--timeshift-auto` to grub-btrfsd, the servicefile of grub-btrfsd can be edited with
+To pass `--timeshift-auto` to grub-btrfsd, the .service-file of grub-btrfsd can be edited with
 ```bash
 sudo systemctl edit --full grub-btrfsd # for systemd
 ```
@@ -269,9 +238,59 @@ sudo systemctl restart grub-btrfsd # for systemd
 
 Note:
 You can view your change with `systemctl cat grub-btrfsd`.
-To revert change use `systemctl revert grub-btrfsd`.
+To revert all the changes use `systemctl revert grub-btrfsd`.
 
-##### OpenRC 
+##### ❇️ Automatically update grub upon restart/boot:
+[Look at this comment](https://github.com/Antynea/grub-btrfs/issues/138#issuecomment-766918328)  
+Currently not implemented
+
+#### OpenRC instructions
+To start the daemon run
+```bash
+sudo rc-service grub-btrfsd start 
+```
+
+To activate it during system startup, run 
+```bash
+sudo rc-config add grub-btrfsd default 
+```
+
+##### 💼 Snapshots not in `/.snapshots`
+NOTE: This works also for Timeshift versions < 22.06, the path to watch would be `/run/timeshift/backup/timeshift-btrfs/snapshots`.
+
+By default the daemon is watching the directory `/.snapshots`. If the daemon should watch a different directory, it can be edited by passing different arguments to it.
+Arguments are passed to grub-btrfsd via the file `/etc/conf.d/grub-btrfsd`. 
+The variable `snapshots` defines, where the daemon will watch for snapshots. 
+
+After editing, the file should look like this:
+``` bash
+# Copyright 2022 Pascal Jaeger
+# Distributed under the terms of the GNU General Public License v3
+
+## Where to locate the root snapshots
+#snapshots="/.snapshots" # Snapper in the root directory
+#snapshots="/run/timeshift/backup/timeshift-btrfs/snapshots" # Timeshift < v22.06
+snapshots="/path/to/your/snapshot/directory"
+
+## Optional arguments to run with the daemon
+# Possible options are:
+# -t, --timeshift-auto  Automatically detect Timeshifts snapshot directory for timeshift >= 22.06
+# -l, --log-file        Specify a logfile to write to
+# -v, --verbose         Let the log of the daemon be more verbose
+# -s, --syslog          Write to syslog
+# Uncomment the line to activate the option
+optional_args+="--syslog " # write to syslog by default
+#optional_args+="--timeshift-auto "
+#optional_args+="--log-file /var/log/grub-btrfsd.log "
+#optional_args+="--verbose "
+```
+
+After that, the daemon should be restarted with
+``` bash
+sudo rc-service grub-btrfsd restart # for openRC
+```
+
+##### 🌟 Timeshift >= version 22.06
 Arguments are passed to grub-btrfsd via the file `/etc/conf.d/grub-btrfsd`. 
 The variable `optional_args` defines, which optional arguments get passed to the daemon. 
 Uncomment `#optional_args+="--timeshift-auto "` to pass the command line option `--timeshift-auto` to it. 
@@ -299,19 +318,12 @@ optional_args+="--timeshift-auto "
 #optional_args+="--verbose "
 ```
 
-
 After that, the daemon should be restarted with
 ``` bash
 sudo rc-service grub-btrfsd restart # for openRC
 ```
 
-----
-### ❇️ Automatically update grub upon restart/boot:
-#### Systemd
-[Look at this comment](https://github.com/Antynea/grub-btrfs/issues/138#issuecomment-766918328)  
-Currently not implemented
-
-#### OpenRC
+##### ❇️ Automatically update grub upon restart/boot:
 If you would like the grub-btrfs menu to automatically update on system restart/ shutdown, just add the following script as `/etc/local.d/grub-btrfs-update.stop`:
 ```bash
 #!/usr/bin/env bash
@@ -327,11 +339,34 @@ depend()
 bash -c 'if [ -s "${GRUB_BTRFS_GRUB_DIRNAME:-/boot/grub}/grub-btrfs.cfg" ]; then /etc/grub.d/41_snapshots-btrfs; else {GRUB_BTRFS_MKCONFIG:-grub-mkconfig} -o {GRUB_BTRFS_GRUB_DIRNAME:-/boot/grub}/grub.cfg; fi' 
 ```
 
-Make your script executable with `chmod a+x /etc/local.d/grub-btrfs-update.stop`.
+Make your script executable with `sudo chmod a+x /etc/local.d/grub-btrfs-update.stop`.
 
-* The extension `.stop` at the end of the filename indicates to locald that this script should be run at shutdown. 
- If you want to run the menu update on startup instead, rename the file to `grub-btrfs-update.start`
-* Works for snapper and timeshift
+* The extension `.stop` at the end of the filename indicates to the locald-daemon that this script should be run at shutdown. 
+ If you want to run the menu update on system startup instead, rename the file to `grub-btrfs-update.start`
+* Works for Snapper and Timeshift
+- - -
+### Troubleshooting
+If there are problems don't hesitate [to file an issue](https://github.com/Antynea/grub-btrfs/issues/new/choose). 
+
+#### Version
+To help the best we would like to know the version of grub-btrfs used. Please run
+``` bash
+sudo /etc/grub.d/41_snapshots-btrfs --version
+```
+or 
+``` bash
+sudo /usr/bin/grub-btrfsd --help
+```
+to get the currently running version of grub-btrfs.
+
+#### Verbose mode of the daemon
+If you have problems with the daemon, you can run it with the `--verbose`-flag. To do so you can run 
+``` bash
+sudo /usr/bin/grub-btrfsd --verbose --timeshift-auto` (for timeshift)
+# or 
+sudo /usr/bin/grub-btrfsd /.snapshots --verbose` (for snapper)
+```
+Or pass `--verbose` to the daemon using the Systemd .service-file or the OpenRC conf.d file respectively. (see Daemon installation instructions how to do that)
 
 - - -
 ### Special thanks for assistance and contributions

@@ -6,7 +6,7 @@
     grub-btrfs - Automatically add btrfs-Snapshots as a Grub submenu
 
 * SYNOPSIS
-/etc/grub.d/41_snapshots-btrfs
+~/etc/grub.d/41_snapshots-btrfs [-V, --version]~
 
 * DESCRIPTION
 Improves grub by adding "btrfs snapshots" to the grub menu.
