@@ -95,6 +95,21 @@ On most distributions and installs, the grub installation resides in `/boot/grub
 Grub-btrfs comes with a daemon script that automatically updates the grub menu when it sees a snapshot being created or deleted in a directory it is given via command line.
 
 The daemon can be configured by passing different command line arguments to it. 
+The arguments are:
+* `SNAPSHOTS_DIR`
+This argument specifies the path where grub-btrfsd looks for newly created snapshots and snapshot deletions. It is usually defined by the program used to make snapshots.
+E.g. for Snapper this would be `/.snapshots`
+* `-c / --no-color`
+Disable colors in output.
+* `-l / --log-file`
+This arguments specifies a file where grub-btrfsd should write log messages.
+* `-s / --syslog`
+* `-t / --timeshift-auto`
+This is a flag to activate the auto detection of the path where Timeshift stores snapshots. Newer versions (>=22.06) of Timeshift mount their snapshots to `/run/timeshift/$PID/backup/timeshift-btrfs`. Where `$PID` is the process ID of the currently running Timeshift session. The PID is changing every time Timeshift is opened. grub-btrfsd can automatically take care of the detection of the correct PID and directory if this flag is set. In this case the argument `SNAPSHOTS_DIR` has no effect.
+* `-v / --verbose`
+Let the log of the daemon be more verbose
+* `-h / --help`
+Displays a short help message.
 
 ##### Systemd instructions
 To edit the arguments that are passed to the daemon, use 

@@ -10,31 +10,36 @@ grub-btrfsd - An OpenRC daemon to automatically update the grub menu with
 when a new btrfs snapshot is created.
 
 * SYNOPSIS
-~grub-btrfsd [-h, --help] [-t, --timeshift-auto] [-l, --log-file LOG_FILE] [-v, --verbose] [-s, --syslog] SNAPSHOTS_DIR~
+~grub-btrfsd [-h, --help] [-c, --no-color] [-l, --log-file LOG_FILE] [-s, --syslog] [-t, --timeshift-auto] [-v, --verbose] SNAPSHOTS_DIR~
 
 * DESCRIPTION
-Grub-btrfs-openrc is a shell script which is meant to be run as a daemon.
-Grub-btrfsd watches a directory where snapshots are created or deleted via inotifywait and runs grub-mkconfig (if grub-mkconfig never ran before since grub-btrfs was installed) or ~/etc/grub.d/41_snapshots-btrfs~ (when grub-mkconfig ran before with grub-btrfs installed) when something in that directory changes.
+Grub-btrfsd is a shell script which is meant to be run as a daemon.
+Grub-btrfsd watches a directory where btrfs-snapshots are created or deleted via inotifywait and runs grub-mkconfig (if grub-mkconfig never ran before since grub-btrfs was installed) or ~/etc/grub.d/41_snapshots-btrfs~ (when grub-mkconfig ran before with grub-btrfs installed) when something in that directory changes.
 
 * OPTIONS
 ** ~SNAPSHOTS_DIR~
 This argument specifies the path where grub-btrfsd looks for newly created snapshots and snapshot deletions. It is usually defined by the program used to make snapshots.
 E.g. for Snapper this would be ~/.snapshots~
 
-** ~-t / --timeshift-auto~
-This is a flag to activate the auto detection of the path where Timeshift stores snapshots. Newer versions (>=22.06) of Timeshift mount their snapshots to ~/run/timeshift/$PID/backup/timeshift-btrfs~. Where ~$PID~ is the process ID of the currently running Timeshift session. The PID is changing every time Timeshift is opened. grub-btrfsd can automatically take care of the detection of the correct PID and directory if this flag is set. In this case the argument ~SNAPSHOTS_DIR~ has no effect.
+** ~-c / --no-color~
+Disable colors in output.
 
 ** ~-l / --log-file~
 This arguments specifies a file where grub-btrfsd should write log messages.
 
-** ~-h / --help~
-Displays a short help message.
+** ~-s / --syslog~
+Write to syslog
+
+** ~-t / --timeshift-auto~
+This is a flag to activate the auto detection of the path where Timeshift stores snapshots. Newer versions (>=22.06) of Timeshift mount their snapshots to ~/run/timeshift/$PID/backup/timeshift-btrfs~. Where ~$PID~ is the process ID of the currently running Timeshift session. The PID is changing every time Timeshift is opened. grub-btrfsd can automatically take care of the detection of the correct PID and directory if this flag is set. In this case the argument ~SNAPSHOTS_DIR~ has no effect.
 
 ** ~-v / --verbose~
 Let the log of the daemon be more verbose
 
-** ~-s / --syslog~
-Write to syslog
+** ~-h / --help~
+Displays a short help message.
+
+
 
 * CONFIGURATION
 The daemon is usually configured via the file ~/etc/conf.d/grub-btrfsd~ on openrc-init systems and ~sudo systemctl edit --full grub-btrfsd~ on systemd systems. In this file the arguments (See OPTIONS), that OpenRC passes to the daemon when it is started, can be configured.

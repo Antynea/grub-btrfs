@@ -12,11 +12,21 @@ timeshift_auto=false
 verbose=false
 syslog=false
 
-# helper functions
-GREEN=$'\033[0;32m'
-RED=$'\033[0;31m'
-CYAN=$'\033[;36m'
-RESET=$'\033[0m'
+setcolors() {
+    if [ "${1}" = true ]; then
+          GREEN=$'\033[0;32m'
+          RED=$'\033[0;31m'
+          CYAN=$'\033[;36m'
+          RESET=$'\033[0m'
+    fi
+    if [ "${1}" = false ]; then
+        GREEN=$'\033[0;0m'
+        RED=$'\033[0;0m'
+        CYAN=$'\033[;0m'
+        RESET=$'\033[0m'
+    fi
+}
+setcolors true # normally we want colors
 
 sysconfdir="/etc"
 grub_btrfs_config="${sysconfdir}/default/grub-btrfs/config"
@@ -26,15 +36,16 @@ grub_btrfs_config="${sysconfdir}/default/grub-btrfs/config"
 
 print_help() {
             echo "${CYAN}[?] Usage:"
-            echo "${0##*/} [-h, --help] [-t, --timeshift-auto] [-l, --log-file LOG_FILE] [-v, --verbose] [-s, --syslog] SNAPSHOTS_DIR"
+            echo "${0##*/} [-h, --help] [-c, --no-color] [-l, --log-file LOG_FILE] [-s, --syslog] [-t, --timeshift-auto] [-v, --verbose] SNAPSHOTS_DIR"
             echo
             echo "SNAPSHOTS_DIR         Snapshot directory to watch, without effect when --timeshift-auto"
             echo
             echo "Optional arguments:"
-            echo "-t, --timeshift-auto  Automatically detect Timeshifts snapshot directory"
+            echo "-c, --no-color        Disable colors in output"
             echo "-l, --log-file        Specify a logfile to write to"
-            echo "-v, --verbose         Let the log of the daemon be more verbose"
             echo "-s, --syslog          Write to syslog"
+            echo "-t, --timeshift-auto  Automatically detect Timeshifts snapshot directory"
+            echo "-v, --verbose         Let the log of the daemon be more verbose"
             echo "-h, --help            Display this message"
             echo
             echo "Version ${GRUB_BTRFS_VERSION}${RESET}"
@@ -73,10 +84,13 @@ err() {
 }
 
 # parse arguments
-while getopts :l:tvsh-: opt; do
+while getopts :l:ctvsh-: opt; do
     case "$opt" in
         -)
             case "${OPTARG}" in
+                no-color)
+                    setcolors false
+                    ;;
                 log-file)
                     logfile="${!OPTIND}"; OPTIND=$(( $OPTIND + 1 ))
                     ;;
@@ -102,6 +116,9 @@ while getopts :l:tvsh-: opt; do
                     exit 1
                     ;;
             esac;;
+        c)
+            setcolors false
+            ;;
         l)
             logfile="${OPTARG}"
             ;;
