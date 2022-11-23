@@ -1,6 +1,8 @@
 [![GitHub release](https://img.shields.io/github/release/Antynea/grub-btrfs.svg)](https://github.com/Antynea/grub-btrfs/releases)
 ![](https://img.shields.io/github/license/Antynea/grub-btrfs.svg)
 
+This is version 4.12 of grub-btrfs. 
+
 ## 💻 grub-btrfs 
 
 ##### BTC donation address: `1Lbvz244WA8xbpHek9W2Y12cakM6rDe5Rt`
