@@ -1,8 +1,6 @@
 [![GitHub release](https://img.shields.io/github/release/Antynea/grub-btrfs.svg)](https://github.com/Antynea/grub-btrfs/releases)
 ![](https://img.shields.io/github/license/Antynea/grub-btrfs.svg)
 
-This is version 4.12 of grub-btrfs. 
-
 ## 💻 grub-btrfs 
 
 ##### BTC donation address: `1Lbvz244WA8xbpHek9W2Y12cakM6rDe5Rt`
@@ -112,7 +110,7 @@ This is a flag to activate the auto detection of the path where Timeshift stores
 Let the log of the daemon be more verbose
 * `-h / --help`
 Displays a short help message.
-
+- - - 
 ##### Systemd instructions
 To edit the arguments that are passed to the daemon, use 
 ```bash
@@ -129,7 +127,7 @@ sudo systemctl stop grub-btrfsd
 ```
 Then the daemon can be manually run and played around with using the command `/usr/bin/grub-btrfsd`. 
 For additional information on the daemon script and its arguments, run `grub-btrfsd -h` and see `man grub-btrfsd`
-
+- - -
 ##### OpenRC instructions
 To edit the arguments that are passed to the daemon edit the file `/etc/conf.d/grub-btrfsd`.  
 After that restart the daemon with
@@ -149,7 +147,7 @@ For additional information on daemon script and its arguments, run `grub-btrfsd 
 Grub-btrfsd is a daemon daemon that watches the snapshot directory for you and updates the grub menu automatically every time a snapshot is created or deleted. 
 By default this daemon watches the directory `/.snapshots` for changes (creation or deletion of snapshots) and triggers the grub menu creation if a snapshot is found. 
 Therefore, if Snapper is used with its default directory, the daemon can just be started and nothing needs to be configured. For other configurations like Timeshift, or Snapper with a different directory, see further below. 
-
+- - - 
 #### SystemD instructions
 To start the daemon run 
 ```bash
@@ -166,7 +164,7 @@ NOTE: This works also for Timeshift versions < 22.06, the path to watch would be
 
 By default the daemon is watching the directory `/.snapshots`. If the daemon should watch a different directory, it can be edited with
 ```bash
-sudo systemctl edit --full grub-btrfsd # for systemd
+sudo systemctl edit --full grub-btrfsd 
 ```
 What should be edited is the `/.snapshots`-part in the line that says `ExecStart=/usr/bin/grub-btrfsd --syslog /.snapshots`. 
 So this is what the file should look afterwards:
@@ -205,10 +203,9 @@ Newer Timeshift versions create a new directory named after their process ID in 
 Therefore the daemon can not simply watch a directory, it watches `/run/timeshift` first, if a directory is created it gets Timeshifts current PID, then watches a directory in that newly created directory from Timeshift. 
 Anyhow, to activate this mode of the daemon, `--timeshift-auto` must be passed to the daemon as a command line argument. 
 
-##### Systemd
 To pass `--timeshift-auto` to grub-btrfsd, the .service-file of grub-btrfsd can be edited with
 ```bash
-sudo systemctl edit --full grub-btrfsd # for systemd
+sudo systemctl edit --full grub-btrfsd 
 ```
 
 The line that says 
@@ -250,7 +247,7 @@ WantedBy=multi-user.target
 
 When done, the service must be restarted with
 ``` bash
-sudo systemctl restart grub-btrfsd # for systemd
+sudo systemctl restart grub-btrfsd 
 ```
 
 Note:
@@ -260,7 +257,7 @@ To revert all the changes use `systemctl revert grub-btrfsd`.
 ##### ❇️ Automatically update grub upon restart/boot:
 [Look at this comment](https://github.com/Antynea/grub-btrfs/issues/138#issuecomment-766918328)  
 Currently not implemented
-
+- - -
 #### OpenRC instructions
 To start the daemon run
 ```bash
@@ -304,7 +301,7 @@ optional_args+="--syslog " # write to syslog by default
 
 After that, the daemon should be restarted with
 ``` bash
-sudo rc-service grub-btrfsd restart # for openRC
+sudo rc-service grub-btrfsd restart 
 ```
 
 ##### 🌟 Timeshift >= version 22.06
@@ -337,7 +334,7 @@ optional_args+="--timeshift-auto "
 
 After that, the daemon should be restarted with
 ``` bash
-sudo rc-service grub-btrfsd restart # for openRC
+sudo rc-service grub-btrfsd restart 
 ```
 
 ##### ❇️ Automatically update grub upon restart/boot:
