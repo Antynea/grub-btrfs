@@ -174,9 +174,7 @@ vlog "Timestift autodetection: $timeshift_auto"
 vlog "Logfile: $logfile"
 
 if ! [ -d "$snapshots" ] && ! [ ${timeshift_auto} = true ]; then
-    err "[!] No directory found at ${snapshots}" "${RED}" >&2
-    err "[!] Please specify a valid snapshot directory" "${RED}" >&2
-    exit 1
+    log "[!] No directory found at ${snapshots}" "${CYAN}" >&2
 fi
 
 if [ ${timeshift_auto} = true ]; then
