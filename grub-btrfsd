@@ -9,6 +9,7 @@ watchtime=0
 logfile=0
 snapshots=-1
 timeshift_auto=false
+timeshift_old=false
 verbose=false
 syslog=false
 
@@ -43,6 +44,7 @@ print_help() {
             echo "Optional arguments:"
             echo "-c, --no-color        Disable colors in output"
             echo "-l, --log-file        Specify a logfile to write to"
+            echo "-o, --timeshift-old   Look for snapshots in directory of Timeshift <v22.06 (still requires --timeshift-auto)"
             echo "-s, --syslog          Write to syslog"
             echo "-t, --timeshift-auto  Automatically detect Timeshifts snapshot directory"
             echo "-v, --verbose         Let the log of the daemon be more verbose"
@@ -97,6 +99,9 @@ while getopts :l:ctvsh-: opt; do
                 timeshift-auto)
                     timeshift_auto=true
                     ;;
+                timeshift-old)
+                    timeshift_old=true
+                    ;;
                 verbose)
                     verbose=true
                     ;;
@@ -124,6 +129,9 @@ while getopts :l:ctvsh-: opt; do
             ;;
         t)
             timeshift_auto=true
+            ;;
+        o)
+            timeshift_old=true
             ;;
         v)
             verbose=true
@@ -168,13 +176,20 @@ else
     inotify_qiet_flag=" -q -q "
 fi
 
+if [ ${timeshift_auto} = false ] && [ ${timeshift_old} = false ]; then
+    err "[!] Flag --timeshift-old requires flags --timeshift-auto" "${RED}" >&2
+    exit 1
+else
+
 vlog "Arguments:"
 vlog "Snapshot directory: $snapshots"
 vlog "Timestift autodetection: $timeshift_auto"
 vlog "Logfile: $logfile"
 
 if ! [ -d "$snapshots" ] && ! [ ${timeshift_auto} = true ]; then
-    log "[!] No directory found at ${snapshots}" "${CYAN}" >&2
+    err "[!] No directory found at ${snapshots}" "${RED}" >&2
+    err "[!] Please specify a valid snapshot directory" "${RED}" >&2
+    exit 1
 fi
 
 if [ ${timeshift_auto} = true ]; then
@@ -202,6 +217,15 @@ create_grub_menu() {
     fi
 }
 
+set_snapshot_dir() {
+    # old timeshift has it's snapshot dir in a different location
+    if [ ${timeshift_old} = true ]; then
+          snapshots="/run/timeshift/backup/timeshift-btrfs/snapshots"
+    else
+          snapshots="/run/timeshift/${timeshift_pid}/backup/timeshift-btrfs/snapshots"
+    fi
+}
+
 # start the actual daemon
 vlog "Snapshot dir watchtimeout: $watchtime"
 vlog "Entering infinite while" "${GREEN}"
@@ -215,7 +239,7 @@ while true; do
         fi
         timeshift_pid=$(ps ax | awk '{sub(/.*\//, "", $5)} $5 ~ /timeshift/ {print $1}')
         if [ "${#timeshift_pid}" -gt 0 ]; then
-            snapshots="/run/timeshift/${timeshift_pid}/backup/timeshift-btrfs/snapshots"
+            set_snapshot_dir
             log "detected running Timeshift at daemon startup, PID is: $timeshift_pid"
             vlog "new snapshots directory is $snapshots"
         else
@@ -223,7 +247,7 @@ while true; do
             inotifywait ${inotify_qiet_flag} -e create -e delete /run/timeshift && {
                 sleep 1
                 timeshift_pid=$(ps ax | awk '{sub(/.*\//, "", $5)} $5 ~ /timeshift/ {print $1}')
-                snapshots="/run/timeshift/${timeshift_pid}/backup/timeshift-btrfs/snapshots"
+                set_snapshot_dir
                 log "detected Timeshift startup, PID is: $timeshift_pid" "${CYAN}"
                 vlog "new snapshots directory is $snapshots" "${CYAN}"
                 (create_grub_menu) # create the grub menu once immidiatly in a forking process. Snapshots from commandline using timeshift --create need this
