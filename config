@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-GRUB_BTRFS_VERSION=4.12-20221123
+GRUB_BTRFS_VERSION=4.12-make-prefix-configurable-2022-11-26T14:14:00+00:00
 
 # Disable grub-btrfs.
 # Default: "false"
@@ -98,6 +98,24 @@ GRUB_BTRFS_IGNORE_PREFIX_PATH=("var/lib/docker" "@var/lib/docker" "@/var/lib/doc
 # Use by "grub-btrfs" to detect the boot partition and the location of kernels/initrafms/microcodes.
 # Default: "/boot"
 #GRUB_BTRFS_BOOT_DIRNAME="/boot"
+
+# Location where grub-btrfs.cfg should be saved.
+# Some distributions (like OpenSuSE) store those file at the snapshot directory
+# instead of boot. Be aware that this direcory must be available for grub during
+# startup of the system.
+# Default: "/boot/grub"
+#GRUB_BTRFS_GBTRFS_DIRNAME="/boot/grub"
+
+# Location of the directory where Grub searches for the grub-btrfs.cfg file.
+# Some distributions (like OpenSuSE) store those file at the snapshot directory
+# instead of boot. Be aware that this direcory must be available for grub during
+# startup of the system.
+# Default: "\${prefix}" # This is a grub variable that resolves to where grub is
+# installed. (like /boot/grub, /boot/efi/grub)
+# NOTE: If variables of grub are used here (like ${prefix}) they need to be escaped
+# with `\` before the `$`
+#GRUB_BTRFS_GBTRFS_SEARCH_DIRNAME="\${prefix}"
+
 
 # Name/path of grub-mkconfig command, use by "grub-btrfs.service"
 # Might be 'grub2-mkconfig' on some systems (Fedora ...)

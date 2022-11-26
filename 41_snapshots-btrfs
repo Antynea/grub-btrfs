@@ -91,6 +91,10 @@ btrfs_subvolume_sort="--sort=${GRUB_BTRFS_SUBVOLUME_SORT:-"-rootid"}"
 grub_directory=${GRUB_BTRFS_GRUB_DIRNAME:-"/boot/grub"}
 ## Customize BOOT directory, where kernels/initrams/microcode is saved.
 boot_directory=${GRUB_BTRFS_BOOT_DIRNAME:-"/boot"}
+## Customize GRUB-BTRFS.cfg directory, where "grub-btrfs.cfg" file is saved
+grub_btrfs_directory=${GRUB_BTRFS_GBTRFS_DIRNAME:-"/boot/grub"}
+## Customize directory where "grub-btrfs.cfg" file is searched for by grub
+grub_btrfs_search_directory=${GRUB_BTRFS_GBTRFS_SEARCH_DIRNAME:-"\${prefix}"}
 ## Password protection management for submenu
 # Protection support for submenu (--unrestricted)
 case "${GRUB_BTRFS_DISABLE_PROTECTION_SUBMENU,,}" in
@@ -177,7 +181,7 @@ fi
 ## Create entry
 entry()
 {
-    echo "$@" >> "$grub_directory/grub-btrfs.new"
+    echo "$@" >> "$grub_btrfs_directory/grub-btrfs.new"
 }
 
 ## menu entries
@@ -494,7 +498,7 @@ header_menu()
             local lenght_title_column_right=$(((${#var}-lenght_title_column_left)+1)) #+1 is necessary for extra "|" character
             header_entry+=$(printf "%${lenght_title_column_left}s%${lenght_title_column_right}s" "${title_column[${GRUB_BTRFS_TITLE_FORMAT[$key],,}]}" "|") # Final "|" is for visuals only
         done
-    sed -i "1imenuentry '|${header_entry}' { echo }" "$grub_directory/grub-btrfs.new" # First "|" is for visuals only
+    sed -i "1imenuentry '|${header_entry}' { echo }" "$grub_btrfs_directory/grub-btrfs.new" # First "|" is for visuals only
 }
 
 ## List of kernels, initramfs and microcode in snapshots
@@ -561,8 +565,8 @@ boot_separate()
     IFS=$oldIFS
 }
 
-rm -f "$grub_directory/grub-btrfs.new"
-> "$grub_directory/grub-btrfs.new" # Create a "grub-btrfs.new" file in "grub_directory"
+rm -f "$grub_btrfs_directory/grub-btrfs.new"
+> "$grub_btrfs_directory/grub-btrfs.new" # Create a "grub-btrfs.new" file in "grub_btrfs_directory"
 # Create mount point then mounting
 [[ ! -d $grub_btrfs_mount_point ]] && mkdir -p "$grub_btrfs_mount_point"
 mount -o ro,subvolid=5 /dev/disk/by-uuid/"$root_uuid" "$grub_btrfs_mount_point/"
@@ -585,16 +589,16 @@ if [[ "${count_limit_snap}" = "0" || -z "${count_limit_snap}" ]]; then
 fi
 # Make a submenu in GRUB (grub.cfg) and move "grub-btrfs.new" to "grub-btrfs.cfg"
 header_menu
-if "${bindir}/${GRUB_BTRFS_SCRIPT_CHECK:-grub-script-check}" "$grub_directory/grub-btrfs.new"; then
-    cat "$grub_directory/grub-btrfs.new" > "$grub_directory/grub-btrfs.cfg"
-    rm -f "$grub_directory/grub-btrfs.new"
+if "${bindir}/${GRUB_BTRFS_SCRIPT_CHECK:-grub-script-check}" "$grub_btrfs_directory/grub-btrfs.new"; then
+    cat "$grub_btrfs_directory/grub-btrfs.new" > "$grub_btrfs_directory/grub-btrfs.cfg"
+    rm -f "$grub_btrfs_directory/grub-btrfs.new"
     cat << EOF
 submenu '${submenuname}' ${protection_authorized_users}${unrestricted_access_submenu}{
-    configfile "\${prefix}/grub-btrfs.cfg"
+    configfile "${grub_btrfs_search_directory}/grub-btrfs.cfg"
 }
 EOF
 else
-    print_error "Syntax errors were detected in generated ${grub_directory}/grub-btrfs.new file. Old grub-btrfs.cfg (if present) was not replaced."
+    print_error "Syntax errors were detected in generated ${grub_btrfs_directory}/grub-btrfs.new file. Old grub-btrfs.cfg (if present) was not replaced."
 fi
 
 # warn when this script is run but there is no entry in grub.cfg

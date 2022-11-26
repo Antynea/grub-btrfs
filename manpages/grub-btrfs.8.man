@@ -48,16 +48,16 @@ Example: \fCGRUB_BTRFS_DISABLE="true"\fP
 The snapshot entries submenu in Grub are added according to this line. It is possible to change to order of the fields.
 .IP \(em 4
 Default: (“date” “snapshot” “type” “description”)
-.PP
--Example: \fCGRUB_BTRFS_TITLE_FORMAT=("date" "snapshot" "type" "description")\fP
+.IP \(em 4
+Example: \fCGRUB_BTRFS_TITLE_FORMAT=("date" "snapshot" "type" "description")\fP
 
 .SS "\fCGRUB_BTRFS_LIMIT\fP"
 .PP
 Maximum number of snapshots in the GRUB snapshots sub menu.
 .IP \(em 4
 Default: “50”
-.PP
--Example: \fCGRUB_BTRFS_LIMIT="50"\fP
+.IP \(em 4
+Example: \fCGRUB_BTRFS_LIMIT="50"\fP
 
 .SS "\fCGRUB_BTRFS_SUBVOLUME_SORT\fP"
 .PP
@@ -69,16 +69,16 @@ See Sorting section in
 “-rootid” means list snapshot by new ones first.
 .IP \(em 4
 Default: “-rootid”
-.PP
--Example: \fCGRUB_BTRFS_SUBVOLUME_SORT="+ogen,\-gen,path,rootid"\fP
+.IP \(em 4
+Example: \fCGRUB_BTRFS_SUBVOLUME_SORT="+ogen,\-gen,path,rootid"\fP
 
 .SS "\fCGRUB_BTRFS_SHOW_SNAPSHOTS_FOUND\fP"
 .PP
 Show snapshots found during run “grub-mkconfig”
 .IP \(em 4
 Default: “true”
-.PP
--Example: \fCGRUB_BTRFS_SHOW_SNAPSHOTS_FOUND="false"\fP
+.IP \(em 4
+Example: \fCGRUB_BTRFS_SHOW_SNAPSHOTS_FOUND="false"\fP
 
 .SS "\fCGRUB_BTRFS_ROOTFLAGS\fP"
 .PP
@@ -89,8 +89,8 @@ takes priority over `fstab` entries.
 NB: Do NOT include “subvol=...” or “subvolid=...” here.
 .IP \(em 4
 Default: “”
-.PP
--Example: \fCGRUB_BTRFS_ROOTFLAGS="space_cache,commit=10,norecovery"\fP
+.IP \(em 4
+Example: \fCGRUB_BTRFS_ROOTFLAGS="space_cache,commit=10,norecovery"\fP
 
 .SS "\fCGRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION\fP"
 .PP
@@ -99,8 +99,8 @@ either located at the system root or on a separate partition or in a subvolume,
 Change to “true” if your boot partition is not detected as separate.
 .IP \(em 4
 Default: “false”
-.PP
--Example: \fCGRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION="true"\fP
+.IP \(em 4
+Example: \fCGRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION="true"\fP
 
 .SS "CUSTOM KERNELS"
 .SS "\fCGRUB_BTRFS_NKERNEL\fP / \fCGRUB_BTRFS_NINIT\fP / \fCGRUB_BTRFS_CUSTOM_MICROCODE\fP"
@@ -109,10 +109,10 @@ By default, “grub-btrfs” automatically detects most existing kernels, initra
 Customs kernel, initramfs and microcodes that are not detected can be added in these variables.
 .IP \(em 4
 Default: (“”)
-.PP
--Example: \fCGRUB_BTRFS_NKERNEL=("kernel\-5.19.4\-custom" "vmlinux\-5.19.4\-custom")\fP
-          \fCGRUB_BTRFS_NINIT=("initramfs\-5.19.4\-custom.img" "initrd\-5.19.4\-custom.img" "otherinit\-5.19.4\-custom.gz")\fP
-          \fCGRUB_BTRFS_CUSTOM_MICROCODE=("custom\-ucode.img" "custom\-uc.img "custom_ucode.cpio")\fP
+.IP \(em 4
+Example: \fCGRUB_BTRFS_NKERNEL=("kernel\-5.19.4\-custom" "vmlinux\-5.19.4\-custom")\fP
+\fCGRUB_BTRFS_NINIT=("initramfs\-5.19.4\-custom.img" "initrd\-5.19.4\-custom.img" "otherinit\-5.19.4\-custom.gz")\fP
+\fCGRUB_BTRFS_CUSTOM_MICROCODE=("custom\-ucode.img" "custom\-uc.img "custom_ucode.cpio")\fP
 
 .SS "SNAPSHOT FILTERING"
 .SS "\fCGRUB_BTRFS_IGNORE_SPECIFIC_PATH\fP"
@@ -122,8 +122,8 @@ Only exact paths are ignored.
 e.g : if `specific path` = @, only `@` snapshot will be ignored.
 .IP \(em 4
 Default: (“@”)
-.PP
--Example: \fCGRUB_BTRFS_IGNORE_SPECIFIC_PATH=("@home")\fP
+.IP \(em 4
+Example: \fCGRUB_BTRFS_IGNORE_SPECIFIC_PATH=("@home")\fP
 
 .SS "\fCGRUB_BTRFS_IGNORE_PREFIX_PATH\fP"
 .PP
@@ -132,8 +132,8 @@ Any path starting with the specified string will be ignored.
 e.g : if `prefix path` = @, all snapshots beginning with “@/...” will be ignored.
 .IP \(em 4
 Default: (“var/lib/docker” “@var/lib/docker” “@/var/lib/docker”)
-.PP
--Example: \fCGRUB_BTRFS_IGNORE_PREFIX_PATH=("var/lib/docker" "@var/lib/docker" "@/var/lib/docker")\fP
+.IP \(em 4
+Example: \fCGRUB_BTRFS_IGNORE_PREFIX_PATH=("var/lib/docker" "@var/lib/docker" "@/var/lib/docker")\fP
 
 .SS "\fCGRUB_BTRFS_IGNORE_SNAPSHOT_TYPE\fP"
 .PP
@@ -144,16 +144,16 @@ For Timeshift:
 Tag = boot, ondemand, hourly, daily, weekly, monthly.
 .IP \(em 4
 Default: (“”)
-.PP
--Example: \fCGRUB_BTRFS_IGNORE_SNAPSHOT_TYPE=("ondemand")\fP
+.IP \(em 4
+Example: \fCGRUB_BTRFS_IGNORE_SNAPSHOT_TYPE=("ondemand")\fP
 
 .SS "\fCGRUB_BTRFS_IGNORE_SNAPSHOT_DESCRIPTION\fP"
 .PP
 Ignore specific description of snapshot during run “grub-mkconfig”.
 .IP \(em 4
 Default: (“”)
-.PP
--Example: \fCGRUB_BTRFS_IGNORE_SNAPSHOT_DESCRIPTION=("timeline")\fP
+.IP \(em 4
+Example: \fCGRUB_BTRFS_IGNORE_SNAPSHOT_DESCRIPTION=("timeline")\fP
 
 .SS "DISTRIBUTION DEPENDENT SETTINGS"
 .SS "\fCGRUB_BTRFS_BOOT_DIRNAME\fP"
@@ -162,8 +162,8 @@ Location of kernels/initramfs/microcode.
 Used by “grub-btrfs” to detect the boot partition and the location of kernels, initramfs and microcodes.
 .IP \(em 4
 Default: “/boot”
-.PP
--Example: \fCGRUB_BTRFS_BOOT_DIRNAME="/"\fP
+.IP \(em 4
+Example: \fCGRUB_BTRFS_BOOT_DIRNAME="/"\fP
 
 .SS "\fCGRUB_BTRFS_GRUB_DIRNAME\fP"
 .PP
@@ -173,8 +173,37 @@ Might be grub2 on some systems.
 For example, on Fedora with EFI : “/boot/efi/EFI/fedora”
 .IP \(em 4
 Default: “/boot/grub”
+.IP \(em 4
+Example: \fCGRUB_BTRFS_GRUB_DIRNAME="/boot/grub2"\fP
+
+.SS "\fCGRUB_BTRFS_GBTRFS_DIRNAME\fP"
 .PP
--Example: \fCGRUB_BTRFS_GRUB_DIRNAME="/boot/grub2"\fP
+Location where grub-btrfs.cfg should be saved.
+Some distributions (like OpenSuSE) store those file at the snapshot directory
+instead of boot. Be aware that this direcory must be available for grub during
+startup of the system.
+.IP \(em 4
+Default: “/boot/grub”
+.IP \(em 4
+Example GRUB\d\s-2BTRFS\s+2\u\d\s-2GBTRFS\s+2\u\d\s-2DIRNAME\s+2\u=“/boot/grub”
+
+.SS "\fCGRUB_BTRFS_GBTRFS_SEARCH_DIRNAME\fP"
+.PP
+Location of the directory where Grub searches for the grub-btrfs.cfg file.
+Some distributions (like OpenSuSE) store those file at the snapshot directory
+instead of boot. Be aware that this direcory must be available for grub during
+startup of the system.
+.IP \(em 4
+Default: “\${prefix}” (This is a grub variable that resolves to where grub is
+.PP
+installed. (like /boot/grub, /boot/efi/grub))
+.IP \(em 4
+NOTE: If variables of grub are used here like ${prefix}, they need to be escaped
+.PP
+with `$\` before the `$`
+.IP \(em 4
+Example: GRUB\d\s-2BTRFS\s+2\u\d\s-2GBTRFS\s+2\u\d\s-2SEARCH\s+2\u\d\s-2DIRNAME\s+2\u=“\${prefix}”
+
 
 .SS "\fCGRUB_BTRFS_MKCONFIG\fP"
 .PP
@@ -184,8 +213,8 @@ Default paths are /sbin:/bin:/usr/sbin:/usr/bin, if your path is missing, report
 You can use the name of the command only or full the path.
 .IP \(em 4
 Default: grub-mkconfig
-.PP
--Example: \fCGRUB_BTRFS_MKCONFIG=/sbin/grub2\-mkconfig\fP
+.IP \(em 4
+Example: \fCGRUB_BTRFS_MKCONFIG=/sbin/grub2\-mkconfig\fP
 
 .SS "\fCGRUB_BTRFS_SCRIPT_CHECK\fP"
 .PP

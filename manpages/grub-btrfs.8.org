@@ -35,12 +35,12 @@ Disable grub-btrfs if true.
 *** ~GRUB_BTRFS_TITLE_FORMAT~
 The snapshot entries submenu in Grub are added according to this line. It is possible to change to order of the fields.
 - Default: ("date" "snapshot" "type" "description")
--Example: ~GRUB_BTRFS_TITLE_FORMAT=("date" "snapshot" "type" "description")~
+- Example: ~GRUB_BTRFS_TITLE_FORMAT=("date" "snapshot" "type" "description")~
 
 *** ~GRUB_BTRFS_LIMIT~
 Maximum number of snapshots in the GRUB snapshots sub menu.
 - Default: "50"
--Example: ~GRUB_BTRFS_LIMIT="50"~
+- Example: ~GRUB_BTRFS_LIMIT="50"~
 
 *** ~GRUB_BTRFS_SUBVOLUME_SORT~
 Sort the found subvolumes by "ogeneration" or "generation" or "path" or "rootid".
@@ -50,12 +50,12 @@ Sort the found subvolumes by "ogeneration" or "generation" or "path" or "rootid"
 #+END_MAN
 "-rootid" means list snapshot by new ones first.
 - Default: "-rootid"
--Example: ~GRUB_BTRFS_SUBVOLUME_SORT="+ogen,-gen,path,rootid"~
+- Example: ~GRUB_BTRFS_SUBVOLUME_SORT="+ogen,-gen,path,rootid"~
 
 *** ~GRUB_BTRFS_SHOW_SNAPSHOTS_FOUND~
 Show snapshots found during run "grub-mkconfig"
 - Default: "true"
--Example: ~GRUB_BTRFS_SHOW_SNAPSHOTS_FOUND="false"~
+- Example: ~GRUB_BTRFS_SHOW_SNAPSHOTS_FOUND="false"~
 
 *** ~GRUB_BTRFS_ROOTFLAGS~
 Comma seperated mount options to be used when booting a snapshot.
@@ -64,14 +64,14 @@ They can be defined here as well as in the "/" line inside the respective snapsh
 takes priority over `fstab` entries.
 NB: Do NOT include "subvol=..." or "subvolid=..." here.
 - Default: ""
--Example: ~GRUB_BTRFS_ROOTFLAGS="space_cache,commit=10,norecovery"~
+- Example: ~GRUB_BTRFS_ROOTFLAGS="space_cache,commit=10,norecovery"~
 
 *** ~GRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION~
 By default "grub-btrfs" automatically detects your boot partition,
 either located at the system root or on a separate partition or in a subvolume,
 Change to "true" if your boot partition is not detected as separate.
 - Default: "false"
--Example: ~GRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION="true"~
+- Example: ~GRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION="true"~
 
 ** CUSTOM KERNELS
 
@@ -79,7 +79,7 @@ Change to "true" if your boot partition is not detected as separate.
 By default, "grub-btrfs" automatically detects most existing kernels, initramfs and microcode.
 Customs kernel, initramfs and microcodes that are not detected can be added in these variables.
 - Default: ("")
--Example: ~GRUB_BTRFS_NKERNEL=("kernel-5.19.4-custom" "vmlinux-5.19.4-custom")~
+- Example: ~GRUB_BTRFS_NKERNEL=("kernel-5.19.4-custom" "vmlinux-5.19.4-custom")~
           ~GRUB_BTRFS_NINIT=("initramfs-5.19.4-custom.img" "initrd-5.19.4-custom.img" "otherinit-5.19.4-custom.gz")~
           ~GRUB_BTRFS_CUSTOM_MICROCODE=("custom-ucode.img" "custom-uc.img "custom_ucode.cpio")~
 
@@ -90,14 +90,14 @@ Ignore specific path during run "grub-mkconfig".
 Only exact paths are ignored.
 e.g : if `specific path` = @, only `@` snapshot will be ignored.
 - Default: ("@")
--Example: ~GRUB_BTRFS_IGNORE_SPECIFIC_PATH=("@home")~
+- Example: ~GRUB_BTRFS_IGNORE_SPECIFIC_PATH=("@home")~
 
 *** ~GRUB_BTRFS_IGNORE_PREFIX_PATH~
 Ignore prefix path during run "grub-mkconfig".
 Any path starting with the specified string will be ignored.
 e.g : if `prefix path` = @, all snapshots beginning with "@/..." will be ignored.
 - Default: ("var/lib/docker" "@var/lib/docker" "@/var/lib/docker")
--Example: ~GRUB_BTRFS_IGNORE_PREFIX_PATH=("var/lib/docker" "@var/lib/docker" "@/var/lib/docker")~
+- Example: ~GRUB_BTRFS_IGNORE_PREFIX_PATH=("var/lib/docker" "@var/lib/docker" "@/var/lib/docker")~
 
 *** ~GRUB_BTRFS_IGNORE_SNAPSHOT_TYPE~
 Ignore specific type/tag of snapshot during run "grub-mkconfig".
@@ -106,12 +106,12 @@ Type = single, pre, post.
 For Timeshift:
 Tag = boot, ondemand, hourly, daily, weekly, monthly.
 - Default: ("")
--Example: ~GRUB_BTRFS_IGNORE_SNAPSHOT_TYPE=("ondemand")~
+- Example: ~GRUB_BTRFS_IGNORE_SNAPSHOT_TYPE=("ondemand")~
 
 *** ~GRUB_BTRFS_IGNORE_SNAPSHOT_DESCRIPTION~
 Ignore specific description of snapshot during run "grub-mkconfig".
 - Default: ("")
--Example: ~GRUB_BTRFS_IGNORE_SNAPSHOT_DESCRIPTION=("timeline")~
+- Example: ~GRUB_BTRFS_IGNORE_SNAPSHOT_DESCRIPTION=("timeline")~
 
 ** DISTRIBUTION DEPENDENT SETTINGS
 
@@ -119,7 +119,7 @@ Ignore specific description of snapshot during run "grub-mkconfig".
 Location of kernels/initramfs/microcode.
 Used by "grub-btrfs" to detect the boot partition and the location of kernels, initramfs and microcodes.
 - Default: "/boot"
--Example: ~GRUB_BTRFS_BOOT_DIRNAME="/"~
+- Example: ~GRUB_BTRFS_BOOT_DIRNAME="/"~
 
 *** ~GRUB_BTRFS_GRUB_DIRNAME~
 Location of the folder containing the "grub.cfg" file.
@@ -127,7 +127,27 @@ Used by grub-btrfs to save the file "grub-btrfs.cfg".
 Might be grub2 on some systems.
 For example, on Fedora with EFI : "/boot/efi/EFI/fedora"
 - Default: "/boot/grub"
--Example: ~GRUB_BTRFS_GRUB_DIRNAME="/boot/grub2"~
+- Example: ~GRUB_BTRFS_GRUB_DIRNAME="/boot/grub2"~
+
+*** ~GRUB_BTRFS_GBTRFS_DIRNAME~
+ Location where grub-btrfs.cfg should be saved.
+ Some distributions (like OpenSuSE) store those file at the snapshot directory
+ instead of boot. Be aware that this direcory must be available for grub during
+ startup of the system.
+- Default: "/boot/grub"
+- Example GRUB_BTRFS_GBTRFS_DIRNAME="/boot/grub"
+
+*** ~GRUB_BTRFS_GBTRFS_SEARCH_DIRNAME~
+Location of the directory where Grub searches for the grub-btrfs.cfg file.
+Some distributions (like OpenSuSE) store those file at the snapshot directory
+instead of boot. Be aware that this direcory must be available for grub during
+startup of the system.
+- Default: "\${prefix}" (This is a grub variable that resolves to where grub is
+installed. (like /boot/grub, /boot/efi/grub))
+- NOTE: If variables of grub are used here like ${prefix}, they need to be escaped
+with `\` before the `$`
+- Example: GRUB_BTRFS_GBTRFS_SEARCH_DIRNAME="\${prefix}"
+
 
 *** ~GRUB_BTRFS_MKCONFIG~
 Name/path of the command to generate the grub menu, used by "grub-btrfs.service"
@@ -135,7 +155,7 @@ Might be 'grub2-mkconfig' on some systems (e.g. Fedora)
 Default paths are /sbin:/bin:/usr/sbin:/usr/bin, if your path is missing, report it on the upstream project.
 You can use the name of the command only or full the path.
 - Default: grub-mkconfig
--Example: ~GRUB_BTRFS_MKCONFIG=/sbin/grub2-mkconfig~
+- Example: ~GRUB_BTRFS_MKCONFIG=/sbin/grub2-mkconfig~
 
 *** ~GRUB_BTRFS_SCRIPT_CHECK~
 Name of grub-script-check command, used by "grub-btrfs"
