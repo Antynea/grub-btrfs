@@ -32,8 +32,8 @@ setcolors true # normally we want colors
 sysconfdir="/etc"
 grub_btrfs_config="${sysconfdir}/default/grub-btrfs/config"
 # source config file
-[[ -f "$grub_btrfs_config" ]] && . "$grub_btrfs_config"
-[[ -f "${sysconfdir}/default/grub" ]] && . "${sysconfdir}/default/grub"
+[ -f "$grub_btrfs_config" ] && . "$grub_btrfs_config"
+[ -f "${sysconfdir}/default/grub" ] && . "${sysconfdir}/default/grub"
 
 print_help() {
             echo "${CYAN}[?] Usage:"
@@ -44,8 +44,8 @@ print_help() {
             echo "Optional arguments:"
             echo "-c, --no-color        Disable colors in output"
             echo "-l, --log-file        Specify a logfile to write to"
-            echo "-o, --timeshift-old   Look for snapshots in directory of Timeshift <v22.06 (still requires --timeshift-auto)"
             echo "-s, --syslog          Write to syslog"
+            echo "-o, --timeshift-old   Look for snapshots in directory of Timeshift <v22.06 (requires --timeshift-auto)"
             echo "-t, --timeshift-auto  Automatically detect Timeshifts snapshot directory"
             echo "-v, --verbose         Let the log of the daemon be more verbose"
             echo "-h, --help            Display this message"
@@ -177,13 +177,14 @@ else
 fi
 
 if [ ${timeshift_auto} = false ] && [ ${timeshift_old} = false ]; then
-    err "[!] Flag --timeshift-old requires flags --timeshift-auto" "${RED}" >&2
+    err "[!] Flag --timeshift-old requires flag --timeshift-auto" "${RED}" >&2
     exit 1
-else
+fi
 
 vlog "Arguments:"
 vlog "Snapshot directory: $snapshots"
 vlog "Timestift autodetection: $timeshift_auto"
+vlog "Timeshift old: $timeshift_old"
 vlog "Logfile: $logfile"
 
 if ! [ -d "$snapshots" ] && ! [ ${timeshift_auto} = true ]; then
@@ -219,7 +220,7 @@ create_grub_menu() {
 
 set_snapshot_dir() {
     # old timeshift has it's snapshot dir in a different location
-    if [ ${timeshift_old} = true ]; then
+    if [ "${timeshift_old}" = true ]; then
           snapshots="/run/timeshift/backup/timeshift-btrfs/snapshots"
     else
           snapshots="/run/timeshift/${timeshift_pid}/backup/timeshift-btrfs/snapshots"

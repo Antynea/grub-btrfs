@@ -9,7 +9,7 @@ when a new btrfs snapshot is created.
 
 .SH "SYNOPSIS"
 .PP
-\fCgrub\-btrfsd [\-h, \-\-help] [\-c, \-\-no\-color] [\-l, \-\-log\-file LOG_FILE] [\-s, \-\-syslog] [\-t, \-\-timeshift\-auto] [\-v, \-\-verbose] SNAPSHOTS_DIR\fP
+\fCgrub\-btrfsd [\-h, \-\-help] [\-c, \-\-no\-color] [\-l, \-\-log\-file LOG_FILE] [\-s, \-\-syslog] [\-t, \-\-timeshift\-auto] [\-o, \-\-timeshift\-old] [\-v, \-\-verbose] SNAPSHOTS_DIR\fP
 
 .SH "DESCRIPTION"
 .PP
@@ -37,6 +37,10 @@ Write to syslog
 .SS "\fC\-t / \-\-timeshift\-auto\fP"
 .PP
 This is a flag to activate the auto detection of the path where Timeshift stores snapshots. Newer versions (>=22.06) of Timeshift mount their snapshots to \fC/run/timeshift/$PID/backup/timeshift\-btrfs\fP. Where \fC$PID\fP is the process ID of the currently running Timeshift session. The PID is changing every time Timeshift is opened. grub-btrfsd can automatically take care of the detection of the correct PID and directory if this flag is set. In this case the argument \fCSNAPSHOTS_DIR\fP has no effect.
+
+.SS "\fC\-o / \-\-timeshift\-old\fP"
+.PP
+Look for snapshots in \fC/run/timeshift/backup/timeshift\-btrfs\fP instead of \fC/run/timeshift/$PID/backup/timeshift\-btrfs\fP. This is to be used for Timeshift versions <22.06.
 
 .SS "\fC\-v / \-\-verbose\fP"
 .PP
