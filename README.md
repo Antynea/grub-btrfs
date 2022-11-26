@@ -383,6 +383,23 @@ sudo /usr/bin/grub-btrfsd /.snapshots --verbose` (for snapper)
 Or pass `--verbose` to the daemon using the Systemd .service-file or the OpenRC conf.d file respectively. (see Daemon installation instructions how to do that)
 
 - - -
+### Development
+Grub-btrfs uses a rudimentary system of automatic versioning to tell apart different commits. This is helpful when users report problems and it is not immediately clear what version they are using. 
+We therefore have the following script in `.git/hooks/pre-commit`:
+
+``` bash
+#!/bin/sh
+
+echo "Doing pre commit hook with version bump"
+version="$(git describe --tags --abbrev=0)-$(git rev-parse --abbrev-ref HEAD)-$(date -u -Iseconds)"
+echo "New version is ${version}"
+sed -i "s/GRUB_BTRFS_VERSION=.*/GRUB_BTRFS_VERSION=${version}/" config
+git add config
+```
+
+This automatically sets the version in the `config`-file to `[lasttag]-[branch-name]-[current-date-in-UTC]`.
+In order to create a Tag we don't want to have this long version. In this case we set the version manually in `config` and commit with `git commit --no-verify`. This avoids running the hook. 
+
 ### Special thanks for assistance and contributions
 * [Maxim Baz](https://github.com/maximbaz)
 * [Schievel1](https://github.com/Antynea/grub-btrfs/discussions/173#discussioncomment-1438790)
