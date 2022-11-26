@@ -104,6 +104,8 @@ Disable colors in output.
 * `-l / --log-file`
 This arguments specifies a file where grub-btrfsd should write log messages.
 * `-s / --syslog`
+* `-o / --timeshift-old`
+Look for snapshots in `/run/timeshift/backup/timeshift-btrfs` instead of `/run/timeshift/$PID/backup/timeshift-btrfs.` This is to be used for Timeshift versions <22.06.
 * `-t / --timeshift-auto`
 This is a flag to activate the auto detection of the path where Timeshift stores snapshots. Newer versions (>=22.06) of Timeshift mount their snapshots to `/run/timeshift/$PID/backup/timeshift-btrfs`. Where `$PID` is the process ID of the currently running Timeshift session. The PID is changing every time Timeshift is opened. grub-btrfsd can automatically take care of the detection of the correct PID and directory if this flag is set. In this case the argument `SNAPSHOTS_DIR` has no effect.
 * `-v / --verbose`
@@ -160,8 +162,6 @@ sudo systemctl enable grub-btrfsd
 ```
 
 ##### 💼 Snapshots not in `/.snapshots`
-NOTE: This works also for Timeshift versions < 22.06, the path to watch would be `/run/timeshift/backup/timeshift-btrfs/snapshots`.
-
 By default the daemon is watching the directory `/.snapshots`. If the daemon should watch a different directory, it can be edited with
 ```bash
 sudo systemctl edit --full grub-btrfsd 
@@ -184,10 +184,11 @@ EnvironmentFile=/etc/default/grub-btrfs/config
 # SNAPSHOTS_DIR         Snapshot directory to watch, without effect when --timeshift-auto
 # Optional arguments:
 # -t, --timeshift-auto  Automatically detect Timeshifts snapshot directory
+# -o, --timeshift-old   Activate for timeshift versions <22.06
 # -l, --log-file        Specify a logfile to write to
 # -v, --verbose         Let the log of the daemon be more verbose
 # -s, --syslog          Write to syslog
-ExecStart=/usr/bin/grub-btrfsd --syslog /path/to/your/snapshot/directory
+ExecStart=/usr/bin/grub-btrfsd --syslog /.snapshots
 
 [Install]
 WantedBy=multi-user.target
@@ -282,19 +283,20 @@ After editing, the file should look like this:
 # Distributed under the terms of the GNU General Public License v3
 
 ## Where to locate the root snapshots
-#snapshots="/.snapshots" # Snapper in the root directory
+snapshots="/.snapshots" # Snapper in the root directory
 #snapshots="/run/timeshift/backup/timeshift-btrfs/snapshots" # Timeshift < v22.06
-snapshots="/path/to/your/snapshot/directory"
 
 ## Optional arguments to run with the daemon
 # Possible options are:
 # -t, --timeshift-auto  Automatically detect Timeshifts snapshot directory for timeshift >= 22.06
+# -o, --timeshift-old   Activate for timeshift versions <22.06
 # -l, --log-file        Specify a logfile to write to
 # -v, --verbose         Let the log of the daemon be more verbose
 # -s, --syslog          Write to syslog
 # Uncomment the line to activate the option
 optional_args+="--syslog " # write to syslog by default
 #optional_args+="--timeshift-auto "
+#optional_args+="--timeshift-old "
 #optional_args+="--log-file /var/log/grub-btrfsd.log "
 #optional_args+="--verbose "
 ```

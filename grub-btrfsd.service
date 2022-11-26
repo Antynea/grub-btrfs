@@ -13,6 +13,7 @@ EnvironmentFile=/etc/default/grub-btrfs/config
 # SNAPSHOTS_DIR         Snapshot directory to watch, without effect when --timeshift-auto
 # Optional arguments:
 # -t, --timeshift-auto  Automatically detect Timeshifts snapshot directory
+# -o, --timeshift-old   Activate for timeshift versions <22.06
 # -l, --log-file        Specify a logfile to write to
 # -v, --verbose         Let the log of the daemon be more verbose
 # -s, --syslog          Write to syslog
