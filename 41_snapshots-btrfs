@@ -569,7 +569,7 @@ rm -f "$grub_btrfs_directory/grub-btrfs.new"
 > "$grub_btrfs_directory/grub-btrfs.new" # Create a "grub-btrfs.new" file in "grub_btrfs_directory"
 # Create mount point then mounting
 [[ ! -d $grub_btrfs_mount_point ]] && mkdir -p "$grub_btrfs_mount_point"
-mount -o ro,subvolid=5 /dev/disk/by-uuid/"$root_uuid" "$grub_btrfs_mount_point/"
+mount -o ro,subvolid=5 /dev/disk/by-uuid/"$root_uuid" "$grub_btrfs_mount_point/" > /dev/null
 trap "unmount_grub_btrfs_mount_point" EXIT # unmounting mount point on EXIT signal
 count_warning_menuentries=0 # Count menuentries
 count_limit_snap=0 # Count snapshots
