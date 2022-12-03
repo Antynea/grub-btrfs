@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 # Copyright 2022 Pascal Jaeger
 # Distributed under the terms of the GNU General Public License v3
 # Update GRUB when new BTRFS snapshots are created.
