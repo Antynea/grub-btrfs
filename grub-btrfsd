@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 # Copyright 2022 Pascal Jaeger
 # Distributed under the terms of the GNU General Public License v3
 # Update GRUB when new BTRFS snapshots are created.
@@ -158,7 +158,7 @@ shift $(( OPTIND - 1 ))
 snapshots="${1}"
 
 # check if inotify exists, see issue #227
-if ! command -v inotifywait &> /dev/null; then
+if ! command -v inotifywait >/dev/null 2>&1; then
     err "[!] inotifywait was not found, exiting. Is inotify-tools installed?" "${RED}" >&2
     exit 1
 fi
