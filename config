@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-GRUB_BTRFS_VERSION=4.12-improve-config-2022-12-05T20:15:10+00:00
+GRUB_BTRFS_VERSION=4.12-improve-config-2022-12-06T21:56:44+00:00
 
 # Disable grub-btrfs.
 # Default: "false"
@@ -47,6 +47,13 @@ GRUB_BTRFS_VERSION=4.12-improve-config-2022-12-05T20:15:10+00:00
 # If you have one or more custom microcodes, you can add them here.
 # Default: ("")
 #GRUB_BTRFS_CUSTOM_MICROCODE=("custom-ucode.img" "custom-uc.img "custom_ucode.cpio")
+
+# Additonal kernel command line parameters that should be passed to the kernel
+# when booting a snapshot.
+# For dracut based distros this could be useful to pass "rd.live.overlay.overlayfs=1"
+# or "rd.live.overlay.readonly=1" to the Kernel for booting snapshots read only.
+# Default: ""
+#GRUB_BTRFS_SNAPSHOT_KERNEL_PARAMETERS="rd.live.overlay.overlayfs=1"
 
 # Comma seperated mount options to be used when booting a snapshot.
 # They can be defined here as well as in the "/" line inside the respective snapshots'

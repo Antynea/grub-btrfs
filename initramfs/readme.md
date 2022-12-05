@@ -39,7 +39,11 @@ You notice that the name of the `hook` must match the name of the 2 installed fi
 Re-generate your initramfs  
 `mkinitcpio -P` (option -P means, all preset present in `/etc/mkinitcpio.d`)
 
+#### Dracut based distros
+Distributions that use Dracut to make their initramfs (many of the Fedora based Distros) simply have to pass either `rd.live.overlay.readonly=1` (to boot into the snapshot read only) or `rd.live.overlay.overlayfs=1` (to act like a livedisk, that is files can be changed but changes will be lost on the next boot) to their kernel command line in grub. 
+Grub-btrfs provides the variable `GRUB_BTRFS_SNAPSHOT_KERNEL_PARAMETERS` to add any command to the kernel command line. Set it to `GRUB_BTRFS_SNAPSHOT_KERNEL_PARAMETERS="rd.live.overlay.overlayfs=1"` to make snapshots immutable when booted into. 
+After changing this run `sudo /etc/grub.d/41_snapshots-btrfs` to generate a new snapshot-submenu with the parameter added. 
+
 #### Other distribution
-Refer to your distribution's documentation  
-or contribute to this project to add a paragraph.
+Refer to your distribution's documentation or contribute to this project to add a paragraph.
 #

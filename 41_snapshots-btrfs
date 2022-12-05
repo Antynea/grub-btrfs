@@ -121,7 +121,7 @@ boot_hs=$(${grub_probe} --device ${boot_device} --target="hints_string" 2>/dev/n
 boot_fs=$(${grub_probe} --device ${boot_device} --target="fs" 2>/dev/null) # Type filesystem of boot device
 
 ## Parameters passed to the kernel
-kernel_parameters="$GRUB_CMDLINE_LINUX $GRUB_CMDLINE_LINUX_DEFAULT"
+kernel_parameters="$GRUB_CMDLINE_LINUX $GRUB_CMDLINE_LINUX_DEFAULT $GRUB_BTRFS_SNAPSHOT_KERNEL_PARAMETERS"
 ## Mount point location
 grub_btrfs_mount_point=$(mktemp -dt grub-btrfs.XXXXXXXXXX)
 ## Class for theme
