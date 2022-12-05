@@ -92,7 +92,7 @@ grub_directory=${GRUB_BTRFS_GRUB_DIRNAME:-"/boot/grub"}
 ## Customize BOOT directory, where kernels/initrams/microcode is saved.
 boot_directory=${GRUB_BTRFS_BOOT_DIRNAME:-"/boot"}
 ## Customize GRUB-BTRFS.cfg directory, where "grub-btrfs.cfg" file is saved
-grub_btrfs_directory=${GRUB_BTRFS_GBTRFS_DIRNAME:-"/boot/grub"}
+grub_btrfs_directory=${GRUB_BTRFS_GBTRFS_DIRNAME:-${grub_directory}}
 ## Customize directory where "grub-btrfs.cfg" file is searched for by grub
 grub_btrfs_search_directory=${GRUB_BTRFS_GBTRFS_SEARCH_DIRNAME:-"\${prefix}"}
 ## Password protection management for submenu

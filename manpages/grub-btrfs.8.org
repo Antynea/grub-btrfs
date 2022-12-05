@@ -123,7 +123,6 @@ Used by "grub-btrfs" to detect the boot partition and the location of kernels, i
 
 *** ~GRUB_BTRFS_GRUB_DIRNAME~
 Location of the folder containing the "grub.cfg" file.
-Used by grub-btrfs to save the file "grub-btrfs.cfg".
 Might be grub2 on some systems.
 For example, on Fedora with EFI : "/boot/efi/EFI/fedora"
 - Default: "/boot/grub"
@@ -134,8 +133,8 @@ For example, on Fedora with EFI : "/boot/efi/EFI/fedora"
  Some distributions (like OpenSuSE) store those file at the snapshot directory
  instead of boot. Be aware that this direcory must be available for grub during
  startup of the system.
-- Default: "/boot/grub"
-- Example GRUB_BTRFS_GBTRFS_DIRNAME="/boot/grub"
+- Default: $GRUB_BTRFS_GRUB_DIRNAME
+- Example: ~GRUB_BTRFS_GBTRFS_DIRNAME="/.snapshots"~
 
 *** ~GRUB_BTRFS_GBTRFS_SEARCH_DIRNAME~
 Location of the directory where Grub searches for the grub-btrfs.cfg file.
@@ -147,7 +146,6 @@ installed. (like /boot/grub, /boot/efi/grub))
 - NOTE: If variables of grub are used here like ${prefix}, they need to be escaped
 with `\` before the `$`
 - Example: GRUB_BTRFS_GBTRFS_SEARCH_DIRNAME="\${prefix}"
-
 
 *** ~GRUB_BTRFS_MKCONFIG~
 Name/path of the command to generate the grub menu, used by "grub-btrfs.service"

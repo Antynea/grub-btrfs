@@ -1,4 +1,4 @@
-.TH "grub-btrfs" "8"
+.TH "grub-btrfs" "1" 
 
 .SH "NAME"
 .PP
@@ -185,7 +185,7 @@ startup of the system.
 .IP \(em 4
 Default: “/boot/grub”
 .IP \(em 4
-Example GRUB\d\s-2BTRFS\s+2\u\d\s-2GBTRFS\s+2\u\d\s-2DIRNAME\s+2\u=“/boot/grub”
+Example: \fCGRUB_BTRFS_GBTRFS_DIRNAME="/.snapshots"\fP
 
 .SS "\fCGRUB_BTRFS_GBTRFS_SEARCH_DIRNAME\fP"
 .PP
