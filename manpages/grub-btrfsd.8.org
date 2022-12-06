@@ -1,6 +1,6 @@
 #+title: grub-btrfsd
 #+author: Pascal Jaeger
-#+man_class_option: :sectionid 8
+#+MAN_CLASS_OPTIONS: :section-id "8"
 
 * NAME
 grub-btrfsd - An OpenRC daemon to automatically update the grub menu with

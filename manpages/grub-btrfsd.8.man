@@ -1,4 +1,4 @@
-.TH "grub-btrfsd" "8"
+.TH "grub-btrfsd" "8" 
 
 .SH "NAME"
 .PP

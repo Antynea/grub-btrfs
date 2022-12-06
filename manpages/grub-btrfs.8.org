@@ -1,6 +1,6 @@
 #+title: grub-btrfs
 #+author: Pascal Jaeger
-#+man_class_option: :sectionid 8
+#+MAN_CLASS_OPTIONS: :section-id "8"
 
 * NAME
     grub-btrfs - Automatically add btrfs-Snapshots as a Grub submenu
@@ -141,7 +141,7 @@ For example, on Fedora with EFI : "/boot/efi/EFI/fedora"
  Some distributions (like OpenSuSE) store those file at the snapshot directory
  instead of boot. Be aware that this direcory must be available for grub during
  startup of the system.
-- Default: $GRUB_BTRFS_GRUB_DIRNAME
+- Default: ~$GRUB_BTRFS_GRUB_DIRNAME~
 - Example: ~GRUB_BTRFS_GBTRFS_DIRNAME="/.snapshots"~
 
 *** ~GRUB_BTRFS_GBTRFS_SEARCH_DIRNAME~
@@ -153,10 +153,13 @@ startup of the system.
 installed. (like /boot/grub, /boot/efi/grub))
 - NOTE: If variables of grub are used here like ${prefix}, they need to be escaped
 with `\` before the `$`
-- Example: GRUB_BTRFS_GBTRFS_SEARCH_DIRNAME="\${prefix}"
+- Example: ~GRUB_BTRFS_GBTRFS_SEARCH_DIRNAME="\${prefix}"~
 
 *** ~GRUB_BTRFS_MKCONFIG~
-Name/path of the command to generate the grub menu, used by "grub-btrfs.service"
+Name/path of the command to generate the grub menu, used by
+#+BEGIN_MAN
+.BR grub-btrfsd (8)
+#+END_MAN
 Might be 'grub2-mkconfig' on some systems (e.g. Fedora)
 Default paths are /sbin:/bin:/usr/sbin:/usr/bin, if your path is missing, report it on the upstream project.
 You can use the name of the command only or full the path.
@@ -183,7 +186,8 @@ Refer to the Grub documentation https://www.gnu.org/software/grub/manual/grub/gr
 and this comment https://github.com/Antynea/grub-btrfs/issues/95#issuecomment-682295660
 Add authorized usernames separate by comma (userfoo,userbar).
 When Grub's password protection is enabled, the superuser is authorized by default, it is not necessary to add it
-- Default: "- Example: ~GRUB_BTRFS_PROTECTION_AUTHORIZED_USERS="userfoo,userbar"~
+- Default: ""
+- Example: ~GRUB_BTRFS_PROTECTION_AUTHORIZED_USERS="userfoo,userbar"~
 
 *** ~GRUB_BTRFS_DISABLE_PROTECTION_SUBMENU~
 Disable authentication support for submenu of Grub-btrfs only (--unrestricted)
