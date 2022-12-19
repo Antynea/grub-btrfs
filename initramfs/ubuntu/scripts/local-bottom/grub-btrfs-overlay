@@ -1,0 +1,30 @@
+#!/bin/sh -e
+PREREQ=
+prereqs() {
+  echo "$PREREQ"
+}
+case $1 in
+  prereqs)
+    prereqs
+    exit 0
+    ;;
+esac
+
+. /scripts/functions
+on_err() {
+	panic 'script error'
+}
+trap on_err ERR
+if [ "$readonly" = y ]
+then
+	log_begin_msg 'remount read-only root as read-only layer in non-persistent, writable overlay'
+	lower_dir="$(mktemp -d -p /)"
+	ram_dir="$(mktemp -d -p /)"
+	upper_dir="$ram_dir"/upper
+	work_dir="$ram_dir"/work
+	mount --move "$rootmnt" "$lower_dir"
+	mount -t tmpfs cowspace "$ram_dir"
+	mkdir -p "$upper_dir" "$work_dir"
+	mount -t overlay -o lowerdir="$lower_dir",upperdir="$upper_dir",workdir="$work_dir" rootfs "$rootmnt"
+	log_end_msg
+fi

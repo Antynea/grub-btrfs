@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+SCRIPT_DIR="$(cd -P -- "$(dirname -- "$BASH_SOURCE")" && pwd)"
+install {"$SCRIPT_DIR",/etc/initramfs-tools}/hooks/grub-btrfs-overlay
+install {"$SCRIPT_DIR",/etc/initramfs-tools}/scripts/local-bottom/grub-btrfs-overlay
