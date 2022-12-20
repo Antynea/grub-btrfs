@@ -39,6 +39,18 @@ You notice that the name of the `hook` must match the name of the 2 installed fi
 Re-generate your initramfs  
 `mkinitcpio -P` (option -P means, all preset present in `/etc/mkinitcpio.d`)
 
+#### Ubuntu
+1. Install initramfs scripts.
+
+	``` shell
+	sudo ./initramfs/ubuntu/setup
+	```
+2. Re-generate initramfs.
+
+	``` shell
+	sudo update-initramfs -u
+	```
+
 #### Other distribution
 Refer to your distribution's documentation  
 or contribute to this project to add a paragraph.
