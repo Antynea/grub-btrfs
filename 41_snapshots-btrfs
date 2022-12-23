@@ -577,6 +577,16 @@ check_uuid_required
 # Detects if /boot is a separate partition
 [[ "${GRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION,,}" == "true" ]] && printf "Override boot partition detection : enable \n" >&2 && boot_separate;
 if [[ "$root_uuid" != "$boot_uuid" ]] || [[ "$root_uuid_subvolume" != "$boot_uuid_subvolume" ]]; then boot_separate ; else boot_bounded ; fi
+# Make a submenu in GRUB (grub.cfg)
+cat << EOF
+if [ ! -e "\${prefix}/grub-btrfs.cfg" ]; then
+echo ""
+else
+submenu '${submenuname}' ${protection_authorized_users}${unrestricted_access_submenu}{
+    configfile "\${prefix}/grub-btrfs.cfg"
+}
+fi
+EOF
 # Show warn, menuentries exceeds 250 entries
 [[ $count_warning_menuentries -ge 250 ]] && printf "Generated %s total GRUB entries. You might experience issues loading snapshots menu in GRUB.\n" "${count_warning_menuentries}" >&2 ;
 # Show total found snapshots
@@ -587,16 +597,11 @@ fi
 if [[ "${count_limit_snap}" = "0" || -z "${count_limit_snap}" ]]; then
     print_error "No snapshots found."
 fi
-# Make a submenu in GRUB (grub.cfg) and move "grub-btrfs.new" to "grub-btrfs.cfg"
+# Move "grub-btrfs.new" to "grub-btrfs.cfg"
 header_menu
 if "${bindir}/${GRUB_BTRFS_SCRIPT_CHECK:-grub-script-check}" "$grub_btrfs_directory/grub-btrfs.new"; then
     cat "$grub_btrfs_directory/grub-btrfs.new" > "$grub_btrfs_directory/grub-btrfs.cfg"
     rm -f "$grub_btrfs_directory/grub-btrfs.new"
-    cat << EOF
-submenu '${submenuname}' ${protection_authorized_users}${unrestricted_access_submenu}{
-    configfile "${grub_btrfs_search_directory}/grub-btrfs.cfg"
-}
-EOF
 else
     print_error "Syntax errors were detected in generated ${grub_btrfs_directory}/grub-btrfs.new file. Old grub-btrfs.cfg (if present) was not replaced."
 fi
