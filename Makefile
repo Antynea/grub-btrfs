@@ -12,6 +12,8 @@ MAN_DIR = $(SHARE_DIR)/man
 
 TEMP_DIR = ./temp
 
+BOOT_DIR = /boot/grub
+
 .PHONY: install uninstall clean help
 
 install:
@@ -63,8 +65,9 @@ install:
 	@install -Dm644 -t "$(SHARE_DIR)/doc/$(PKGNAME)/" README.md
 	@install -Dm644 "initramfs/readme.md" "$(SHARE_DIR)/doc/$(PKGNAME)/initramfs-overlayfs.md"
 	@rm -rf "${TEMP_DIR}"
-	@if command -v grub-mkconfig; then \
-		grub-mkconfig -o /boot/grub/grub.cfg; \
+	@if command -v grub-mkconfig > /dev/null; then \
+		echo "Updating the GRUB menu..."; \
+		grub-mkconfig -o "$(BOOT_DIR)/grub.cfg"; \
 	 fi
 
 uninstall:
@@ -97,6 +100,10 @@ uninstall:
 	@rmdir --ignore-fail-on-non-empty "$(SHARE_DIR)/doc/$(PKGNAME)/" || :
 	@rmdir --ignore-fail-on-non-empty "$(SHARE_DIR)/licenses/$(PKGNAME)/" || :
 	@rmdir --ignore-fail-on-non-empty "$(DESTDIR)/etc/default/grub-btrfs" || :
+	@if command -v grub-mkconfig > /dev/null; then \
+                echo "Updating the GRUB menu..."; \
+                grub-mkconfig -o "$(BOOT_DIR)/grub.cfg"; \
+         fi
 
 clean:
 	@echo "Deleting ./temp"
@@ -115,6 +122,7 @@ help:
 	@echo "  ----------+------+--------------------------------+----------------------------"
 	@echo "  DESTDIR   | path | install destination            | <unset>"
 	@echo "  PREFIX    | path | system tree prefix             | '/usr'"
+	@echo "  BOOT_DIR  | path | boot data location             | '/boot/grub'"
 	@echo "  SHARE_DIR | path | shared data location           | '\$$(DESTDIR)\$$(PREFIX)/share'"
 	@echo "  LIB_DIR   | path | system libraries location      | '\$$(DESTDIR)\$$(PREFIX)/lib'"
 	@echo "  PKGNAME   | name | name of the ditributed package | 'grub-btrfs'"
