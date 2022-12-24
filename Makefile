@@ -63,6 +63,9 @@ install:
 	@install -Dm644 -t "$(SHARE_DIR)/doc/$(PKGNAME)/" README.md
 	@install -Dm644 "initramfs/readme.md" "$(SHARE_DIR)/doc/$(PKGNAME)/initramfs-overlayfs.md"
 	@rm -rf "${TEMP_DIR}"
+	@if command -v grub-mkconfig; then \
+		grub-mkconfig -o /boot/grub/grub.cfg; \
+	 fi
 
 uninstall:
 	@echo "Uninstalling grub-btrfs"
