@@ -203,19 +203,12 @@ fi
 create_grub_menu() {
     #  create the grub submenu of the whole grub menu, depending on wether the submenu already exists
     #  and gives feedback if it worked
-    if [ -s "${GRUB_BTRFS_GRUB_DIRNAME:-/boot/grub}/grub-btrfs.cfg" ]; then
-        if /etc/grub.d/41_snapshots-btrfs; then
+    if [ -x "/etc/grub.d/41_snapshots-btrfs" ]; then
+        /etc/grub.d/41_snapshots-btrfs
 			log "Grub submenu recreated" "${GREEN}"
         else
 			err "[!] Error during grub submenu creation (grub-btrfs error)" "${RED}"
         fi
-    else
-        if ${GRUB_BTRFS_MKCONFIG:-grub-mkconfig} -o ${GRUB_BTRFS_GRUB_DIRNAME:-/boot/grub}/grub.cfg; then
-            log "Grub menu recreated" "${GREEN}"
-        else
-            err "[!] Error during grub menu creation (grub/ grub-btrfs error)" "${RED}"
-        fi
-    fi
 }
 
 set_snapshot_dir() {
