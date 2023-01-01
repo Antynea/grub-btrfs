@@ -565,8 +565,12 @@ boot_separate()
     IFS=$oldIFS
 }
 
-rm -f "$grub_btrfs_directory/grub-btrfs.new" "$grub_btrfs_directory/grub-btrfs.cfg"
+rm -f "$grub_btrfs_directory/grub-btrfs.new"
 > "$grub_btrfs_directory/grub-btrfs.new" # Create a "grub-btrfs.new" file in "grub_btrfs_directory"
+# Create a backup of the "$grub_btrfs_directory/grub-btrfs.cfg" file if exist
+if [ -e "$grub_btrfs_directory/grub-btrfs.cfg" ]; then
+	mv -f "$grub_btrfs_directory/grub-btrfs.cfg" "$grub_btrfs_directory/grub-btrfs.cfg.bkp"
+fi
 # Create mount point then mounting
 [[ ! -d $grub_btrfs_mount_point ]] && mkdir -p "$grub_btrfs_mount_point"
 mount -o ro,subvolid=5 /dev/disk/by-uuid/"$root_uuid" "$grub_btrfs_mount_point/" > /dev/null
@@ -593,17 +597,21 @@ EOF
 if [[ "${GRUB_BTRFS_SHOW_TOTAL_SNAPSHOTS_FOUND:-"true"}" = "true" && -n "${count_limit_snap}" && "${count_limit_snap}" != "0" ]]; then
     printf "Found %s snapshot(s)\n" "${count_limit_snap}" >&2 ;
 fi
-# if no snapshot found, exit
+# if no snapshot found, delete the "$grub_btrfs_directory/grub-btrfs.new" file and the "$grub_btrfs_directory/grub-btrfs.cfg.bkp" file and exit
 if [[ "${count_limit_snap}" = "0" || -z "${count_limit_snap}" ]]; then
+    rm -f "$grub_btrfs_directory/grub-btrfs.new" "$grub_btrfs_directory/grub-btrfs.cfg.bkp"
     print_error "No snapshots found."
 fi
 # Move "grub-btrfs.new" to "grub-btrfs.cfg"
 header_menu
 if "${bindir}/${GRUB_BTRFS_SCRIPT_CHECK:-grub-script-check}" "$grub_btrfs_directory/grub-btrfs.new"; then
     cat "$grub_btrfs_directory/grub-btrfs.new" > "$grub_btrfs_directory/grub-btrfs.cfg"
-    rm -f "$grub_btrfs_directory/grub-btrfs.new"
+    rm -f "$grub_btrfs_directory/grub-btrfs.new" "$grub_btrfs_directory/grub-btrfs.cfg.bkp"
 else
-    print_error "Syntax errors were detected in generated ${grub_btrfs_directory}/grub-btrfs.new file. Old grub-btrfs.cfg (if present) was not replaced."
+if [ -e "$grub_btrfs_directory/grub-btrfs.cfg.bkp" ]; then
+        mv -f "$grub_btrfs_directory/grub-btrfs.cfg.bkp" "$grub_btrfs_directory/grub-btrfs.cfg"
+fi
+	print_error "Syntax errors were detected in generated ${grub_btrfs_directory}/grub-btrfs.new file. The old grub-btrfs.cfg file (if present) have been restored."
 fi
 
 # warn when this script is run but there is no entry in grub.cfg
