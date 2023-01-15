@@ -40,16 +40,11 @@ Re-generate your initramfs
 `mkinitcpio -P` (option -P means, all preset present in `/etc/mkinitcpio.d`)
 
 #### Ubuntu
-1. Install initramfs scripts.
+ Install initramfs scripts & re-generate initramfs.
 
-	``` shell
-	sudo ./initramfs/ubuntu/setup
-	```
-2. Re-generate initramfs.
-
-	``` shell
-	sudo update-initramfs -u
-	```
+``` shell
+sudo initramfs/ubuntu/setup install
+```
 
 #### Other distribution
 Refer to your distribution's documentation  
