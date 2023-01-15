@@ -45,16 +45,11 @@ Grub-btrfs provides the variable `GRUB_BTRFS_SNAPSHOT_KERNEL_PARAMETERS` to add 
 After changing this run `sudo /etc/grub.d/41_snapshots-btrfs` to generate a new snapshot-submenu with the parameter added. 
 
 #### Ubuntu
-1. Install initramfs scripts.
+ Install initramfs scripts & re-generate initramfs.
 
-	``` shell
-	sudo ./initramfs/ubuntu/setup
-	```
-2. Re-generate initramfs.
-
-	``` shell
-	sudo update-initramfs -u
-	```
+``` shell
+sudo initramfs/ubuntu/setup install
+```
 
 #### Other distribution
 Refer to your distribution's documentation or contribute to this project to add a paragraph.
