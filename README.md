@@ -287,18 +287,15 @@ snapshots="/.snapshots" # Snapper in the root directory
 #snapshots="/run/timeshift/backup/timeshift-btrfs/snapshots" # Timeshift < v22.06
 
 ## Optional arguments to run with the daemon
+# Append options to this like this:
+# optional_args="--syslog --timeshift-auto --verbose"
 # Possible options are:
 # -t, --timeshift-auto  Automatically detect Timeshifts snapshot directory for timeshift >= 22.06
-# -o, --timeshift-old   Activate for timeshift versions <22.06
+# -o, --timeshift-old   Look for snapshots in directory of Timeshift <v22.06 (requires --timeshift-auto)
 # -l, --log-file        Specify a logfile to write to
 # -v, --verbose         Let the log of the daemon be more verbose
 # -s, --syslog          Write to syslog
-# Uncomment the line to activate the option
-optional_args+="--syslog " # write to syslog by default
-#optional_args+="--timeshift-auto "
-#optional_args+="--timeshift-old "
-#optional_args+="--log-file /var/log/grub-btrfsd.log "
-#optional_args+="--verbose "
+optional_args="--syslog"
 ```
 
 After that, the daemon should be restarted with
