@@ -86,7 +86,7 @@ uninstall:
 	@rm -f "$(DESTDIR)/etc/conf.d/grub-btrfsd;"
 	@rm -f "$(LIB_DIR)/initcpio/install/grub-btrfs-overlayfs"
 	@rm -f "$(LIB_DIR)/initcpio/hooks/grub-btrfs-overlayfs"
-	@initramfs/ubuntu/setup uninstall
+	@initramfs/ubuntu/setup uninstall || true
 	@rm -f "$(MAN_DIR)/man8/grub-btrfs.8.bz2"
 	@rm -f "$(MAN_DIR)/man8/grub-btrfsd.8.bz2"
 	@# Arch Linux UNlike distros only :
