@@ -92,7 +92,7 @@ grub_directory=${GRUB_BTRFS_GRUB_DIRNAME:-"/boot/grub"}
 ## Customize BOOT directory, where kernels/initrams/microcode is saved.
 boot_directory=${GRUB_BTRFS_BOOT_DIRNAME:-"/boot"}
 ## Customize GRUB-BTRFS.cfg directory, where "grub-btrfs.cfg" file is saved
-grub_btrfs_directory=${GRUB_BTRFS_GBTRFS_DIRNAME:-"/boot/grub"}
+grub_btrfs_directory=${GRUB_BTRFS_GBTRFS_DIRNAME:-${grub_directory}}
 ## Customize directory where "grub-btrfs.cfg" file is searched for by grub
 grub_btrfs_search_directory=${GRUB_BTRFS_GBTRFS_SEARCH_DIRNAME:-"\${prefix}"}
 ## Password protection management for submenu
@@ -121,7 +121,7 @@ boot_hs=$(${grub_probe} --device ${boot_device} --target="hints_string" 2>/dev/n
 boot_fs=$(${grub_probe} --device ${boot_device} --target="fs" 2>/dev/null) # Type filesystem of boot device
 
 ## Parameters passed to the kernel
-kernel_parameters="$GRUB_CMDLINE_LINUX $GRUB_CMDLINE_LINUX_DEFAULT"
+kernel_parameters="$GRUB_CMDLINE_LINUX $GRUB_CMDLINE_LINUX_DEFAULT $GRUB_BTRFS_SNAPSHOT_KERNEL_PARAMETERS"
 ## Mount point location
 grub_btrfs_mount_point=$(mktemp -dt grub-btrfs.XXXXXXXXXX)
 ## Class for theme

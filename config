@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-GRUB_BTRFS_VERSION=4.12-master-2022-12-10T21:20:15+00:00
+
+GRUB_BTRFS_VERSION=4.12-improve-config-2022-12-06T22:10:24+00:00
 
 # Disable grub-btrfs.
 # Default: "false"
@@ -48,6 +49,13 @@ GRUB_BTRFS_VERSION=4.12-master-2022-12-10T21:20:15+00:00
 # Default: ("")
 #GRUB_BTRFS_CUSTOM_MICROCODE=("custom-ucode.img" "custom-uc.img "custom_ucode.cpio")
 
+# Additonal kernel command line parameters that should be passed to the kernel
+# when booting a snapshot.
+# For dracut based distros this could be useful to pass "rd.live.overlay.overlayfs=1"
+# or "rd.live.overlay.readonly=1" to the Kernel for booting snapshots read only.
+# Default: ""
+#GRUB_BTRFS_SNAPSHOT_KERNEL_PARAMETERS="rd.live.overlay.overlayfs=1"
+
 # Comma seperated mount options to be used when booting a snapshot.
 # They can be defined here as well as in the "/" line inside the respective snapshots'
 # "/etc/fstab" files.  Mount options found in both places are combined, and this variable
@@ -88,7 +96,6 @@ GRUB_BTRFS_IGNORE_PREFIX_PATH=("var/lib/docker" "@var/lib/docker" "@/var/lib/doc
 #GRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION="true"
 
 # Location of the folder containing the "grub.cfg" file.
-# Use by grub-btrfs to save the file "grub-btrfs.cfg".
 # Might be grub2 on some systems.
 # For example, on Fedora with EFI : "/boot/efi/EFI/fedora"
 # Default: "/boot/grub"
@@ -100,10 +107,10 @@ GRUB_BTRFS_IGNORE_PREFIX_PATH=("var/lib/docker" "@var/lib/docker" "@/var/lib/doc
 #GRUB_BTRFS_BOOT_DIRNAME="/boot"
 
 # Location where grub-btrfs.cfg should be saved.
-# Some distributions (like OpenSuSE) store those file at the snapshot directory
+# Some distributions (like OpenSuSE) store those files at the snapshot directory
 # instead of boot. Be aware that this direcory must be available for grub during
 # startup of the system.
-# Default: "/boot/grub"
+# Default: $GRUB_BTRFS_GRUB_DIRNAME
 #GRUB_BTRFS_GBTRFS_DIRNAME="/boot/grub"
 
 # Location of the directory where Grub searches for the grub-btrfs.cfg file.
