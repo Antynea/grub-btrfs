@@ -2,6 +2,7 @@ PKGNAME ?= grub-btrfs
 PREFIX ?= /usr
 
 INITCPIO ?= false
+MKINITRAMFS ?= false
 SYSTEMD ?= true
 OPENRC ?= false
 
@@ -59,6 +60,11 @@ install:
 		install -Dm644 "initramfs/Arch Linux/overlay_snap_ro-install" "$(LIB_DIR)/initcpio/install/grub-btrfs-overlayfs"; \
 		install -Dm644 "initramfs/Arch Linux/overlay_snap_ro-hook" "$(LIB_DIR)/initcpio/hooks/grub-btrfs-overlayfs"; \
 	 fi
+	@# Ubuntu like distros only :
+	@if test "$(MKINITRAMFS)" = true; then \
+		echo "Installing mkinitramfs hook"; \
+		initramfs/ubuntu/setup install; \
+	 fi
 	@install -Dm644 -t "$(SHARE_DIR)/licenses/$(PKGNAME)/" LICENSE
 	@install -Dm644 -t "$(SHARE_DIR)/doc/$(PKGNAME)/" README.md
 	@install -Dm644 "initramfs/readme.md" "$(SHARE_DIR)/doc/$(PKGNAME)/initramfs-overlayfs.md"
@@ -80,6 +86,7 @@ uninstall:
 	@rm -f "$(DESTDIR)/etc/conf.d/grub-btrfsd;"
 	@rm -f "$(LIB_DIR)/initcpio/install/grub-btrfs-overlayfs"
 	@rm -f "$(LIB_DIR)/initcpio/hooks/grub-btrfs-overlayfs"
+	@initramfs/ubuntu/setup uninstall || true
 	@rm -f "$(MAN_DIR)/man8/grub-btrfs.8.bz2"
 	@rm -f "$(MAN_DIR)/man8/grub-btrfsd.8.bz2"
 	@# Arch Linux UNlike distros only :
@@ -108,14 +115,15 @@ help:
 	@echo "           uninstall"
 	@echo "           help"
 	@echo
-	@echo "  parameter | type | description                    | defaults"
-	@echo "  ----------+------+--------------------------------+----------------------------"
-	@echo "  DESTDIR   | path | install destination            | <unset>"
-	@echo "  PREFIX    | path | system tree prefix             | '/usr'"
-	@echo "  SHARE_DIR | path | shared data location           | '\$$(DESTDIR)\$$(PREFIX)/share'"
-	@echo "  LIB_DIR   | path | system libraries location      | '\$$(DESTDIR)\$$(PREFIX)/lib'"
-	@echo "  PKGNAME   | name | name of the ditributed package | 'grub-btrfs'"
-	@echo "  INITCPIO  | bool | include mkinitcpio hook        | false"
-	@echo "  SYSTEMD   | bool | include unit files             | true"
-	@echo "  OPENRC    | bool | include OpenRc daemon          | false"
+	@echo "  parameter   | type | description                    | defaults"
+	@echo "  ------------+------+--------------------------------+----------------------------"
+	@echo "  DESTDIR     | path | install destination            | <unset>"
+	@echo "  PREFIX      | path | system tree prefix             | '/usr'"
+	@echo "  SHARE_DIR   | path | shared data location           | '\$$(DESTDIR)\$$(PREFIX)/share'"
+	@echo "  LIB_DIR     | path | system libraries location      | '\$$(DESTDIR)\$$(PREFIX)/lib'"
+	@echo "  PKGNAME     | name | name of the ditributed package | 'grub-btrfs'"
+	@echo "  INITCPIO    | bool | include mkinitcpio hook        | false"
+	@echo "  MKINITRAMFS | bool | include mkinitramfs hook       | false"
+	@echo "  SYSTEMD     | bool | include unit files             | true"
+	@echo "  OPENRC      | bool | include OpenRc daemon          | false"
 	@echo

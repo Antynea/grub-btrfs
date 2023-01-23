@@ -1,0 +1,32 @@
+#!/bin/sh -e
+PREREQ=
+prereqs() {
+	echo "$PREREQ"
+}
+case $1 in
+	prereqs)
+		prereqs
+		exit 0
+		;;
+esac
+
+. /scripts/functions
+on_err() {
+	log_failure_msg 'error setting up overlay'
+}
+trap on_err ERR
+if [ -x /usr/bin/btrfs -a -x /usr/bin/findmnt ] &&
+		 [ "$(findmnt -no FSTYPE -M "$rootmnt")" = btrfs ] &&
+		 [ "$(btrfs property get $rootmnt ro)" != ro=false ]
+then
+	log_begin_msg 'remount read-only subvolume as read-only layer in non-persistent, writable overlay'
+	trap log_end_msg EXIT
+	lower_dir="$(mktemp -dp /)"
+	ram_dir="$(mktemp -dp /)"
+	upper_dir="$ram_dir"/upper
+	work_dir="$ram_dir"/work
+	mount --move "$rootmnt" "$lower_dir"
+	mount -t tmpfs cowspace "$ram_dir"
+	mkdir -p "$upper_dir" "$work_dir"
+	mount -t overlay -o lowerdir="$lower_dir",upperdir="$upper_dir",workdir="$work_dir" rootfs "$rootmnt"
+fi

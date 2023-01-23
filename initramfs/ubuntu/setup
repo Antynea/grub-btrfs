@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+log() {
+	local CODE=$?
+	echo >&2 "$*"
+	return $CODE
+}
+print-help() {
+	log "\
+usage: ${0##*/} [-h] [--] (install|uninstall)
+Install initramfs scripts for Ubuntu.
+
+# Options
+-h	display this help & exit
+
+# Subcommands
+install	install initramfs scripts
+uninstall	remove initramfs scripts"
+}
+usage-error() {
+	print-help
+	exit 2
+}
+action-install() {
+	local SCRIPT_DIR="$(cd -P -- "$(dirname -- "$BASH_SOURCE")" && pwd)"
+	install {"$SCRIPT_DIR",/etc/initramfs-tools}/hooks/grub-btrfs-overlay
+	install {"$SCRIPT_DIR",/etc/initramfs-tools}/scripts/local-bottom/grub-btrfs-overlay
+}
+action-uninstall() {
+	rm -f /etc/initramfs-tools/{hooks,scripts/local-bottom}/grub-btrfs-overlay
+}
+set -e
+while getopts h OPT
+do case "$OPT" in
+	h)
+		print-help
+		exit
+	;;
+	*)
+		usage-error
+esac done
+shift $(( OPTIND - 1 ))
+OPTIND=1
+ACTION=
+case "$#" in
+	0)
+		log event: a subcommand is required
+		usage-error
+		;;
+	1)
+		case "$1" in
+			install|uninstall)
+				ACTION="action-$1"
+				;;
+			*)
+				log "\
+event: unknown subcommand
+subcommand: $1"
+				usage-error
+		esac
+		;;
+	*)
+		log "\
+event: too many arguments
+arguments: $*"
+		usage-error
+esac
+"$ACTION" || log "\
+event: execution failure
+suggestion: rerun with sudo"
+exec update-initramfs -u
