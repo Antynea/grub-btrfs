@@ -5,6 +5,11 @@ INITCPIO ?= false
 SYSTEMD ?= true
 OPENRC ?= false
 
+BOOT_DIR_DEBIAN ?= /boot/grub
+BOOT_DIR_FEDORA ?= /boot/grub2
+
+GRUB_UPDATE_EXCLUDE ?= false
+
 SHARE_DIR = $(DESTDIR)$(PREFIX)/share
 LIB_DIR = $(DESTDIR)$(PREFIX)/lib
 BIN_DIR = $(DESTDIR)$(PREFIX)/bin
@@ -12,8 +17,6 @@ MAN_DIR = $(SHARE_DIR)/man
 
 TEMP_DIR = ./temp
 
-BOOT_DIR_DEBIAN = /boot/grub
-BOOT_DIR_FEDORA = /boot/grub2
 
 .PHONY: install uninstall clean help
 
@@ -66,11 +69,11 @@ install:
 	@install -Dm644 -t "$(SHARE_DIR)/doc/$(PKGNAME)/" README.md
 	@install -Dm644 "initramfs/readme.md" "$(SHARE_DIR)/doc/$(PKGNAME)/initramfs-overlayfs.md"
 	@rm -rf "${TEMP_DIR}"
-	@if command -v grub-mkconfig > /dev/null && [ -e "$(BOOT_DIR_DEBIAN)/grub.cfg" ]; then \
+	@if command -v grub-mkconfig > /dev/null && [ -e "$(BOOT_DIR_DEBIAN)/grub.cfg" ] && test "$(GRUB_UPDATE_EXCLUDE)" = false; then \
 		echo "Updating the GRUB menu..."; \
 		grub-mkconfig -o "$(BOOT_DIR_DEBIAN)/grub.cfg"; \
 	 fi
-	@if command -v grub2-mkconfig > /dev/null && [ -e "$(BOOT_DIR_FEDORA)/grub.cfg" ]; then \
+	@if command -v grub2-mkconfig > /dev/null && [ -e "$(BOOT_DIR_FEDORA)/grub.cfg" ] && test "$(GRUB_UPDATE_EXCLUDE)" = false; then \
 		echo "Updating the GRUB menu..."; \
 		grub2-mkconfig -o "$(BOOT_DIR_FEDORA)/grub.cfg"; \
 	fi
@@ -105,11 +108,11 @@ uninstall:
 	@rmdir --ignore-fail-on-non-empty "$(SHARE_DIR)/doc/$(PKGNAME)/" || :
 	@rmdir --ignore-fail-on-non-empty "$(SHARE_DIR)/licenses/$(PKGNAME)/" || :
 	@rmdir --ignore-fail-on-non-empty "$(DESTDIR)/etc/default/grub-btrfs" || :
-	@if command -v grub-mkconfig > /dev/null && [ -e "$(BOOT_DIR_DEBIAN)/grub.cfg" ]; then \
+	@if command -v grub-mkconfig > /dev/null && [ -e "$(BOOT_DIR_DEBIAN)/grub.cfg" ] && test "$(GRUB_UPDATE_EXCLUDE)" = false; then \
                 echo "Updating the GRUB menu..."; \
                 grub-mkconfig -o "$(BOOT_DIR_DEBIAN)/grub.cfg"; \
          fi
-	@if command -v grub2-mkconfig > /dev/null && [ -e "$(BOOT_DIR_FEDORA)/grub.cfg" ]; then \
+	@if command -v grub2-mkconfig > /dev/null && [ -e "$(BOOT_DIR_FEDORA)/grub.cfg" ] && test "$(GRUB_UPDATE_EXCLUDE)" = false; then \
 		echo "Updating the GRUB menu..."; \
 		grub2-mkconfig -o "$(BOOT_DIR_FEDORA)/grub.cfg"; \
 	fi
@@ -127,16 +130,17 @@ help:
 	@echo "           uninstall"
 	@echo "           help"
 	@echo
-	@echo "  parameter | type | description                    | defaults"
-	@echo "  ----------+------+--------------------------------+----------------------------"
-	@echo "  DESTDIR          | path | install destination                                   | <unset>"
-	@echo "  PREFIX           | path | system tree prefix                                    | '/usr'"
-	@echo "  BOOT_DIR_DEBIAN  | path | boot data location (Debian, Ubuntu, Gentoo, Arch...)  | '/boot/grub'"
-	@echo "  BOOT_DIR_FEDORA  | path | boot data location (Fedora, RHEL, CentOS, Rocky...)   | '/boot/grub2'"
-	@echo "  SHARE_DIR        | path | shared data location                                  | '\$$(DESTDIR)\$$(PREFIX)/share'"
-	@echo "  LIB_DIR          | path | system libraries location                             | '\$$(DESTDIR)\$$(PREFIX)/lib'"
-	@echo "  PKGNAME          | name | name of the ditributed package                        | 'grub-btrfs'"
-	@echo "  INITCPIO         | bool | include mkinitcpio hook                               | false"
-	@echo "  SYSTEMD          | bool | include unit files                                    | true"
-	@echo "  OPENRC           | bool | include OpenRc daemon                                 | false"
+	@echo "  parameter           | type | description                                           | defaults"
+	@echo "  --------------------+------+-------------------------------------------------------+----------------------------"
+	@echo "  DESTDIR             | path | install destination                                   | <unset>"
+	@echo "  PREFIX              | path | system tree prefix                                    | '/usr'"
+	@echo "  BOOT_DIR_DEBIAN     | path | boot data location (Debian, Ubuntu, Gentoo, Arch...)  | '/boot/grub'"
+	@echo "  BOOT_DIR_FEDORA     | path | boot data location (Fedora, RHEL, CentOS, Rocky...)   | '/boot/grub2'"
+	@echo "  SHARE_DIR           | path | shared data location                                  | '\$$(DESTDIR)\$$(PREFIX)/share'"
+	@echo "  LIB_DIR             | path | system libraries location                             | '\$$(DESTDIR)\$$(PREFIX)/lib'"
+	@echo "  PKGNAME             | name | name of the ditributed package                        | 'grub-btrfs'"
+	@echo "  INITCPIO            | bool | include mkinitcpio hook                               | false"
+	@echo "  SYSTEMD             | bool | include unit files                                    | true"
+	@echo "  OPENRC              | bool | include OpenRc daemon                                 | false"
+	@echo "  GRUB_UPDATE_EXCLUDE | bool | Do not update grub after installation                 | false"
 	@echo
