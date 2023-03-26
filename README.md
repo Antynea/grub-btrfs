@@ -96,9 +96,10 @@ Grub-btrfs comes with a daemon script that automatically updates the grub menu w
 
 The daemon can be configured by passing different command line arguments to it. 
 The arguments are:
-* `SNAPSHOTS_DIR`
-This argument specifies the path where grub-btrfsd looks for newly created snapshots and snapshot deletions. It is usually defined by the program used to make snapshots.
-E.g. for Snapper this would be `/.snapshots`
+* `SNAPSHOTS_DIRS`
+This argument specifies the (space separated) paths where grub-btrfsd looks for newly created snapshots and snapshot deletions. It is usually defined by the program used to make snapshots.
+E.g. for Snapper this would be `/.snapshots`. It is possible to define more than one directory here, all directories will inherit the same settings (recursive etc.). 
+This argument is not necessary to provide if `--timeshift-auto` is set. 
 * `-c / --no-color`
 Disable colors in output.
 * `-l / --log-file`
@@ -109,7 +110,7 @@ Watch the snapshots directory recursively
 * `-o / --timeshift-old`
 Look for snapshots in `/run/timeshift/backup/timeshift-btrfs` instead of `/run/timeshift/$PID/backup/timeshift-btrfs.` This is to be used for Timeshift versions <22.06.
 * `-t / --timeshift-auto`
-This is a flag to activate the auto detection of the path where Timeshift stores snapshots. Newer versions (>=22.06) of Timeshift mount their snapshots to `/run/timeshift/$PID/backup/timeshift-btrfs`. Where `$PID` is the process ID of the currently running Timeshift session. The PID is changing every time Timeshift is opened. grub-btrfsd can automatically take care of the detection of the correct PID and directory if this flag is set. In this case the argument `SNAPSHOTS_DIR` has no effect.
+This is a flag to activate the auto detection of the path where Timeshift stores snapshots. Newer versions (>=22.06) of Timeshift mount their snapshots to `/run/timeshift/$PID/backup/timeshift-btrfs`. Where `$PID` is the process ID of the currently running Timeshift session. The PID is changing every time Timeshift is opened. grub-btrfsd can automatically take care of the detection of the correct PID and directory if this flag is set. In this case the argument `SNAPSHOTS_DIRS` has no effect.
 * `-v / --verbose`
 Let the log of the daemon be more verbose
 * `-h / --help`
@@ -182,8 +183,8 @@ Environment="PATH=/sbin:/bin:/usr/sbin:/usr/bin"
 # Load environment variables from the configuration
 EnvironmentFile=/etc/default/grub-btrfs/config
 # Start the daemon, usage of it is:
-# grub-btrfsd [-h, --help] [-t, --timeshift-auto] [-l, --log-file LOG_FILE] SNAPSHOTS_DIR
-# SNAPSHOTS_DIR         Snapshot directory to watch, without effect when --timeshift-auto
+# grub-btrfsd [-h, --help] [-t, --timeshift-auto] [-l, --log-file LOG_FILE] SNAPSHOTS_DIRS
+# SNAPSHOTS_DIRS         Snapshot directories to watch, without effect when --timeshift-auto
 # Optional arguments:
 # -t, --timeshift-auto  Automatically detect Timeshifts snapshot directory
 # -o, --timeshift-old   Activate for timeshift versions <22.06
@@ -235,8 +236,8 @@ Environment="PATH=/sbin:/bin:/usr/sbin:/usr/bin"
 # Load environment variables from the configuration
 EnvironmentFile=/etc/default/grub-btrfs/config
 # Start the daemon, usage of it is:
-# grub-btrfsd [-h, --help] [-t, --timeshift-auto] [-l, --log-file LOG_FILE] SNAPSHOTS_DIR
-# SNAPSHOTS_DIR         Snapshot directory to watch, without effect when --timeshift-auto
+# grub-btrfsd [-h, --help] [-t, --timeshift-auto] [-l, --log-file LOG_FILE] SNAPSHOTS_DIRS
+# SNAPSHOTS_DIRS         Snapshot directories to watch, without effect when --timeshift-auto
 # Optional arguments:
 # -t, --timeshift-auto  Automatically detect Timeshifts snapshot directory
 # -l, --log-file        Specify a logfile to write to

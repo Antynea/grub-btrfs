@@ -1,5 +1,5 @@
 #!/sbin/openrc-run
-# Copyright 2021 Pascal Jaeger
+# Copyright 2023 Pascal Jaeger
 # Distributed under the terms of the GNU General Public License v3
 
 name="grub-btrfs daemon"
