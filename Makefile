@@ -9,6 +9,7 @@ BOOT_DIR_DEBIAN ?= /boot/grub
 BOOT_DIR_FEDORA ?= /boot/grub2
 
 GRUB_UPDATE_EXCLUDE ?= false
+INSTALL_DOCS ?= true
 
 SHARE_DIR = $(DESTDIR)$(PREFIX)/share
 LIB_DIR = $(DESTDIR)$(PREFIX)/lib
@@ -40,11 +41,16 @@ install:
 	@mkdir "${TEMP_DIR}"
 	@chmod 777 ${TEMP_DIR}
 	@cp manpages/grub-btrfs.8.man ${TEMP_DIR}/grub-btrfs.8
-	@bzip2 ${TEMP_DIR}/grub-btrfs.8
-	@install -Dm644 -t "${MAN_DIR}/man8" "${TEMP_DIR}/grub-btrfs.8.bz2"
+	@if test "$(INSTALL_DOCS)" = true; then \
+		echo "Installing manpages..."; \
+		bzip2 ${TEMP_DIR}/grub-btrfs.8; \
+		install -Dm644 -t "${MAN_DIR}/man8" "${TEMP_DIR}/grub-btrfs.8.bz2"; \
+	fi
 	@cp manpages/grub-btrfsd.8.man ${TEMP_DIR}/grub-btrfsd.8
-	@bzip2 ${TEMP_DIR}/grub-btrfsd.8
-	@install -Dm644 -t "${MAN_DIR}/man8" "${TEMP_DIR}/grub-btrfsd.8.bz2";
+	@if test "$(INSTALL_DOCS)" = true; then \
+		bzip2 ${TEMP_DIR}/grub-btrfsd.8; \
+		install -Dm644 -t "${MAN_DIR}/man8" "${TEMP_DIR}/grub-btrfsd.8.bz2"; \
+	fi
 	@install -Dm755 -t "$(DESTDIR)/etc/grub.d/" 41_snapshots-btrfs
 	@install -Dm644 -t "$(DESTDIR)/etc/default/grub-btrfs/" config
 	@install -Dm744 -t "$(BIN_DIR)/" grub-btrfsd;
@@ -65,9 +71,12 @@ install:
 		install -Dm644 "initramfs/Arch Linux/overlay_snap_ro-install" "$(LIB_DIR)/initcpio/install/grub-btrfs-overlayfs"; \
 		install -Dm644 "initramfs/Arch Linux/overlay_snap_ro-hook" "$(LIB_DIR)/initcpio/hooks/grub-btrfs-overlayfs"; \
 	 fi
-	@install -Dm644 -t "$(SHARE_DIR)/licenses/$(PKGNAME)/" LICENSE
-	@install -Dm644 -t "$(SHARE_DIR)/doc/$(PKGNAME)/" README.md
-	@install -Dm644 "initramfs/readme.md" "$(SHARE_DIR)/doc/$(PKGNAME)/initramfs-overlayfs.md"
+	@if test "$(INSTALL_DOCS)" = true; then \
+		echo "Installing docs..."; \
+		install -Dm644 -t "$(SHARE_DIR)/licenses/$(PKGNAME)/" LICENSE; \
+		install -Dm644 -t "$(SHARE_DIR)/doc/$(PKGNAME)/" README.md; \
+		install -Dm644 "initramfs/readme.md" "$(SHARE_DIR)/doc/$(PKGNAME)/initramfs-overlayfs.md"; \
+	fi
 	@rm -rf "${TEMP_DIR}"
 	@if command -v grub-mkconfig > /dev/null && [ -e "$(BOOT_DIR_DEBIAN)/grub.cfg" ] && test "$(GRUB_UPDATE_EXCLUDE)" = false; then \
 		echo "Updating the GRUB menu..."; \
