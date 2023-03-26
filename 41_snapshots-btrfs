@@ -20,14 +20,16 @@
 # - Automatically generate grub.cfg if you use the provided systemd service.
 #
 # Installation:
-# - Refer to https://github.com/Antynea/grub-btrfs#installation-
+# - Refer to https://github.com/Antynea/grub-btrfs#%EF%B8%8F-installation
 #
 # Customization:
 #  You have the possibility to modify many parameters in /etc/default/grub-btrfs/config.
+#  Read more here https://github.com/Antynea/grub-btrfs#installation- an in the manpage
+#  'man grub-btrfs'
 #
 # Automatically update Grub
 #  If you would like grub-btrfs menu to automatically update when a snapshot is created or deleted:
-#  - Refer to https://github.com/Antynea/grub-btrfs#automatically-update-grub.
+#  - Refer to https://github.com/Antynea/grub-btrfs#-automatically-update-grub-upon-snapshot.
 #
 # Special thanks for assistance and contributions:
 # - My friends
