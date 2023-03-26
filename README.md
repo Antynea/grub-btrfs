@@ -103,6 +103,8 @@ E.g. for Snapper this would be `/.snapshots`
 Disable colors in output.
 * `-l / --log-file`
 This arguments specifies a file where grub-btrfsd should write log messages.
+* `-r / --recursive`
+Watch the snapshots directory recursively
 * `-s / --syslog`
 * `-o / --timeshift-old`
 Look for snapshots in `/run/timeshift/backup/timeshift-btrfs` instead of `/run/timeshift/$PID/backup/timeshift-btrfs.` This is to be used for Timeshift versions <22.06.

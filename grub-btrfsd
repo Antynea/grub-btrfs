@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Copyright 2022 Pascal Jaeger
+# Copyright 2023 Pascal Jaeger
 # Distributed under the terms of the GNU General Public License v3
 # Update GRUB when new BTRFS snapshots are created.
 
@@ -12,6 +12,7 @@ timeshift_auto=false
 timeshift_old=false
 verbose=false
 syslog=false
+recursive=false
 
 setcolors() {
     if [ "${1}" = true ]; then
@@ -37,13 +38,14 @@ grub_btrfs_config="${sysconfdir}/default/grub-btrfs/config"
 
 print_help() {
             echo "${CYAN}[?] Usage:"
-            echo "${0##*/} [-h, --help] [-c, --no-color] [-l, --log-file LOG_FILE] [-s, --syslog] [-t, --timeshift-auto] [-v, --verbose] SNAPSHOTS_DIR"
+            echo "${0##*/} [-h, --help] [-c, --no-color] [-l, --log-file LOG_FILE] [-r, --recursive] [-s, --syslog] [-t, --timeshift-auto] [-v, --verbose] SNAPSHOTS_DIR"
             echo
             echo "SNAPSHOTS_DIR         Snapshot directory to watch, without effect when --timeshift-auto"
             echo
             echo "Optional arguments:"
             echo "-c, --no-color        Disable colors in output"
             echo "-l, --log-file        Specify a logfile to write to"
+            echo "-r, --recursive       Watch snapshots directory recursively"
             echo "-s, --syslog          Write to syslog"
             echo "-o, --timeshift-old   Look for snapshots in directory of Timeshift <v22.06 (requires --timeshift-auto)"
             echo "-t, --timeshift-auto  Automatically detect Timeshifts snapshot directory"
@@ -59,7 +61,7 @@ log() {
         logger -p user.notice -t ${0##*/}"["$$"]" "$1"
     fi
     if [ ${#logfile} -gt 1  ]; then
-        echo "$(date) ${1}" >> ${logfile}
+        echo "$(date) ${1}" >> "${logfile}"
     fi
 }
 
@@ -70,7 +72,7 @@ vlog() {
            logger -p user.notice -t ${0##*/} "$1"
        fi
        if [ ${#logfile} -gt 1  ]; then
-        echo "$(date) ${1}" >> ${logfile}
+        echo "$(date) ${1}" >> "${logfile}"
        fi
     fi
 }
@@ -81,12 +83,12 @@ err() {
       logger -p user.error -t ${0##*/} "$1"
   fi
   if [ ${#logfile} -gt 1  ]; then
-      echo "$(date) error: ${1}" >> ${logfile}
+      echo "$(date) error: ${1}" >> "${logfile}"
   fi
 }
 
 # parse arguments
-while getopts :l:ctvsh-: opt; do
+while getopts :l:ctvrsh-: opt; do
     case "$opt" in
         -)
             case "${OPTARG}" in
@@ -104,6 +106,9 @@ while getopts :l:ctvsh-: opt; do
                     ;;
                 verbose)
                     verbose=true
+                    ;;
+                recursive)
+                    recursive=true
                     ;;
                 syslog)
                     syslog=true
@@ -135,6 +140,9 @@ while getopts :l:ctvsh-: opt; do
             ;;
         v)
             verbose=true
+            ;;
+        r)
+            recursive=true
             ;;
         s)
             syslog=true
@@ -176,6 +184,12 @@ else
     inotify_qiet_flag=" -q -q "
 fi
 
+if [ ${recursive} = true ]; then
+    inotify_recursive_flag=" -r "
+else
+    inotify_recursive_flag=""
+fi
+
 if [ ${timeshift_auto} = false ] && [ ${timeshift_old} = true ]; then
     err "[!] Flag --timeshift-old requires flag --timeshift-auto" "${RED}" >&2
     exit 1
@@ -186,6 +200,7 @@ vlog "Snapshot directory: $snapshots"
 vlog "Timestift autodetection: $timeshift_auto"
 vlog "Timeshift old: $timeshift_old"
 vlog "Logfile: $logfile"
+vlog "Recursive: $recursive"
 
 if ! [ -d "$snapshots" ] && ! [ ${timeshift_auto} = true ]; then
     err "[!] No directory found at ${snapshots}" "${RED}" >&2
@@ -210,7 +225,7 @@ create_grub_menu() {
 		err "[!] Error during grub submenu creation (grub-btrfs error)" "${RED}"
         fi
     else
-        if ${GRUB_BTRFS_MKCONFIG:-grub-mkconfig} -o ${GRUB_BTRFS_GRUB_DIRNAME:-/boot/grub}/grub.cfg; then
+        if ${GRUB_BTRFS_MKCONFIG:-grub-mkconfig} -o "${GRUB_BTRFS_GRUB_DIRNAME:-/boot/grub}"/grub.cfg; then
 		log "Grub menu recreated" "${GREEN}"
 	else
 		err "[!] Error during grub menu creation (grub/ grub-btrfs error)" "${RED}"
@@ -264,7 +279,7 @@ while true; do
                 vlog "Watching $snapshots for new snapshots..." "${CYAN}"
             fi
             runs=true
-            inotifywait ${inotify_qiet_flag}  -e create -e delete -e unmount -t "$watchtime" "$snapshots" && {
+            inotifywait ${inotify_qiet_flag} ${inotify_recursive_flag} -e create -e delete -e unmount -t "$watchtime" "$snapshots" && {
                 log "Detected snapshot creation/ deletion, recreating Grub menu" "${CYAN}"
                 sleep 5
                 create_grub_menu

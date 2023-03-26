@@ -10,7 +10,7 @@ grub-btrfsd - An OpenRC daemon to automatically update the grub menu with
 when a new btrfs snapshot is created.
 
 * SYNOPSIS
-~grub-btrfsd [-h, --help] [-c, --no-color] [-l, --log-file LOG_FILE] [-s, --syslog] [-t, --timeshift-auto] [-o, --timeshift-old] [-v, --verbose] SNAPSHOTS_DIR~
+~grub-btrfsd [-h, --help] [-c, --no-color] [-l, --log-file LOG_FILE] [-r, --recursive] [-s, --syslog] [-t, --timeshift-auto] [-o, --timeshift-old] [-v, --verbose] SNAPSHOTS_DIR~
 
 * DESCRIPTION
 Grub-btrfsd is a shell script which is meant to be run as a daemon.
@@ -27,6 +27,9 @@ Disable colors in output.
 ** ~-l / --log-file~
 This arguments specifies a file where grub-btrfsd should write log messages.
 
+** ~-r / --recursive~
+Watch snapshot directory recursively
+
 ** ~-s / --syslog~
 Write to syslog
 
@@ -41,8 +44,6 @@ Let the log of the daemon be more verbose
 
 ** ~-h / --help~
 Displays a short help message.
-
-
 
 * CONFIGURATION
 The daemon is usually configured via the file ~/etc/conf.d/grub-btrfsd~ on openrc-init systems and ~sudo systemctl edit --full grub-btrfsd~ on systemd systems. In this file the arguments (See OPTIONS), that OpenRC passes to the daemon when it is started, can be configured.

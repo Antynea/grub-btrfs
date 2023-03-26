@@ -9,7 +9,7 @@ when a new btrfs snapshot is created.
 
 .SH "SYNOPSIS"
 .PP
-\fCgrub\-btrfsd [\-h, \-\-help] [\-c, \-\-no\-color] [\-l, \-\-log\-file LOG_FILE] [\-s, \-\-syslog] [\-t, \-\-timeshift\-auto] [\-o, \-\-timeshift\-old] [\-v, \-\-verbose] SNAPSHOTS_DIR\fP
+\fCgrub\-btrfsd [\-h, \-\-help] [\-c, \-\-no\-color] [\-l, \-\-log\-file LOG_FILE] [\-r, \-\-recursive] [\-s, \-\-syslog] [\-t, \-\-timeshift\-auto] [\-o, \-\-timeshift\-old] [\-v, \-\-verbose] SNAPSHOTS_DIR\fP
 
 .SH "DESCRIPTION"
 .PP
@@ -30,6 +30,10 @@ Disable colors in output.
 .PP
 This arguments specifies a file where grub-btrfsd should write log messages.
 
+.SS "\fC\-r / \-\-recursive\fP"
+.PP
+Watch snapshot directory recursively
+
 .SS "\fC\-s / \-\-syslog\fP"
 .PP
 Write to syslog
@@ -49,8 +53,6 @@ Let the log of the daemon be more verbose
 .SS "\fC\-h / \-\-help\fP"
 .PP
 Displays a short help message.
-
-
 
 .SH "CONFIGURATION"
 .PP

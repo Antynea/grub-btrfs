@@ -1,15 +1,7 @@
 #!/usr/bin/env bash
 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-GRUB_BTRFS_VERSION=4.12-HEAD-2023-03-26T17:46:23+00:00
-=======
-GRUB_BTRFS_VERSION=4.12-HEAD-2023-03-26T17:46:23+00:00
->>>>>>> 02513bb (grub-btrfs: get bach the grub_btrfs_search_directory functionality)
-=======
-GRUB_BTRFS_VERSION=4.12-HEAD-2023-03-26T17:46:23+00:00
->>>>>>> 4b564c1 (grub-btrfs: update comments)
+GRUB_BTRFS_VERSION=4.12-master-2023-03-26T18:44:50+00:00
 
 # Disable grub-btrfs.
 # Default: "false"
