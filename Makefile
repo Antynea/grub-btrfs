@@ -38,6 +38,7 @@ install:
 	@echo
 	@echo "  For further information visit https://github.com/Antynea/grub-btrfs or read the man page: 'man grub-btrfs'"
 	@echo
+	@rm -rf "${TEMP_DIR}"
 	@mkdir "${TEMP_DIR}"
 	@chmod 777 ${TEMP_DIR}
 	@cp manpages/grub-btrfs.8.man ${TEMP_DIR}/grub-btrfs.8
@@ -77,7 +78,6 @@ install:
 		install -Dm644 -t "$(SHARE_DIR)/doc/$(PKGNAME)/" README.md; \
 		install -Dm644 "initramfs/readme.md" "$(SHARE_DIR)/doc/$(PKGNAME)/initramfs-overlayfs.md"; \
 	fi
-	@rm -rf "${TEMP_DIR}"
 	@if command -v grub-mkconfig > /dev/null && [ -e "$(BOOT_DIR_DEBIAN)/grub.cfg" ] && test "$(GRUB_UPDATE_EXCLUDE)" = false; then \
 		echo "Updating the GRUB menu..."; \
 		grub-mkconfig -o "$(BOOT_DIR_DEBIAN)/grub.cfg"; \
