@@ -130,7 +130,7 @@ CLASS="--class snapshots --class gnu-linux --class gnu --class os"
 oldIFS=$IFS
 ## Detect uuid requirement (lvm,btrfs...)
 check_uuid_required() {
-if [ "x${root_uuid}" = "x" ] || [ "x${GRUB_DISABLE_LINUX_UUID}" = "xtrue" ] \
+if [ "${root_uuid}" = "" ] || [ "${GRUB_DISABLE_LINUX_UUID}" = "true" ] \
     || ! test -e "/dev/disk/by-uuid/${root_uuid}" \
     || ( test -e "${root_device}" && uses_abstraction "${root_device}" lvm ); then
     LINUX_ROOT_DEVICE=${root_device}
@@ -295,7 +295,7 @@ snapshot_list()
     IFS=$'\n'
     for snap in $(btrfs subvolume list -sa "${btrfs_subvolume_sort}" /); do # Parse btrfs snapshots
         IFS=$oldIFS
-        snap=($snap)
+        snap=("${snap}")
         local path_snapshot=${snap[@]:13:${#snap[@]}}
         if [ "$path_snapshot" = "DELETED" ]; then continue; fi # Discard deleted snapshots
         [[ ${path_snapshot%%"/"*} == "<FS_TREE>" ]] && path_snapshot=${path_snapshot#*"/"} # Remove the "<FS_TREE>" string at the beginning of the path
@@ -566,7 +566,7 @@ boot_separate()
 }
 
 rm -f "$grub_btrfs_directory/grub-btrfs.new"
-> "$grub_btrfs_directory/grub-btrfs.new" # Create a "grub-btrfs.new" file in "grub_btrfs_directory"
+true > "$grub_btrfs_directory/grub-btrfs.new" # Create a "grub-btrfs.new" file in "grub_btrfs_directory"
 # Create a backup of the "$grub_btrfs_directory/grub-btrfs.cfg" file if exist
 if [ -e "$grub_btrfs_directory/grub-btrfs.cfg" ]; then
 	mv -f "$grub_btrfs_directory/grub-btrfs.cfg" "$grub_btrfs_directory/grub-btrfs.cfg.bkp"
@@ -583,11 +583,11 @@ check_uuid_required
 if [[ "$root_uuid" != "$boot_uuid" ]] || [[ "$root_uuid_subvolume" != "$boot_uuid_subvolume" ]]; then boot_separate ; else boot_bounded ; fi
 # Make a submenu in GRUB (grub.cfg)
 cat << EOF
-if [ ! -e "\${prefix}/grub-btrfs.cfg" ]; then
+if [ ! -e "${grub_btrfs_search_directory}/grub-btrfs.cfg" ]; then
 echo ""
 else
 submenu '${submenuname}' ${protection_authorized_users}${unrestricted_access_submenu}{
-    configfile "\${prefix}/grub-btrfs.cfg"
+    configfile "${grub_btrfs_search_directory}/grub-btrfs.cfg"
 }
 fi
 EOF
