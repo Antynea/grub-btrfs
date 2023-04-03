@@ -298,7 +298,7 @@ snapshot_list()
     for snap in $(btrfs subvolume list -sa "${btrfs_subvolume_sort}" /); do # Parse btrfs snapshots
         IFS=$oldIFS
         snap=("${snap}")
-        local path_snapshot=${snap[@]:13:${#snap[@]}}
+        local path_snapshot=$(echo "${snap}" | awk '{print $NF}')
         if [ "$path_snapshot" = "DELETED" ]; then continue; fi # Discard deleted snapshots
         [[ ${path_snapshot%%"/"*} == "<FS_TREE>" ]] && path_snapshot=${path_snapshot#*"/"} # Remove the "<FS_TREE>" string at the beginning of the path
 
