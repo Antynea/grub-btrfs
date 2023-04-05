@@ -14,6 +14,17 @@ verbose=false
 syslog=false
 recursive=false
 
+trap sighandler SIGINT SIGTERM
+sighandler()
+{
+    trap '""' SIGINT SIGTERM
+    vlog "Parent $$: Received signal SIGINT/ SIGTERM"
+    kill 0
+    wait
+    exit 0
+}
+
+
 setcolors() {
     if [ "${1}" = true ]; then
           GREEN=$'\033[0;32m'
@@ -22,10 +33,10 @@ setcolors() {
           RESET=$'\033[0m'
     fi
     if [ "${1}" = false ]; then
-        GREEN=$'\033[0;0m'
-        RED=$'\033[0;0m'
-        CYAN=$'\033[;0m'
-        RESET=$'\033[0m'
+          GREEN=$'\033[0;0m'
+          RED=$'\033[0;0m'
+          CYAN=$'\033[;0m'
+          RESET=$'\033[0m'
     fi
 }
 setcolors true # normally we want colors
@@ -37,129 +48,129 @@ grub_btrfs_config="${sysconfdir}/default/grub-btrfs/config"
 [ -f "${sysconfdir}/default/grub" ] && . "${sysconfdir}/default/grub"
 
 print_help() {
-            echo "${CYAN}[?] Usage:"
-            echo "${0##*/} [-h, --help] [-c, --no-color] [-l, --log-file LOG_FILE] [-r, --recursive] [-s, --syslog] [-t, --timeshift-auto] [-v, --verbose] SNAPSHOTS_DIRS"
-            echo
-            echo "SNAPSHOTS_DIRS         Snapshot directories to watch, without effect when --timeshift-auto"
-            echo
-            echo "Optional arguments:"
-            echo "-c, --no-color        Disable colors in output"
-            echo "-l, --log-file        Specify a logfile to write to"
-            echo "-r, --recursive       Watch snapshots directory recursively"
-            echo "-s, --syslog          Write to syslog"
-            echo "-o, --timeshift-old   Look for snapshots in directory of Timeshift <v22.06 (requires --timeshift-auto)"
-            echo "-t, --timeshift-auto  Automatically detect Timeshifts snapshot directory"
-            echo "-v, --verbose         Let the log of the daemon be more verbose"
-            echo "-h, --help            Display this message"
-            echo
-            echo "Version ${GRUB_BTRFS_VERSION}${RESET}"
+    echo "${CYAN}[?] Usage:"
+    echo "${0##*/} [-h, --help] [-c, --no-color] [-l, --log-file LOG_FILE] [-r, --recursive] [-s, --syslog] [-t, --timeshift-auto] [-v, --verbose] SNAPSHOTS_DIRS"
+    echo
+    echo "SNAPSHOTS_DIRS         Snapshot directories to watch, without effect when --timeshift-auto"
+    echo
+    echo "Optional arguments:"
+    echo "-c, --no-color        Disable colors in output"
+    echo "-l, --log-file        Specify a logfile to write to"
+    echo "-r, --recursive       Watch snapshots directory recursively"
+    echo "-s, --syslog          Write to syslog"
+    echo "-o, --timeshift-old   Look for snapshots in directory of Timeshift <v22.06 (requires --timeshift-auto)"
+    echo "-t, --timeshift-auto  Automatically detect Timeshifts snapshot directory"
+    echo "-v, --verbose         Let the log of the daemon be more verbose"
+    echo "-h, --help            Display this message"
+    echo
+    echo "Version ${GRUB_BTRFS_VERSION}${RESET}"
 }
 
 log() {
     echo "${2}"$1"${RESET}"
     if [ ${syslog} = true ]; then
-        logger -p user.notice -t ${0##*/}"["$$"]" "$1"
+          logger -p user.notice -t ${0##*/}"["$$"]" "$1"
     fi
     if [ ${#logfile} -gt 1  ]; then
-        echo "$(date) ${1}" >> "${logfile}"
+          echo "$(date) ${1}" >> "${logfile}"
     fi
 }
 
 vlog() {
     if [ ${verbose} = true ]; then
-       echo "${2}"$1"${RESET}"
-       if [ ${syslog} = true ]; then
-           logger -p user.notice -t ${0##*/} "$1"
-       fi
-       if [ ${#logfile} -gt 1  ]; then
-        echo "$(date) ${1}" >> "${logfile}"
-       fi
+          echo "${2}"$1"${RESET}"
+          if [ ${syslog} = true ]; then
+                logger -p user.notice -t ${0##*/} "$1"
+          fi
+          if [ ${#logfile} -gt 1  ]; then
+                echo "$(date) ${1}" >> "${logfile}"
+          fi
     fi
 }
 
 err() {
-  echo "${2}"${1}"${RESET}" >&2
-  if [ ${syslog} = true ]; then
-      logger -p user.error -t ${0##*/} "$1"
-  fi
-  if [ ${#logfile} -gt 1  ]; then
-      echo "$(date) error: ${1}" >> "${logfile}"
-  fi
+    echo "${2}"${1}"${RESET}" >&2
+    if [ ${syslog} = true ]; then
+          logger -p user.error -t ${0##*/} "$1"
+    fi
+    if [ ${#logfile} -gt 1  ]; then
+          echo "$(date) error: ${1}" >> "${logfile}"
+    fi
 }
 
 # parse arguments
 while getopts :l:ctvrsh-: opt; do
-    case "$opt" in
-        -)
-            case "${OPTARG}" in
-                no-color)
-                    setcolors false
-                    ;;
-                log-file)
-                    logfile="${!OPTIND}"; OPTIND=$(( $OPTIND + 1 ))
-                    ;;
-                timeshift-auto)
-                    timeshift_auto=true
-                    ;;
-                timeshift-old)
-                    timeshift_old=true
-                    ;;
-                verbose)
-                    verbose=true
-                    ;;
-                recursive)
-                    recursive=true
-                    ;;
-                syslog)
-                    syslog=true
-                    ;;
-                help)
-                    print_help
-                    exit 0
-                    ;;
-                *)
-                    if [ "$OPTERR" = 1 ] && [ "${optspec:0:1}" != ":" ]; then
-                        err "[!] Unknown option --${OPTARG}" "${RED}" >&2
-                        echo
-                    fi
-                    print_help
-                    exit 1
-                    ;;
-            esac;;
-        c)
-            setcolors false
-            ;;
-        l)
-            logfile="${OPTARG}"
-            ;;
-        t)
-            timeshift_auto=true
-            ;;
-        o)
-            timeshift_old=true
-            ;;
-        v)
-            verbose=true
-            ;;
-        r)
-            recursive=true
-            ;;
-        s)
-            syslog=true
-            ;;
-        h)
-            print_help
-            exit 0
-            ;;
-        *)
-            if [ "$OPTERR" = 1 ] || [ "${optspec:0:1}" = ":" ]; then
-                err "[!] Non-option argument: '-${OPTARG}'" "${RED}" >&2
-                echo
-            fi
-            print_help
-            exit 1
-            ;;
-    esac
+        case "$opt" in
+            -)
+                case "${OPTARG}" in
+                    no-color)
+                        setcolors false
+                        ;;
+                    log-file)
+                        logfile="${!OPTIND}"; OPTIND=$(( $OPTIND + 1 ))
+                        ;;
+                    timeshift-auto)
+                        timeshift_auto=true
+                        ;;
+                    timeshift-old)
+                        timeshift_old=true
+                        ;;
+                    verbose)
+                        verbose=true
+                        ;;
+                    recursive)
+                        recursive=true
+                        ;;
+                    syslog)
+                        syslog=true
+                        ;;
+                    help)
+                        print_help
+                        exit 0
+                        ;;
+                    *)
+                        if [ "$OPTERR" = 1 ] && [ "${optspec:0:1}" != ":" ]; then
+                              err "[!] Unknown option --${OPTARG}" "${RED}" >&2
+                              echo
+                        fi
+                        print_help
+                        exit 1
+                        ;;
+                esac;;
+            c)
+                setcolors false
+                ;;
+            l)
+                logfile="${OPTARG}"
+                ;;
+            t)
+                timeshift_auto=true
+                ;;
+            o)
+                timeshift_old=true
+                ;;
+            v)
+                verbose=true
+                ;;
+            r)
+                recursive=true
+                ;;
+            s)
+                syslog=true
+                ;;
+            h)
+                print_help
+                exit 0
+                ;;
+            *)
+                if [ "$OPTERR" = 1 ] || [ "${optspec:0:1}" = ":" ]; then
+                      err "[!] Non-option argument: '-${OPTARG}'" "${RED}" >&2
+                      echo
+                fi
+                print_help
+                exit 1
+                ;;
+        esac
 done
 shift $(( OPTIND - 1 ))
 
@@ -167,32 +178,32 @@ snapshots="${1}"
 
 # check if inotify exists, see issue #227
 if ! command -v inotifywait >/dev/null 2>&1; then
-    err "[!] inotifywait was not found, exiting. Is inotify-tools installed?" "${RED}" >&2
-    exit 1
+      err "[!] inotifywait was not found, exiting. Is inotify-tools installed?" "${RED}" >&2
+      exit 1
 fi
 
 if [ ${#logfile} -gt 1  ]; then
-    touch "${logfile}"
-    echo "GRUB-BTRFSD log $(date)" >> "${logfile}"
+      touch "${logfile}"
+      echo "GRUB-BTRFSD log $(date)" >> "${logfile}"
 fi
 
 log  "grub-btrfsd starting up..." "${GREEN}"
 
 if [ ${verbose} = true ]; then
-    inotify_qiet_flag=""
+      inotify_qiet_flag=""
 else
     inotify_qiet_flag=" -q -q "
 fi
 
 if [ ${recursive} = true ]; then
-    inotify_recursive_flag=" -r "
+      inotify_recursive_flag=" -r "
 else
     inotify_recursive_flag=""
 fi
 
 if [ ${timeshift_auto} = false ] && [ ${timeshift_old} = true ]; then
-    err "[!] Flag --timeshift-old requires flag --timeshift-auto" "${RED}" >&2
-    exit 1
+      err "[!] Flag --timeshift-old requires flag --timeshift-auto" "${RED}" >&2
+      exit 1
 fi
 
 vlog "Arguments:"
@@ -203,14 +214,14 @@ vlog "Logfile: $logfile"
 vlog "Recursive: $recursive"
 
 if ! [ -d "$snapshots" ] && ! [ ${timeshift_auto} = true ]; then
-    err "[!] No directory found at ${snapshots}" "${RED}" >&2
-    err "[!] Please specify a valid snapshot directory" "${RED}" >&2
-    exit 1
+      err "[!] No directory found at ${snapshots}" "${RED}" >&2
+      err "[!] Please specify a valid snapshot directory" "${RED}" >&2
+      exit 1
 fi
 
 if [ ${timeshift_auto} = true ]; then
-    watchtime=15
-    [ -d /run/timeshift ] || mkdir /run/timeshift
+      watchtime=15
+      [ -d /run/timeshift ] || mkdir /run/timeshift
 else
     watchtime=0
 fi
@@ -219,17 +230,17 @@ create_grub_menu() {
     #  create the grub submenu of the whole grub menu, depending on wether the submenu already exists
     #  and gives feedback if it worked
     if grep "snapshots-btrfs" "{grub_directory}/grub.cfg"; then
-    	if  /etc/grub.d/41_snapshots-btrfs; then
-		log "Grub submenu recreated" "${GREEN}"
-        else
-		err "[!] Error during grub submenu creation (grub-btrfs error)" "${RED}"
-        fi
+    	  if  /etc/grub.d/41_snapshots-btrfs; then
+		        log "Grub submenu recreated" "${GREEN}"
+          else
+		      err "[!] Error during grub submenu creation (grub-btrfs error)" "${RED}"
+          fi
     else
         if ${GRUB_BTRFS_MKCONFIG:-grub-mkconfig} -o "${GRUB_BTRFS_GRUB_DIRNAME:-/boot/grub}"/grub.cfg; then
-		log "Grub menu recreated" "${GREEN}"
-	else
-		err "[!] Error during grub menu creation (grub/ grub-btrfs error)" "${RED}"
-	fi
+		      log "Grub menu recreated" "${GREEN}"
+	    else
+		    err "[!] Error during grub menu creation (grub/ grub-btrfs error)" "${RED}"
+	    fi
     fi
 }
 
