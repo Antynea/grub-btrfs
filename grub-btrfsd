@@ -219,7 +219,7 @@ create_grub_menu() {
     #  create the grub submenu of the whole grub menu, depending on wether the submenu already exists
     #  and gives feedback if it worked
     if grep "snapshots-btrfs" "{grub_directory}/grub.cfg"; then
-    	if  /etc/grub.d/41_snapshots-btrfs; then 
+    	if  /etc/grub.d/41_snapshots-btrfs; then
 		log "Grub submenu recreated" "${GREEN}"
         else
 		err "[!] Error during grub submenu creation (grub-btrfs error)" "${RED}"
@@ -238,73 +238,77 @@ set_snapshot_dir() {
     if [ "${timeshift_old}" = true ]; then
           snapdir="/run/timeshift/backup/timeshift-btrfs/snapshots"
     else
-          snapdir="/run/timeshift/${timeshift_pid}/backup/timeshift-btrfs/snapshots"
+        snapdir="/run/timeshift/${timeshift_pid}/backup/timeshift-btrfs/snapshots"
     fi
 }
 
 daemon_function() {
+    trap 'vlog "$BASHPID: Received SIGINT/ SIGTERM"; exit 0' SIGINT SIGTERM
     # start the actual daemon
     snapdir=$1
-    vlog "Snapshot dir watchtimeout: $watchtime"
-    vlog "Entering infinite while for $snapdir" "${GREEN}"
+    vlog "Subdaemon function started, PID: $BASHPID" "${GREEN}"
+    vlog "${BASHPID}: Entering infinite while for $snapdir" "${GREEN}"
+    vlog "${BASHPID}: Snapshot dir watchtimeout: $watchtime"
     while true; do
-          runs=false
-          if [ ${timeshift_auto} = true ] && ! [ "${timeshift_pid}" -gt 0 ] ; then
-                # watch the timeshift folder for a folder that is created when timeshift starts up
-                sleep 1 # for safety so the outer while is not going crazy
-                if [ "${timeshift_pid}" -eq -2 ]; then
-                      log "detected timeshift shutdown"
-                fi
-                timeshift_pid=$(ps ax | awk '{sub(/.*\//, "", $5)} $5 ~ /timeshift/ {print $1}')
-                if [ "${#timeshift_pid}" -gt 0 ]; then
-                      set_snapshot_dir
-                      log "detected running Timeshift at daemon startup, PID is: $timeshift_pid"
-                      vlog "new snapshots directory is $snapdir"
-                else
-                    log "Watching /run/timeshift for timeshift to start"
-                    inotifywait ${inotify_qiet_flag} -e create -e delete /run/timeshift && {
-                        sleep 1
-                        timeshift_pid=$(ps ax | awk '{sub(/.*\//, "", $5)} $5 ~ /timeshift/ {print $1}')
+            runs=false
+            if [ ${timeshift_auto} = true ] && ! [ "${timeshift_pid}" -gt 0 ] ; then
+                  # watch the timeshift folder for a folder that is created when timeshift starts up
+                  sleep 1 # for safety so the outer while is not going crazy
+                  if [ "${timeshift_pid}" -eq -2 ]; then
+                        log "${BASHPID}: detected timeshift shutdown"
+                  fi
+                  timeshift_pid=$(ps ax | awk '{sub(/.*\//, "", $5)} $5 ~ /timeshift/ {print $1}')
+                  if [ "${#timeshift_pid}" -gt 0 ]; then
                         set_snapshot_dir
-                        log "detected Timeshift startup, PID is: $timeshift_pid" "${CYAN}"
-                        vlog "new snapshots directory is $snapdir" "${CYAN}"
-                        (create_grub_menu) # create the grub menu once immidiatly in a forking process. Snapshots from commandline using timeshift --create need this
-                    }
-                fi
-                runs=false
-          else
-              while [ -d "$snapdir" ]; do
-                    # watch the actual snapshots folder for a new snapshot or a deletion of a snapshot
-                    if [ ${runs} = false ] && [ ${verbose} = false ]; then
-                          log "Watching $snapdir for new snapshots..." "${CYAN}"
-                    else
-                        vlog "Watching $snapdir for new snapshots..." "${CYAN}"
-                    fi
-                    runs=true
-                    inotifywait ${inotify_qiet_flag} ${inotify_recursive_flag} -e create -e delete -e unmount -t "$watchtime" "$snapdir" && {
-                        log "Detected snapshot creation/ deletion, recreating Grub menu" "${CYAN}"
-                        sleep 5
-                        create_grub_menu
-                    }
-                    sleep 1
-              done
-              timeshift_pid=-2
-          fi
-          if ! [ ${timeshift_auto} = true ] && ! [ -d "${snapdir}" ] ; then # in case someone deletes the snapshots folder (in snapper mode) to prevent the while loop from going wild
-                break
-          fi
+                        log "${BASHPID}: detected running Timeshift at daemon startup, PID is: $timeshift_pid"
+                        vlog "${BASHPID}: new snapshots directory is $snapdir"
+                  else
+                      log "Watching /run/timeshift for timeshift to start"
+                      inotifywait ${inotify_qiet_flag} -e create -e delete /run/timeshift && {
+                          sleep 1
+                          timeshift_pid=$(ps ax | awk '{sub(/.*\//, "", $5)} $5 ~ /timeshift/ {print $1}')
+                          set_snapshot_dir
+                          log "${BASHPID}: detected Timeshift startup, PID is: $timeshift_pid" "${CYAN}"
+                          vlog "${BASHPID}: new snapshots directory is $snapdir" "${CYAN}"
+                          (create_grub_menu) # create the grub menu once immidiatly in a forking process. Snapshots from commandline using timeshift --create need this
+                      }
+                  fi
+                  runs=false
+            else
+                while [ -d "$snapdir" ]; do
+                        # watch the actual snapshots folder for a new snapshot or a deletion of a snapshot
+                        if [ ${runs} = false ] && [ ${verbose} = false ]; then
+                              log "${BASHPID}: Watching $snapdir for new snapshots..." "${CYAN}"
+                        else
+                            vlog "${BASHPID}: Watching $snapdir for new snapshots..." "${CYAN}"
+                        fi
+                        runs=true
+                        inotifywait ${inotify_qiet_flag} ${inotify_recursive_flag} -e create -e delete -e unmount -t "$watchtime" "$snapdir" && {
+                            log "${BASHPID}: Detected snapshot creation/ deletion, recreating Grub menu" "${CYAN}"
+                            sleep 5
+                            create_grub_menu
+                        }
+                        sleep 1
+                done
+                timeshift_pid=-2
+            fi
+            if ! [ ${timeshift_auto} = true ] && ! [ -d "${snapdir}" ] ; then # in case someone deletes the snapshots folder (in snapper mode) to prevent the while loop from going wild
+                  break
+            fi
     done
 }
 
-# for all dirs that got passed to the script, start a new fork with that dir
-snapdirs=( "${@}" )
-for snapdir in "${snapdirs[@]}"
-  do
-      vlog "starting daemon with watching $snapdir..."
-      daemon_function "${snapdir}" &
-done
 
+if [ ${timeshift_auto} = true ] ; then
+      daemon_function &
+else
+    # for all dirs that got passed to the script, start a new fork with that dir
+    snapdirs=( "${@}" )
+    for snapdir in "${snapdirs[@]}"
+        do
+            vlog "starting daemon watching $snapdir..."
+            daemon_function "${snapdir}" &
+    done
+fi
 wait # wait for forks to finish, kill child forks if SIGTERM is sent
-
-
 exit 0 # tradition is tradition
