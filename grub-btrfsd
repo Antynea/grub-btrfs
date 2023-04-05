@@ -3,26 +3,13 @@
 # Distributed under the terms of the GNU General Public License v3
 # Update GRUB when new BTRFS snapshots are created.
 
-# init
-timeshift_pid=-1
-watchtime=0
-logfile=0
-timeshift_auto=false
-timeshift_old=false
-verbose=false
-syslog=false
-recursive=false
-
-trap sighandler SIGINT SIGTERM
-sighandler()
-{
+sighandler() {
     trap '""' SIGINT SIGTERM
     vlog "Parent $$: Received signal SIGINT/ SIGTERM"
     kill 0
     wait
     exit 0
 }
-
 
 setcolors() {
     if [ "${1}" = true ]; then
@@ -38,13 +25,6 @@ setcolors() {
           RESET=$'\033[0m'
     fi
 }
-setcolors true # normally we want colors
-
-sysconfdir="/etc"
-grub_btrfs_config="${sysconfdir}/default/grub-btrfs/config"
-# source config file
-[ -f "$grub_btrfs_config" ] && . "$grub_btrfs_config"
-[ -f "${sysconfdir}/default/grub" ] && . "${sysconfdir}/default/grub"
 
 print_help() {
     echo "${CYAN}[?] Usage:"
@@ -97,138 +77,131 @@ err() {
     fi
 }
 
-# parse arguments
-while getopts :l:ctvrsh-: opt; do
-        case "$opt" in
-            -)
-                case "${OPTARG}" in
-                    no-color)
-                        setcolors false
-                        ;;
-                    log-file)
-                        logfile="${!OPTIND}"; OPTIND=$(( $OPTIND + 1 ))
-                        ;;
-                    timeshift-auto)
-                        timeshift_auto=true
-                        ;;
-                    timeshift-old)
-                        timeshift_old=true
-                        ;;
-                    verbose)
-                        verbose=true
-                        ;;
-                    recursive)
-                        recursive=true
-                        ;;
-                    syslog)
-                        syslog=true
-                        ;;
-                    help)
-                        print_help
-                        exit 0
-                        ;;
-                    *)
-                        if [ "$OPTERR" = 1 ] && [ "${optspec:0:1}" != ":" ]; then
-                              err "[!] Unknown option --${OPTARG}" "${RED}" >&2
-                              echo
-                        fi
-                        print_help
-                        exit 1
-                        ;;
-                esac;;
-            c)
-                setcolors false
-                ;;
-            l)
-                logfile="${OPTARG}"
-                ;;
-            t)
-                timeshift_auto=true
-                ;;
-            o)
-                timeshift_old=true
-                ;;
-            v)
-                verbose=true
-                ;;
-            r)
-                recursive=true
-                ;;
-            s)
-                syslog=true
-                ;;
-            h)
-                print_help
-                exit 0
-                ;;
-            *)
-                if [ "$OPTERR" = 1 ] || [ "${optspec:0:1}" = ":" ]; then
-                      err "[!] Non-option argument: '-${OPTARG}'" "${RED}" >&2
-                      echo
-                fi
-                print_help
-                exit 1
-                ;;
-        esac
-done
-shift $(( OPTIND - 1 ))
-
-snapdirs=( "${@}" )
-
-# check if inotify exists, see issue #227
-if ! command -v inotifywait >/dev/null 2>&1; then
-      err "[!] inotifywait was not found, exiting. Is inotify-tools installed?" "${RED}" >&2
-      exit 1
-fi
-
-if [ ${#logfile} -gt 1  ]; then
-      touch "${logfile}"
-      echo "GRUB-BTRFSD log $(date)" >> "${logfile}"
-fi
-
-log  "grub-btrfsd starting up..." "${GREEN}"
-
-if [ ${verbose} = true ]; then
-      inotify_qiet_flag=""
-else
-    inotify_qiet_flag=" -q -q "
-fi
-
-if [ ${recursive} = true ]; then
-      inotify_recursive_flag=" -r "
-else
-    inotify_recursive_flag=""
-fi
-
-if [ ${timeshift_auto} = false ] && [ ${timeshift_old} = true ]; then
-      err "[!] Flag --timeshift-old requires flag --timeshift-auto" "${RED}" >&2
-      exit 1
-fi
-
-vlog "Arguments:"
-vlog "Snapshot directories: ${snapdirs[*]}"
-vlog "Timestift autodetection: $timeshift_auto"
-vlog "Timeshift old: $timeshift_old"
-vlog "Logfile: $logfile"
-vlog "Recursive: $recursive"
-
-if ! [ ${timeshift_auto} = true ]; then
-      for snapdir in "${snapdirs[@]}"
-          do
-              if ! [ -d ${snapdir} ]; then
-                    err "[!] No directory found at ${snapdir}" "${RED}" >&2
-                    err "[!] Please specify a valid snapshot directory" "${RED}" >&2
+parse_arguments() {
+    while getopts :l:ctvrsh-: opt; do
+            case "$opt" in
+                -)
+                    case "${OPTARG}" in
+                        no-color)
+                            setcolors false
+                            ;;
+                        log-file)
+                            logfile="${!OPTIND}"; OPTIND=$(( $OPTIND + 1 ))
+                            ;;
+                        timeshift-auto)
+                            timeshift_auto=true
+                            ;;
+                        timeshift-old)
+                            timeshift_old=true
+                            ;;
+                        verbose)
+                            verbose=true
+                            ;;
+                        recursive)
+                            recursive=true
+                            ;;
+                        syslog)
+                            syslog=true
+                            ;;
+                        help)
+                            print_help
+                            exit 0
+                            ;;
+                        *)
+                            if [ "$OPTERR" = 1 ] && [ "${optspec:0:1}" != ":" ]; then
+                                  err "[!] Unknown option --${OPTARG}" "${RED}" >&2
+                                  echo
+                            fi
+                            print_help
+                            exit 1
+                            ;;
+                    esac;;
+                c)
+                    setcolors false
+                    ;;
+                l)
+                    logfile="${OPTARG}"
+                    ;;
+                t)
+                    timeshift_auto=true
+                    ;;
+                o)
+                    timeshift_old=true
+                    ;;
+                v)
+                    verbose=true
+                    ;;
+                r)
+                    recursive=true
+                    ;;
+                s)
+                    syslog=true
+                    ;;
+                h)
+                    print_help
+                    exit 0
+                    ;;
+                *)
+                    if [ "$OPTERR" = 1 ] || [ "${optspec:0:1}" = ":" ]; then
+                          err "[!] Non-option argument: '-${OPTARG}'" "${RED}" >&2
+                          echo
+                    fi
+                    print_help
                     exit 1
-              fi
-      done
-fi
+                    ;;
+            esac
+    done
+}
 
-if [ ${timeshift_auto} = true ]; then
-      watchtime=15
-      [ -d /run/timeshift ] || mkdir /run/timeshift
-else
-    watchtime=0
-fi
+checks() {
+    # check if inotify exists, see issue #227
+    if ! command -v inotifywait >/dev/null 2>&1; then
+          err "[!] inotifywait was not found, exiting. Is inotify-tools installed?" "${RED}" >&2
+          exit 1
+    fi
+
+    if [ ${timeshift_auto} = false ] && [ ${timeshift_old} = true ]; then
+          err "[!] Flag --timeshift-old requires flag --timeshift-auto" "${RED}" >&2
+          exit 1
+    fi
+
+    if ! [ ${timeshift_auto} = true ]; then
+          for snapdir in "${snapdirs[@]}"
+              do
+                  if ! [ -d ${snapdir} ]; then
+                        err "[!] No directory found at ${snapdir}" "${RED}" >&2
+                        err "[!] Please specify a valid snapshot directory" "${RED}" >&2
+                        exit 1
+                  fi
+          done
+    fi
+}
+
+setup() {
+    if [ ${#logfile} -gt 1  ]; then
+          touch "${logfile}"
+          echo "GRUB-BTRFSD log $(date)" >> "${logfile}"
+    fi
+
+    if [ ${verbose} = true ]; then
+          inotify_qiet_flag=""
+    else
+        inotify_qiet_flag=" -q -q "
+    fi
+
+    if [ ${recursive} = true ]; then
+          inotify_recursive_flag=" -r "
+    else
+        inotify_recursive_flag=""
+    fi
+
+    if [ ${timeshift_auto} = true ]; then
+          watchtime=15
+          [ -d /run/timeshift ] || mkdir /run/timeshift
+    else
+        watchtime=0
+    fi
+}
 
 create_grub_menu() {
     #  create the grub submenu of the whole grub menu, depending on wether the submenu already exists
@@ -313,16 +286,55 @@ daemon_function() {
     done
 }
 
+main() {
+    # init
+    timeshift_pid=-1
+    watchtime=0
+    logfile=0
+    snapshots=-1
+    timeshift_auto=false
+    timeshift_old=false
+    verbose=false
+    syslog=false
+    recursive=false
+    trap sighandler SIGINT SIGTERM
 
-if [ ${timeshift_auto} = true ] ; then
-      daemon_function &
-else
-    # for all dirs that got passed to the script, start a new fork with that dir
-    for snapdir in "${snapdirs[@]}"
-        do
-            vlog "starting daemon watching $snapdir..."
-            daemon_function "${snapdir}" &
-    done
-fi
-wait # wait for forks to finish, kill child forks if SIGTERM is sent
-exit 0 # tradition is tradition
+    setcolors true # normally we want colors
+
+    sysconfdir="/etc"
+    grub_btrfs_config="${sysconfdir}/default/grub-btrfs/config"
+    # source config file
+    [ -f "$grub_btrfs_config" ] && . "$grub_btrfs_config"
+    [ -f "${sysconfdir}/default/grub" ] && . "${sysconfdir}/default/grub"
+
+    parse_arguments "${@}"
+    shift $(( OPTIND - 1 ))
+    snapdirs=( "${@}" )
+
+    vlog "Arguments:"
+    vlog "Snapshot directories: ${snapdirs[*]}"
+    vlog "Timestift autodetection: $timeshift_auto"
+    vlog "Timeshift old: $timeshift_old"
+    vlog "Logfile: $logfile"
+    vlog "Recursive: $recursive"
+
+    checks
+    setup
+
+    log  "grub-btrfsd starting up..." "${GREEN}"
+
+    if [ ${timeshift_auto} = true ] ; then
+          daemon_function "timeshift" &
+    else
+        # for all dirs that got passed to the script, start a new fork with that dir
+        for snapdir in "${snapdirs[@]}"
+            do
+                vlog "starting daemon watching $snapdir..."
+                daemon_function "${snapdir}" &
+        done
+    fi
+    wait # wait for forks to finish, kill child forks if SIGTERM is sent
+    exit 0
+}
+
+main "${@}"
