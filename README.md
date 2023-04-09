@@ -6,7 +6,7 @@
 ##### BTC donation address: `1Lbvz244WA8xbpHek9W2Y12cakM6rDe5Rt`
 - - -
 ### 🔎 Description:
-Improves grub by adding a btrfs snapshots to the grub menu.
+Improves grub by adding a btrfs snapshots sub-menu to the grub menu.
 
 grub-btrfs supports manual snapshots as well as snapper and timeshift created snapshots.
 
