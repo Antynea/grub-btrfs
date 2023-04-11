@@ -190,7 +190,7 @@ Should be modified to read:
 ExecStart=/usr/bin/grub-btrfsd --syslog --timeshift-auto
 ```
 
-The mofified file should look like this:
+The modified file should look like this:
 ``` bash
 [Unit]
 Description=Regenerate grub-btrfs.cfg
@@ -222,7 +222,7 @@ If you are using an older release of Timeshift (before 22.06), you also need to 
 ExecStart=/usr/bin/grub-btrfsd --syslog --timeshift-auto --timeshift-old
 ```
 
-When done, the service must be restarted with
+When done, the service must be restarted with:
 ``` bash
 sudo systemctl restart grub-btrfsd 
 ```
