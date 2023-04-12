@@ -57,7 +57,7 @@ apt install grub-btrfs
 ```
 Booting into read-only snapshots is fully supported when choosing btrfs as the file system during a standard Kali Linux installation following [this walk-through](https://www.kali.org/docs/installation/btrfs/).
 
-#### Manual installation from source
+#### Manual installation
 * Run `make install`
 * Run `make help` to check what options are available. 
 * Dependencies:
@@ -69,13 +69,13 @@ Booting into read-only snapshots is fully supported when choosing btrfs as the f
 
 - - -
 ### 📚 Manual usage of grub-btrfs
-To manually (re)generate grub snapshot entries you can run `sudo /etc/grub.d/41_snapshots-btrfs` which updates `grub-btrfs.cfg`. You then need to re-install GRUB by running one of the following commands:
+To manually generate grub snapshot entries you can run `sudo /etc/grub.d/41_snapshots-btrfs` which updates `grub-btrfs.cfg`. You then need to regenerate the GRUB configuration by running one of the following commands:
 
 * On **Arch Linux** or **Gentoo** use `grub-mkconfig -o /boot/grub/grub.cfg`.  
 * On **Fedora** use `grub2-mkconfig -o /boot/grub2/grub.cfg`  
 * On **Debian and Ubuntu based** distributions `update-grub` is a script that runs `grub-mkconfig ...`
 
-This process of updating the grub config and re-instaling GRUB can be automated to occur whenever you create or delete snaphots but the process of configuring this is slightly different depending upon your distributions choice on init system. See the relevant instructions for your init system below.
+This process can be automated to occur whenever you create or delete snaphots but this process is slightly different depending upon your distributions choice on init system. See the relevant instructions for your init system below.
 
 ### ⚙️ Customization:
 
@@ -244,8 +244,6 @@ sudo rc-config add grub-btrfsd default
 ```
 
 ##### 💼 Snapshots not in `/.snapshots` for OpenRC
-NOTE: This works also for Timeshift versions < 22.06, the path to watch would be `/run/timeshift/backup/timeshift-btrfs/snapshots`.
-
 By default the daemon is watching the directory `/.snapshots`. If the daemon should watch a different directory, it can be edited by passing different arguments to it.
 Arguments are passed to grub-btrfsd via the file `/etc/conf.d/grub-btrfsd`. 
 The variable `snapshots` defines the path the daemon will monitor for snapshots.
