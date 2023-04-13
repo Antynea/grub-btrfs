@@ -274,29 +274,6 @@ After that, the daemon should be restarted with:
 sudo rc-service grub-btrfsd restart
 ```
 
-##### ❇️ Automatically update grub upon restart/boot for OpenRC
-If you would like the grub-btrfs menu to automatically update on system restart/ shutdown, just add the following script as `/etc/local.d/grub-btrfs-update.stop`:
-```bash
-#!/usr/bin/env bash
-
-description="Update the grub btrfs snapshots menu"
-name="grub-btrfs-update"
-
-depend()
-{
-	use localmount
-}
-	
-bash -c 'if [ -s "${GRUB_BTRFS_GRUB_DIRNAME:-/boot/grub}/grub-btrfs.cfg" ]; then /etc/grub.d/41_snapshots-btrfs; else {GRUB_BTRFS_MKCONFIG:-grub-mkconfig} -o {GRUB_BTRFS_GRUB_DIRNAME:-/boot/grub}/grub.cfg; fi' 
-```
-
-Make your script executable with `sudo chmod a+x /etc/local.d/grub-btrfs-update.stop`.
-
-* The extension `.stop` at the end of the filename indicates to the locald-daemon that this script should be run at shutdown. 
- If you want to run the menu update on system startup instead, rename the file to `grub-btrfs-update.start`
-* Works for Snapper and Timeshift
-
-[Here is a similar solution for systemd](https://github.com/Antynea/grub-btrfs/issues/138#issuecomment-766918328)
 - - -
 ### Troubleshooting
 If you experience problems with grub-btrfs don't hesitate [to file an issue](https://github.com/Antynea/grub-btrfs/issues/new/choose).
