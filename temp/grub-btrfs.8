@@ -1,0 +1,280 @@
+.TH "grub-btrfs" "8" 
+
+.SH "NAME"
+.PP
+grub-btrfs - Automatically add btrfs-Snapshots as a Grub submenu
+
+.SH "SYNOPSIS"
+.PP
+\fC/etc/grub.d/41_snapshots\-btrfs [\-V, \-\-version]\fP
+
+.SH "DESCRIPTION"
+.PP
+Improves grub by adding “btrfs snapshots” to the grub menu.
+
+.PP
+You can boot your system on a “snapshot” from the grub menu.
+Supports manual snapshots, snapper and timeshift.
+Features of grub-btrfs:
+.IP \(em 4
+Automatically list snapshots existing on root partition (btrfs).
+.IP \(em 4
+Automatically detect if /boot is in separate partition.
+.IP \(em 4
+Automatically detect kernel, initramfs and intel/amd microcode in /boot directory on snapshots.
+.IP \(em 4
+Automatically create corresponding “menuentry” in grub.cfg
+.IP \(em 4
+Automatically detect the type/tags and descriptions/comments of snapper/timeshift snapshots.
+.IP \(em 4
+Automatically generate grub.cfg if you use the provided systemd service.
+
+.SH "CONFIGURATION"
+.PP
+grub-btrfs is configured via the file \fC/etc/default/grub\-btrfs/config\fP.
+Possible options are:
+
+.SS "GENERAL"
+.SS "\fCGRUB_BTRFS_DISABLE\fP"
+.PP
+Disable grub-btrfs if true.
+.IP \(em 4
+Default: “false”
+.IP \(em 4
+Example: \fCGRUB_BTRFS_DISABLE="true"\fP
+
+.SS "\fCGRUB_BTRFS_TITLE_FORMAT\fP"
+.PP
+The snapshot entries submenu in Grub are added according to this line. It is possible to change to order of the fields.
+.IP \(em 4
+Default: (“date” “snapshot” “type” “description”)
+.IP \(em 4
+Example: \fCGRUB_BTRFS_TITLE_FORMAT=("date" "snapshot" "type" "description")\fP
+
+.SS "\fCGRUB_BTRFS_LIMIT\fP"
+.PP
+Maximum number of snapshots in the GRUB snapshots sub menu.
+.IP \(em 4
+Default: “50”
+.IP \(em 4
+Example: \fCGRUB_BTRFS_LIMIT="50"\fP
+
+.SS "\fCGRUB_BTRFS_SUBVOLUME_SORT\fP"
+.PP
+Sort the found subvolumes by “ogeneration” or “generation” or “path” or “rootid”.
+.IP \(em 4
+See Sorting section in
+.BR btrfs-subvolume (8)
+.PP
+“-rootid” means list snapshot by new ones first.
+.IP \(em 4
+Default: “-rootid”
+.IP \(em 4
+Example: \fCGRUB_BTRFS_SUBVOLUME_SORT="+ogen,\-gen,path,rootid"\fP
+
+.SS "\fCGRUB_BTRFS_SHOW_SNAPSHOTS_FOUND\fP"
+.PP
+Show snapshots found during run “grub-mkconfig”
+.IP \(em 4
+Default: “true”
+.IP \(em 4
+Example: \fCGRUB_BTRFS_SHOW_SNAPSHOTS_FOUND="false"\fP
+
+.SS "\fCGRUB_BTRFS_ROOTFLAGS\fP"
+.PP
+Comma seperated mount options to be used when booting a snapshot.
+They can be defined here as well as in the “/” line inside the respective snapshots’
+“/etc/fstab” files.  Mount options found in both places are combined, and this variable
+takes priority over `fstab` entries.
+NB: Do NOT include “subvol=...” or “subvolid=...” here.
+.IP \(em 4
+Default: “”
+.IP \(em 4
+Example: \fCGRUB_BTRFS_ROOTFLAGS="space_cache,commit=10,norecovery"\fP
+
+.SS "\fCGRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION\fP"
+.PP
+By default “grub-btrfs” automatically detects your boot partition,
+either located at the system root or on a separate partition or in a subvolume,
+Change to “true” if your boot partition is not detected as separate.
+.IP \(em 4
+Default: “false”
+.IP \(em 4
+Example: \fCGRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION="true"\fP
+
+.SS "CUSTOM KERNELS"
+.SS "\fCGRUB_BTRFS_NKERNEL\fP / \fCGRUB_BTRFS_NINIT\fP / \fCGRUB_BTRFS_CUSTOM_MICROCODE\fP"
+.PP
+By default, “grub-btrfs” automatically detects most existing kernels, initramfs and microcode.
+Customs kernel, initramfs and microcodes that are not detected can be added in these variables.
+.IP \(em 4
+Default: (“”)
+.IP \(em 4
+Example: \fCGRUB_BTRFS_NKERNEL=("kernel\-5.19.4\-custom" "vmlinux\-5.19.4\-custom")\fP
+\fCGRUB_BTRFS_NINIT=("initramfs\-5.19.4\-custom.img" "initrd\-5.19.4\-custom.img" "otherinit\-5.19.4\-custom.gz")\fP
+\fCGRUB_BTRFS_CUSTOM_MICROCODE=("custom\-ucode.img" "custom\-uc.img "custom_ucode.cpio")\fP
+
+.SS "\fCGRUB_BTRFS_SNAPSHOT_KERNEL_PARAMETERS\fP"
+.PP
+Additonal kernel command line parameters that should be passed to the kernelwhen
+booting a snapshot.
+For dracut based distros this could be useful to pass “rd.live.overlay.overlayfs=1”
+or “rd.live.overlay.readonly=1” to the Kernel for booting read only snapshots.
+.IP \(em 4
+Default: “”
+.IP \(em 4
+Example: \fCGRUB_BTRFS_SNAPSHOT_KERNEL_PARAMETERS="rd.live.overlay.overlayfs=1"\fP
+
+.SS "SNAPSHOT FILTERING"
+.SS "\fCGRUB_BTRFS_IGNORE_SPECIFIC_PATH\fP"
+.PP
+Ignore specific path during run “grub-mkconfig”.
+Only exact paths are ignored.
+e.g : if `specific path` = @, only `@` snapshot will be ignored.
+.IP \(em 4
+Default: (“@”)
+.IP \(em 4
+Example: \fCGRUB_BTRFS_IGNORE_SPECIFIC_PATH=("@home")\fP
+
+.SS "\fCGRUB_BTRFS_IGNORE_PREFIX_PATH\fP"
+.PP
+Ignore prefix path during run “grub-mkconfig”.
+Any path starting with the specified string will be ignored.
+e.g : if `prefix path` = @, all snapshots beginning with “@/...” will be ignored.
+.IP \(em 4
+Default: (“var/lib/docker” “@var/lib/docker” “@/var/lib/docker”)
+.IP \(em 4
+Example: \fCGRUB_BTRFS_IGNORE_PREFIX_PATH=("var/lib/docker" "@var/lib/docker" "@/var/lib/docker")\fP
+
+.SS "\fCGRUB_BTRFS_IGNORE_SNAPSHOT_TYPE\fP"
+.PP
+Ignore specific type/tag of snapshot during run “grub-mkconfig”.
+For snapper:
+Type = single, pre, post.
+For Timeshift:
+Tag = boot, ondemand, hourly, daily, weekly, monthly.
+.IP \(em 4
+Default: (“”)
+.IP \(em 4
+Example: \fCGRUB_BTRFS_IGNORE_SNAPSHOT_TYPE=("ondemand")\fP
+
+.SS "\fCGRUB_BTRFS_IGNORE_SNAPSHOT_DESCRIPTION\fP"
+.PP
+Ignore specific description of snapshot during run “grub-mkconfig”.
+.IP \(em 4
+Default: (“”)
+.IP \(em 4
+Example: \fCGRUB_BTRFS_IGNORE_SNAPSHOT_DESCRIPTION=("timeline")\fP
+
+.SS "DISTRIBUTION DEPENDENT SETTINGS"
+.SS "\fCGRUB_BTRFS_BOOT_DIRNAME\fP"
+.PP
+Location of kernels/initramfs/microcode.
+Used by “grub-btrfs” to detect the boot partition and the location of kernels, initramfs and microcodes.
+.IP \(em 4
+Default: “/boot”
+.IP \(em 4
+Example: \fCGRUB_BTRFS_BOOT_DIRNAME="/"\fP
+
+.SS "\fCGRUB_BTRFS_GRUB_DIRNAME\fP"
+.PP
+Location of the folder containing the “grub.cfg” file.
+Might be grub2 on some systems.
+For example, on Fedora with EFI : “/boot/efi/EFI/fedora”
+.IP \(em 4
+Default: “/boot/grub”
+.IP \(em 4
+Example: \fCGRUB_BTRFS_GRUB_DIRNAME="/boot/grub2"\fP
+
+.SS "\fCGRUB_BTRFS_GBTRFS_DIRNAME\fP"
+.PP
+Location where grub-btrfs.cfg should be saved.
+Some distributions (like OpenSuSE) store those file at the snapshot directory
+instead of boot. Be aware that this direcory must be available for grub during
+startup of the system.
+.IP \(em 4
+Default: \fC$GRUB_BTRFS_GRUB_DIRNAME\fP
+.IP \(em 4
+Example: \fCGRUB_BTRFS_GBTRFS_DIRNAME="/.snapshots"\fP
+
+.SS "\fCGRUB_BTRFS_GBTRFS_SEARCH_DIRNAME\fP"
+.PP
+Location of the directory where Grub searches for the grub-btrfs.cfg file.
+Some distributions (like OpenSuSE) store those file at the snapshot directory
+instead of boot. Be aware that this direcory must be available for grub during
+startup of the system.
+.IP \(em 4
+Default: “\${prefix}” (This is a grub variable that resolves to where grub is
+.PP
+installed. (like /boot/grub, /boot/efi/grub))
+.IP \(em 4
+NOTE: If variables of grub are used here like ${prefix}, they need to be escaped
+.PP
+with `$\` before the `$`
+.IP \(em 4
+Example: \fCGRUB_BTRFS_GBTRFS_SEARCH_DIRNAME="\${prefix}"\fP
+
+.SS "\fCGRUB_BTRFS_MKCONFIG\fP"
+.PP
+Name/path of the command to generate the grub menu, used by “grub-btrfs.service”
+Might be ’grub2-mkconfig’ on some systems (e.g. Fedora)
+Default paths are /sbin:/bin:/usr/sbin:/usr/bin, if your path is missing, report it on the upstream project.
+You can use the name of the command only or full the path.
+.IP \(em 4
+Default: grub-mkconfig
+.IP \(em 4
+Example: \fCGRUB_BTRFS_MKCONFIG=/sbin/grub2\-mkconfig\fP
+
+.SS "\fCGRUB_BTRFS_SCRIPT_CHECK\fP"
+.PP
+Name of grub-script-check command, used by “grub-btrfs”
+Might be ’grub2-script-check’ on some systems (e.g. Fedora)
+.IP \(em 4
+Default: grub-script-check
+.IP \(em 4
+Example: \fCGRUB_BTRFS_SCRIPT_CHECK=grub2\-script\-check\fP
+
+.SS "\fCGRUB_BTRFS_MKCONFIG_LIB\fP"
+.PP
+Path of grub-mkconfig\d\s-2lib\s+2\u file, used by “grub-btrfs”
+Might be ’/usr/share/grub2/grub-mkconfig\d\s-2lib\s+2\u’ on some systems (e.g. Opensuse)
+.IP \(em 4
+Default: /usr/share/grub/grub-mkconfig\d\s-2lib\s+2\u
+.IP \(em 4
+Example: \fCGRUB_BTRFS_MKCONFIG_LIB=/usr/share/grub2/grub\-mkconfig_lib\fP
+
+.SS "SECURITY"
+.SS "\fCGRUB_BTRFS_PROTECTION_AUTHORIZED_USERS\fP"
+.PP
+Password protection management for submenu, snapshots
+Refer to the Grub documentation \fIhttps://www.gnu.org/software/grub/manual/grub/grub.html#Authentication-and-authorisation\fP
+and this comment \fIhttps://github.com/Antynea/grub-btrfs/issues/95#issuecomment-682295660\fP
+Add authorized usernames separate by comma (userfoo,userbar).
+When Grub’s password protection is enabled, the superuser is authorized by default, it is not necessary to add it
+.IP \(em 4
+Default: “”
+.IP \(em 4
+Example: \fCGRUB_BTRFS_PROTECTION_AUTHORIZED_USERS="userfoo,userbar"\fP
+
+.SS "\fCGRUB_BTRFS_DISABLE_PROTECTION_SUBMENU\fP"
+.PP
+Disable authentication support for submenu of Grub-btrfs only (--unrestricted)
+does not work if GRUB\d\s-2BTRFS\s+2\u\d\s-2PROTECTION\s+2\u\d\s-2AUTHORIZED\s+2\u\d\s-2USERS\s+2\u is not empty
+.IP \(em 4
+Default: “false”
+.IP \(em 4
+Example: \fCGRUB_BTRFS_DISABLE_PROTECTION_SUBMENU="true"\fP
+
+.SH "FILES"
+.PP
+/etc/default/grub-btrfs/config
+
+.SH "SEE ALSO"
+.IR btrfs (8)
+.IR btrfs-subvolume (8)
+.IR grub-btrfsd (8)
+.IR grub-mkconfig (8)
+
+.SH "COPYRIGHT"
+.PP
+Copyright (c) 2022 Pascal Jäger

@@ -617,5 +617,5 @@ fi
 fi
 
 # warn when this script is run but there is no entry in grub.cfg
-grep "snapshots-btrfs" "${grub_directory}/grub.cfg" || printf "\nWARNING: '%s' needs to run at least once to generate the snapshots (sub)menu entry in grub the main menu. \
+grep "snapshots-btrfs" "${grub_directory}/grub.cfg" >/dev/null 2>&1 || printf "\nWARNING: '%s' needs to run at least once to generate the snapshots (sub)menu entry in grub the main menu. \
 After that this script can run alone to generate the snapshot entries.\n\n" "${GRUB_BTRFS_MKCONFIG:-grub-mkconfig}" >&2 ;
