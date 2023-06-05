@@ -97,7 +97,6 @@ GRUB_BTRFS_IGNORE_PREFIX_PATH=("var/lib/docker" "@var/lib/docker" "@/var/lib/doc
 
 # Location of the folder containing the "grub.cfg" file.
 # Might be grub2 on some systems.
-# For example, on Fedora with EFI : "/boot/efi/EFI/fedora"
 # Default: "/boot/grub"
 #GRUB_BTRFS_GRUB_DIRNAME="/boot/grub2"
 
