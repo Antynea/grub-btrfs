@@ -206,7 +206,7 @@ setup() {
 create_grub_menu() {
     #  create the grub submenu of the whole grub menu, depending on wether the submenu already exists
     #  and gives feedback if it worked
-    if grep "snapshots-btrfs" "{grub_directory}/grub.cfg"; then
+    if grep "snapshots-btrfs" "${GRUB_BTRFS_GRUB_DIRNAME:-/boot/grub}"/grub.cfg; then
     	  if  /etc/grub.d/41_snapshots-btrfs; then
 		        log "Grub submenu recreated" "${GREEN}"
           else
