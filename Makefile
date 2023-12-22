@@ -147,7 +147,7 @@ help:
 	@echo "  BOOT_DIR_FEDORA     | path | boot data location (Fedora, RHEL, CentOS, Rocky...)   | '/boot/grub2'"
 	@echo "  SHARE_DIR           | path | shared data location                                  | '\$$(DESTDIR)\$$(PREFIX)/share'"
 	@echo "  LIB_DIR             | path | system libraries location                             | '\$$(DESTDIR)\$$(PREFIX)/lib'"
-	@echo "  PKGNAME             | name | name of the distributed package                        | 'grub-btrfs'"
+	@echo "  PKGNAME             | name | name of the distributed package                       | 'grub-btrfs'"
 	@echo "  INITCPIO            | bool | include mkinitcpio hook                               | false"
 	@echo "  SYSTEMD             | bool | include unit files                                    | true"
 	@echo "  OPENRC              | bool | include OpenRc daemon                                 | false"
