@@ -82,7 +82,7 @@ Example: \fCGRUB_BTRFS_SHOW_SNAPSHOTS_FOUND="false"\fP
 
 .SS "\fCGRUB_BTRFS_ROOTFLAGS\fP"
 .PP
-Comma seperated mount options to be used when booting a snapshot.
+Comma separated mount options to be used when booting a snapshot.
 They can be defined here as well as in the “/” line inside the respective snapshots’
 “/etc/fstab” files.  Mount options found in both places are combined, and this variable
 takes priority over `fstab` entries.
@@ -116,7 +116,7 @@ Example: \fCGRUB_BTRFS_NKERNEL=("kernel\-5.19.4\-custom" "vmlinux\-5.19.4\-custo
 
 .SS "\fCGRUB_BTRFS_SNAPSHOT_KERNEL_PARAMETERS\fP"
 .PP
-Additonal kernel command line parameters that should be passed to the kernelwhen
+Additional kernel command line parameters that should be passed to the kernelwhen
 booting a snapshot.
 For dracut based distros this could be useful to pass “rd.live.overlay.overlayfs=1”
 or “rd.live.overlay.readonly=1” to the Kernel for booting read only snapshots.
@@ -190,7 +190,7 @@ Example: \fCGRUB_BTRFS_GRUB_DIRNAME="/boot/grub2"\fP
 .PP
 Location where grub-btrfs.cfg should be saved.
 Some distributions (like OpenSuSE) store those file at the snapshot directory
-instead of boot. Be aware that this direcory must be available for grub during
+instead of boot. Be aware that this directory must be available for grub during
 startup of the system.
 .IP \(em 4
 Default: \fC$GRUB_BTRFS_GRUB_DIRNAME\fP
@@ -201,7 +201,7 @@ Example: \fCGRUB_BTRFS_GBTRFS_DIRNAME="/.snapshots"\fP
 .PP
 Location of the directory where Grub searches for the grub-btrfs.cfg file.
 Some distributions (like OpenSuSE) store those file at the snapshot directory
-instead of boot. Be aware that this direcory must be available for grub during
+instead of boot. Be aware that this directory must be available for grub during
 startup of the system.
 .IP \(em 4
 Default: “\${prefix}” (This is a grub variable that resolves to where grub is
