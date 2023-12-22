@@ -1,0 +1,6 @@
+[codespell]
+skip = .git,*.pdf,*.svg,go.sum,.codespellrc
+check-hidden = true
+# ignore-regex = 
+# ist -- unfortunate variable
+ignore-words-list = ist
