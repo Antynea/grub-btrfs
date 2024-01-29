@@ -31,7 +31,7 @@ Refer to the [documentation](https://github.com/Antynea/grub-btrfs/blob/master/i
 - - -
 ### 🛠️ Installation:
 #### Arch Linux
-The package is available in the community repository [grub-btrfs](https://archlinux.org/packages/community/any/grub-btrfs/)
+The package is available in the extra repository [grub-btrfs](https://archlinux.org/packages/extra/any/grub-btrfs/)
 ```
 pacman -S grub-btrfs
 ```
@@ -65,7 +65,7 @@ Booting into read-only snapshots is fully supported when choosing btrfs as the f
   * [grub](https://archlinux.org/packages/core/x86_64/grub/)
   * [bash >4](https://archlinux.org/packages/core/x86_64/bash/)
   * [gawk](https://archlinux.org/packages/core/x86_64/gawk/)
-  * (only when using the grub-btrfsd daemon)[inotify-tools](https://archlinux.org/packages/community/x86_64/inotify-tools/)
+  * (only when using the grub-btrfsd daemon)[inotify-tools](https://archlinux.org/packages/extra/x86_64/inotify-tools/)
 
 - - -
 ### 📚 Manual usage of grub-btrfs
