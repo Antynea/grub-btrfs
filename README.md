@@ -75,7 +75,7 @@ To manually generate grub snapshot entries you can run `sudo /etc/grub.d/41_snap
 * On **Fedora** use `grub2-mkconfig -o /boot/grub2/grub.cfg`  
 * On **Debian and Ubuntu based** distributions `update-grub` is a script that runs `grub-mkconfig ...`
 
-This process can be automated to occur whenever you create or delete snaphots but this process is slightly different depending upon your distributions choice on init system. See the relevant instructions for your init system below.
+This process can be automated to occur whenever you create or delete snapshots but this process is slightly different depending upon your distributions choice on init system. See the relevant instructions for your init system below.
 
 ### ⚙️ Customization:
 

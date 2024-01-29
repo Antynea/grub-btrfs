@@ -108,7 +108,7 @@ if [ -n "${GRUB_BTRFS_PROTECTION_AUTHORIZED_USERS}" ] ; then
     protection_authorized_users="--users ${GRUB_BTRFS_PROTECTION_AUTHORIZED_USERS} "
 fi
 
-## Probe informations of Root and Boot devices
+## Probe information of Root and Boot devices
 # Probe info "Root partition"
 root_device=$(${grub_probe} --target=device /) # Root device
 root_uuid=$(${grub_probe} --device ${root_device} --target="fs_uuid" 2>/dev/null) # UUID of the root device
@@ -174,7 +174,7 @@ if [[ -d "$grub_btrfs_mount_point" ]]; then
     done
     if [[ "$wait" != true ]]; then
         if ! rm -d "$grub_btrfs_mount_point" >/dev/null 2>&1; then
-            printf "Unable to delete %s: Device or ressource is busy\n" "$grub_btrfs_mount_point" >&2;
+            printf "Unable to delete %s: Device or resource is busy\n" "$grub_btrfs_mount_point" >&2;
         fi
     fi
 fi
@@ -315,7 +315,7 @@ snapshot_list()
         fi
         [[ ! -d "$grub_btrfs_mount_point/$path_snapshot/boot" ]] && continue; # Discard snapshots without /boot folder
 
-        # Parse Snapper & timeshift informations
+        # Parse Snapper & timeshift information
         local type_snapshot="N/A"
         local description_snapshot="N/A"
         if [[ -s "$grub_btrfs_mount_point/${path_snapshot%"/"*}/$snapper_info" ]] ; then

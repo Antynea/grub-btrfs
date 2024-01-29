@@ -49,14 +49,14 @@ GRUB_BTRFS_VERSION=4.12-master-2023-04-28T16:26:00+00:00
 # Default: ("")
 #GRUB_BTRFS_CUSTOM_MICROCODE=("custom-ucode.img" "custom-uc.img "custom_ucode.cpio")
 
-# Additonal kernel command line parameters that should be passed to the kernel
+# Additional kernel command line parameters that should be passed to the kernel
 # when booting a snapshot.
 # For dracut based distros this could be useful to pass "rd.live.overlay.overlayfs=1"
 # or "rd.live.overlay.readonly=1" to the Kernel for booting snapshots read only.
 # Default: ""
 #GRUB_BTRFS_SNAPSHOT_KERNEL_PARAMETERS="rd.live.overlay.overlayfs=1"
 
-# Comma seperated mount options to be used when booting a snapshot.
+# Comma separated mount options to be used when booting a snapshot.
 # They can be defined here as well as in the "/" line inside the respective snapshots'
 # "/etc/fstab" files.  Mount options found in both places are combined, and this variable
 # takes priority over `fstab` entries.
@@ -107,14 +107,14 @@ GRUB_BTRFS_IGNORE_PREFIX_PATH=("var/lib/docker" "@var/lib/docker" "@/var/lib/doc
 
 # Location where grub-btrfs.cfg should be saved.
 # Some distributions (like OpenSuSE) store those files at the snapshot directory
-# instead of boot. Be aware that this direcory must be available for grub during
+# instead of boot. Be aware that this directory must be available for grub during
 # startup of the system.
 # Default: $GRUB_BTRFS_GRUB_DIRNAME
 #GRUB_BTRFS_GBTRFS_DIRNAME="/boot/grub"
 
 # Location of the directory where Grub searches for the grub-btrfs.cfg file.
 # Some distributions (like OpenSuSE) store those file at the snapshot directory
-# instead of boot. Be aware that this direcory must be available for grub during
+# instead of boot. Be aware that this directory must be available for grub during
 # startup of the system.
 # Default: "\${prefix}" # This is a grub variable that resolves to where grub is
 # installed. (like /boot/grub, /boot/efi/grub)
