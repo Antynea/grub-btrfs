@@ -8,7 +8,7 @@
 ### 🔎 Description:
 grub-btrfs improves the grub bootloader by adding a btrfs snapshots sub-menu, allowing the user to boot into snapshots.
 
-grub-btrfs supports manual snapshots as well as snapper and timeshift created snapshots.
+grub-btrfs supports manual snapshots as well as snapper, timeshift, and yabsnap created snapshots.
 
 ##### Warning: booting read-only snapshots can be tricky
 
@@ -25,7 +25,7 @@ Refer to the [documentation](https://github.com/Antynea/grub-btrfs/blob/master/i
 * Automatically detect if `/boot` is in a separate partition.
 * Automatically detect kernel, initramfs and Intel/AMD microcode in `/boot` directory within snapshots.
 * Automatically create corresponding menu entries in `grub.cfg`
-* Automatically detect the type/tags and descriptions/comments of Snapper/Timeshift snapshots.
+* Automatically detect the type/tags/triggers and descriptions/comments of Snapper/Timeshift/Yabsnap snapshots.
 * Automatically generate `grub.cfg` if you use the provided Systemd/ OpenRC service.
 
 - - -
@@ -97,7 +97,7 @@ The daemon can be configured by passing different command line arguments to it.
 The available arguments are:
 * `SNAPSHOTS_DIRS`
 This argument specifies the (space separated) paths where grub-btrfsd looks for newly created snapshots and snapshot deletions. It is usually defined by the program used to make snapshots.
-E.g. for Snapper this would be `/.snapshots`. It is possible to define more than one directory here, all directories will inherit the same settings (recursive etc.).
+E.g. for Snapper or Yabsnap this would be `/.snapshots`. It is possible to define more than one directory here, all directories will inherit the same settings (recursive etc.).
 This argument is not necessary to provide if `--timeshift-auto` is set. 
 * `-c / --no-color`
 Disable colors in output.
@@ -118,7 +118,7 @@ Displays a short help message.
 ### 🪀 Automatically update grub upon snapshot creation or deletion
 Grub-btrfsd is a daemon that watches the snapshot directory for you and updates the grub menu automatically every time a snapshot is created or deleted.
 By default this daemon watches the directory `/.snapshots` for changes (creation or deletion of snapshots) and triggers the grub menu creation and re-installation of grub if any changes are noticed.
-Therefore, if Snapper is used with its default directory, the daemon can just be started and nothing needs to be configured. See the instructions below to configure grub-btrfsd for use with Timeshift or when using an alternative snapshots directory with Snapper.
+Therefore, if Snapper or Yabsnap is used with its default directory, the daemon can just be started and nothing needs to be configured. See the instructions below to configure grub-btrfsd for use with Timeshift or when using an alternative snapshots directory with Snapper/Yabsnap.
 - - - 
 #### grub-btrfsd systemd instructions
 To start the daemon run:
@@ -294,7 +294,7 @@ If you have problems with the daemon, you can run it with the `--verbose`-flag. 
 ``` bash
 sudo /usr/bin/grub-btrfsd --verbose --timeshift-auto` (for timeshift)
 # or 
-sudo /usr/bin/grub-btrfsd /.snapshots --verbose` (for snapper)
+sudo /usr/bin/grub-btrfsd /.snapshots --verbose` (for snapper/yabsnap)
 ```
 Or pass `--verbose` to the daemon using the Systemd .service file or the OpenRC conf.d file respectively.
 

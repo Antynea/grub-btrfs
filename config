@@ -81,6 +81,8 @@ GRUB_BTRFS_IGNORE_PREFIX_PATH=("var/lib/docker" "@var/lib/docker" "@/var/lib/doc
 # Type = single, pre, post.
 # For Timeshift:
 # Tag = boot, ondemand, hourly, daily, weekly, monthly.
+# For yabsnap:
+# Trigger = S, I, U.
 # Default: ("")
 #GRUB_BTRFS_IGNORE_SNAPSHOT_TYPE=("")
 
