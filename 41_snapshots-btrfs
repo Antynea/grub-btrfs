@@ -320,7 +320,7 @@ snapshot_list()
         local description_snapshot="N/A"
         
         # path to yabsnap snapshot meta data
-        local yabsnap_info="$grub_btrfs_mount_point/${path_snapshot%"/"*}/$(echo "${snap[@]:13:1}" | awk -F'/' '{print $3 "-meta.json"}')"
+        local yabsnap_info="$grub_btrfs_mount_point/${path_snapshot%"/"*}/$(echo "${snap[13]}" | awk -F'/' '{print $3 "-meta.json"}')"
 
         if [[ -s "$grub_btrfs_mount_point/${path_snapshot%"/"*}/$snapper_info" ]] ; then
             type_snapshot=$(awk -F"<|>" 'match($2, /^type/) {print $3}' "$grub_btrfs_mount_point/${path_snapshot%"/"*}/$snapper_info") # search matching string beginning "type"
