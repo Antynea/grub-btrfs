@@ -44,13 +44,11 @@ install:
 	@cp manpages/grub-btrfs.8.man ${TEMP_DIR}/grub-btrfs.8
 	@if test "$(INSTALL_DOCS)" = true; then \
 		echo "Installing manpages..."; \
-		bzip2 ${TEMP_DIR}/grub-btrfs.8; \
-		install -Dm644 -t "${MAN_DIR}/man8" "${TEMP_DIR}/grub-btrfs.8.bz2"; \
+		install -Dm644 -t "${MAN_DIR}/man8" "${TEMP_DIR}/grub-btrfs.8"; \
 	fi
 	@cp manpages/grub-btrfsd.8.man ${TEMP_DIR}/grub-btrfsd.8
 	@if test "$(INSTALL_DOCS)" = true; then \
-		bzip2 ${TEMP_DIR}/grub-btrfsd.8; \
-		install -Dm644 -t "${MAN_DIR}/man8" "${TEMP_DIR}/grub-btrfsd.8.bz2"; \
+		install -Dm644 -t "${MAN_DIR}/man8" "${TEMP_DIR}/grub-btrfsd.8"; \
 	fi
 	@install -Dm755 -t "$(DESTDIR)/etc/grub.d/" 41_snapshots-btrfs
 	@install -Dm644 -t "$(DESTDIR)/etc/default/grub-btrfs/" config
