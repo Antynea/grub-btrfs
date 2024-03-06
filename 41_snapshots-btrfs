@@ -315,7 +315,7 @@ snapshot_list()
         fi
         [ ! -d "$grub_btrfs_mount_point/$path_snapshot/boot" ] && continue; # Discard snapshots without /boot folder
 
-        # Parse Snapper & timeshift & yabsnap informations
+        # Parse Snapper & timeshift & yabsnap information
         local type_snapshot="N/A"
         local description_snapshot="N/A"
         
