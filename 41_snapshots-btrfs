@@ -41,8 +41,8 @@ set -e
 sysconfdir="/etc"
 grub_btrfs_config="${sysconfdir}/default/grub-btrfs/config"
 
-[[ -f "$grub_btrfs_config" ]] && . "$grub_btrfs_config"
-[[ -f "${sysconfdir}/default/grub" ]] && . "${sysconfdir}/default/grub"
+[ -f "$grub_btrfs_config" ] && . "$grub_btrfs_config"
+[ -f "${sysconfdir}/default/grub" ] && . "${sysconfdir}/default/grub"
 
 ## Error Handling
 print_error()
@@ -75,15 +75,15 @@ while getopts :V-: opt; do
 done
 
 ## Exit the script, if:
-[[ "${GRUB_BTRFS_DISABLE,,}" == "true" ]] && print_error "GRUB_BTRFS_DISABLE is set to true (default=false)"
+[ "$(echo "$GRUB_BTRFS_DISABLE" | tr '[:upper:]' '[:lower:]')" = 'true' ] && print_error "GRUB_BTRFS_DISABLE is set to true (default=false)"
 if ! type btrfs >/dev/null 2>&1; then print_error "btrfs-progs isn't installed"; fi
-[[ -f "${GRUB_BTRFS_MKCONFIG_LIB:-/usr/share/grub/grub-mkconfig_lib}" ]] && . "${GRUB_BTRFS_MKCONFIG_LIB:-/usr/share/grub/grub-mkconfig_lib}" || print_error "grub-mkconfig_lib couldn't be found"
+[ -f "${GRUB_BTRFS_MKCONFIG_LIB:-/usr/share/grub/grub-mkconfig_lib}" ] && . "${GRUB_BTRFS_MKCONFIG_LIB:-/usr/share/grub/grub-mkconfig_lib}" || print_error "grub-mkconfig_lib couldn't be found"
 [[ "$(btrfs filesystem df / 2>&1)" == *"not a btrfs filesystem"* ]] && print_error "Root filesystem isn't btrfs"
 
 printf "Detecting snapshots ...\n" >&2 ;
 
 ## Submenu name
-distro=$(awk -F "=" '/^NAME=/ {gsub(/"/, "", $2); print $2}' /etc/os-release)
+distro=$(awk -F "=" '/^NAME=/ {gsub(/"/, "", $2); print $2}' /etc/os-release) # escape '
 submenuname=${GRUB_BTRFS_SUBMENUNAME:-"${distro:-Linux} snapshots"}
 ## Limit snapshots to show in the Grub menu (default=50)
 limit_snap_show="${GRUB_BTRFS_LIMIT:-50}"
@@ -99,7 +99,7 @@ grub_btrfs_directory=${GRUB_BTRFS_GBTRFS_DIRNAME:-${grub_directory}}
 grub_btrfs_search_directory=${GRUB_BTRFS_GBTRFS_SEARCH_DIRNAME:-"\${prefix}"}
 ## Password protection management for submenu
 # Protection support for submenu (--unrestricted)
-case "${GRUB_BTRFS_DISABLE_PROTECTION_SUBMENU,,}" in
+case "$(echo "$GRUB_BTRFS_DISABLE_PROTECTION_SUBMENU" | tr '[:upper:]' '[:lower:]')" in
     true)   unrestricted_access_submenu="--unrestricted ";;
     *)      unrestricted_access_submenu=""
 esac
@@ -111,16 +111,16 @@ fi
 ## Probe information of Root and Boot devices
 # Probe info "Root partition"
 root_device=$(${grub_probe} --target=device /) # Root device
-root_uuid=$(${grub_probe} --device ${root_device} --target="fs_uuid" 2>/dev/null) # UUID of the root device
+root_uuid=$(${grub_probe} --device "${root_device}" --target="fs_uuid" 2>/dev/null) # UUID of the root device
 root_uuid_subvolume=$(btrfs subvolume show / 2>/dev/null) || print_error "UUID of the root subvolume is not available"; # If UUID of root subvolume is not available, then exit
-root_uuid_subvolume=$(awk -F":" 'match($1, /(^[ \t]+UUID)/) {sub(/^[ \t]+/, "", $2); print $2}' <<< "$root_uuid_subvolume") # UUID of the root subvolume
+root_uuid_subvolume=$(awk -F":" 'match($1, /(^[ \t]+UUID)/) {sub(/^[ \t]+/, "", $2); print $2}' <<< "$root_uuid_subvolume") # UUID of the root subvolume '
 # Probe info "Boot partition"
-boot_device=$(${grub_probe} --target=device ${boot_directory}) # Boot device
-boot_uuid=$(${grub_probe} --device ${boot_device} --target="fs_uuid" 2>/dev/null) # UUID of the boot device
+boot_device=$(${grub_probe} --target=device "${boot_directory}") # Boot device
+boot_uuid=$(${grub_probe} --device "${boot_device}" --target="fs_uuid" 2>/dev/null) # UUID of the boot device
 boot_uuid_subvolume=$(btrfs subvolume show "$boot_directory" 2>/dev/null) || boot_uuid_subvolume=" UUID: $root_uuid_subvolume"; # If boot folder isn't a subvolume, then UUID=root_uuid_subvolume
-boot_uuid_subvolume=$(awk -F":" 'match($1, /(^[ \t]+UUID)/) {sub(/^[ \t]+/, "", $2); print $2}' <<< "$boot_uuid_subvolume") # UUID of the boot subvolume
-boot_hs=$(${grub_probe} --device ${boot_device} --target="hints_string" 2>/dev/null) # hints string
-boot_fs=$(${grub_probe} --device ${boot_device} --target="fs" 2>/dev/null) # Type filesystem of boot device
+boot_uuid_subvolume=$(awk -F":" 'match($1, /(^[ \t]+UUID)/) {sub(/^[ \t]+/, "", $2); print $2}' <<< "$boot_uuid_subvolume") # UUID of the boot subvolume '
+boot_hs=$(${grub_probe} --device "${boot_device}" --target="hints_string" 2>/dev/null) # hints string
+boot_fs=$(${grub_probe} --device "${boot_device}" --target="fs" 2>/dev/null) # Type filesystem of boot device
 
 ## Parameters passed to the kernel
 kernel_parameters="$GRUB_CMDLINE_LINUX $GRUB_CMDLINE_LINUX_DEFAULT $GRUB_BTRFS_SNAPSHOT_KERNEL_PARAMETERS"
@@ -150,7 +150,7 @@ detect_rootflags()
 
 unmount_grub_btrfs_mount_point()
 {
-if [[ -d "$grub_btrfs_mount_point" ]]; then
+if [ -d "$grub_btrfs_mount_point" ]; then
     local wait=true
     local wait_max=0
     printf "Unmount %s .." "$grub_btrfs_mount_point" >&2;
@@ -160,7 +160,7 @@ if [[ -d "$grub_btrfs_mount_point" ]]; then
             if umount "$grub_btrfs_mount_point" >/dev/null 2>&1; then
                 wait=false # umount successful
                 printf " Success\n" >&2;
-            elif [[ $wait_max = 10 ]]; then
+            elif [ $wait_max -eq 10 ]; then
                 printf "\nWarning: Unable to unmount %s in %s\n" "$root_device" "$grub_btrfs_mount_point" >&2;
                 break;
             else
@@ -172,7 +172,7 @@ if [[ -d "$grub_btrfs_mount_point" ]]; then
             printf " Success\n" >&2;
         fi
     done
-    if [[ "$wait" != true ]]; then
+    if [ "$wait" != true ]; then
         if ! rm -d "$grub_btrfs_mount_point" >/dev/null 2>&1; then
             printf "Unable to delete %s: Device or resource is busy\n" "$grub_btrfs_mount_point" >&2;
         fi
@@ -193,10 +193,10 @@ make_menu_entries()
     entry "submenu '${title_menu}' {
     submenu '${title_submenu}' { echo }"
     for k in "${name_kernel[@]}"; do
-        [[ ! -f "${boot_dir}"/"${k}" ]] && continue;
+        [ ! -f "${boot_dir}"/"${k}" ] && continue;
         kversion=${k#*"-"}
         for i in "${name_initramfs[@]}"; do
-            if [[ "${name_initramfs}" != "x" ]] ; then
+            if [ "${name_initramfs}" != "x" ] ; then
                 # prefix_i=${i%%"-"*}
                 suffix_i=${i#*"-"}
                 # alt_suffix_i=${i##*"-"}
@@ -207,7 +207,7 @@ make_menu_entries()
                 else continue;
                 fi
                 for u in "${name_microcode[@]}"; do
-                    if [[ "${name_microcode}" != "x" ]] ; then
+                    if [ "${name_microcode}" != "x" ] ; then
                     entry "
     menuentry '  "${k}" & "${i}" & "${u}"' ${CLASS} "\$menuentry_id_option" 'gnulinux-snapshots-$boot_uuid' {"
                     else
@@ -228,7 +228,7 @@ make_menu_entries()
         echo 'Loading Snapshot: "${snap_date_trim}" "${snap_dir_name_trim}"'
         echo 'Loading Kernel: "${k}" ...'
         linux \"${boot_dir_root_grub}/"${k}"\" root="${LINUX_ROOT_DEVICE}" ${kernel_parameters} ${rootflags}subvol=\""${snap_dir_name_trim}"\""
-                    if [[ "${name_microcode}" != "x" ]] ; then
+                    if [ "${name_microcode}" != "x" ] ; then
                         entry "\
         echo 'Loading Microcode & Initramfs: "${u}" "${i}" ...'
         initrd \"${boot_dir_root_grub}/"${u}"\" \"${boot_dir_root_grub}/"${i}"\""
@@ -242,7 +242,7 @@ make_menu_entries()
                 done
             else
                 for u in "${name_microcode[@]}"; do
-                    if [[ "${name_microcode}" != "x" ]] ; then
+                    if [ "${name_microcode}" != "x" ] ; then
                     entry "
     menuentry '  "${k}" & "${u}"' ${CLASS} "\$menuentry_id_option" 'gnulinux-snapshots-$boot_uuid' {"
                     else
@@ -263,7 +263,7 @@ make_menu_entries()
         echo 'Loading Snapshot: "${snap_date_trim}" "${snap_dir_name_trim}"'
         echo 'Loading Kernel: "${k}" ...'
         linux \"${boot_dir_root_grub}/"${k}"\" root="${LINUX_ROOT_DEVICE}" ${kernel_parameters} ${rootflags}subvol=\""${snap_dir_name_trim}"\""
-                    if [[ "${name_microcode}" != "x" ]] ; then
+                    if [ "${name_microcode}" != "x" ] ; then
                         entry "\
         echo 'Loading Microcode: "${u}" ...'
         initrd \"${boot_dir_root_grub}/"${u}"\""
@@ -305,7 +305,7 @@ snapshot_list()
         # ignore specific path during run "grub-mkconfig"
         if [ -n "${GRUB_BTRFS_IGNORE_SPECIFIC_PATH}" ] ; then
             for isp in "${GRUB_BTRFS_IGNORE_SPECIFIC_PATH[@]}" ; do
-                [[ "${path_snapshot}" == "${isp}" ]] && continue 2;
+                [ "${path_snapshot}" = "${isp}" ] && continue 2;
             done
         fi
         if [ -n "${GRUB_BTRFS_IGNORE_PREFIX_PATH}" ] ; then
@@ -313,7 +313,7 @@ snapshot_list()
                 [[ "${path_snapshot}" == "${isp}"/* ]] && continue 2;
             done
         fi
-        [[ ! -d "$grub_btrfs_mount_point/$path_snapshot/boot" ]] && continue; # Discard snapshots without /boot folder
+        [ ! -d "$grub_btrfs_mount_point/$path_snapshot/boot" ] && continue; # Discard snapshots without /boot folder
 
         # Parse Snapper & timeshift & yabsnap informations
         local type_snapshot="N/A"
@@ -327,24 +327,24 @@ snapshot_list()
             description_snapshot=$(awk -F"<|>" 'match($2, /^description/) {print $3}' "$grub_btrfs_mount_point/${path_snapshot%"/"*}/$snapper_info") # search matching string beginning "description"
         elif [[ -s "$grub_btrfs_mount_point/${path_snapshot%"/"*}/$timeshift_info" ]] ; then
             type_snapshot=$(awk -F" : " 'match($1, /^[ \t]+"tags"/) {gsub(/"|,/,"");print $2}' "$grub_btrfs_mount_point/${path_snapshot%"/"*}/$timeshift_info") # search matching string beginning "tags"
-            description_snapshot=$(awk -F" : " 'match($1, /^[ \t]+"comments"/) {gsub(/"|,/,"");print $2}' "$grub_btrfs_mount_point/${path_snapshot%"/"*}/$timeshift_info") # search matching string beginning "comments"
+            description_snapshot=$(awk -F" : " 'match($1, /^[ \t]+"comments"/) {gsub(/"|,/,"");print $2}' "$grub_btrfs_mount_point/${path_snapshot%"/"*}/$timeshift_info") # search matching string beginning "comments" fix '
         elif [[ -s $yabsnap_info ]] ; then
             type_snapshot=$(grep -P '^\s*"trigger"' $yabsnap_info | awk -F'"' '{print $4}') # search matching string beginning "trigger"
             description_snapshot=$(grep -P '^\s*"comment"' $yabsnap_info | awk -F'"' '{print $4}') # search matching string beginning "comment"
         fi
 
-        [[ -z "$type_snapshot" ]] && type_snapshot=("N/A")
-        [[ -z "$description_snapshot" ]] && description_snapshot=("N/A")
+        [ -z "$type_snapshot" ] && type_snapshot=("N/A")
+        [ -z "$description_snapshot" ] && description_snapshot=("N/A")
 
         # ignore specific {type,tag,description} of snapshot during run "grub-mkconfig"
         if [ -n "${GRUB_BTRFS_IGNORE_SNAPSHOT_TYPE}" ] ; then
             for ist in "${GRUB_BTRFS_IGNORE_SNAPSHOT_TYPE[@]}" ; do
-                [[ "${type_snapshot}" == "${ist}" ]] && continue 2;
+                [ "${type_snapshot}" = "${ist}" ] && continue 2;
             done
         fi
         if [ -n "${GRUB_BTRFS_IGNORE_SNAPSHOT_DESCRIPTION}" ] ; then
             for isd in "${GRUB_BTRFS_IGNORE_SNAPSHOT_DESCRIPTION[@]}" ; do
-                [[ "${description_snapshot}" == "${isd}" ]] && continue 2;
+                [ "${description_snapshot}" = "${isd}" ] && continue 2;
             done
         fi
 
@@ -359,21 +359,21 @@ snapshot_list()
     local max_date_length=0
     for i in "${date_snapshots[@]}"; do
         local length="${#i}"
-        [[ "$length" -gt "$max_date_length" ]] && max_date_length=$length
+        [ "$length" -gt "$max_date_length" ] && max_date_length=$length
     done
 
     # Find max length of a snapshot name, needed for pretty formatting
     local max_path_length=0
     for i in "${path_snapshots[@]}"; do
         local length="${#i}"
-        [[ "$length" -gt "$max_path_length" ]] && max_path_length=$length
+        [ "$length" -gt "$max_path_length" ] && max_path_length=$length
     done
 
     # Find max length of a snapshot type, needed for pretty formatting
     local max_type_length=0
     for i in "${type_snapshots[@]}"; do
         local length="${#i}"
-        [[ "$length" -gt "$max_type_length" ]] && max_type_length=$length
+        [ "$length" -gt "$max_type_length" ] && max_type_length=$length
     done
 
     # Find max length of a snapshot description, needed for pretty formatting
@@ -414,14 +414,14 @@ detect_kernel()
     for okernel in  "${boot_dir}"/vmlinuz-* \
                     "${boot_dir}"/vmlinux-* \
                     "${boot_dir}"/kernel-* ; do
-        [[ ! -f "${okernel}" ]] && continue;
+        [ ! -f "${okernel}" ] && continue;
         list_kernel+=("$okernel")
     done
 
     # Custom name kernel in "GRUB_BTRFS_NKERNEL"
     if [ -n "${GRUB_BTRFS_NKERNEL}" ] ; then
         for ckernel in "${boot_dir}/${GRUB_BTRFS_NKERNEL[@]}" ; do
-            [[ ! -f "${ckernel}" ]] && continue;
+            [ ! -f "${ckernel}" ] && continue;
             list_kernel+=("$ckernel")
         done
     fi
@@ -435,14 +435,14 @@ detect_initramfs()
     for oinitramfs in   "${boot_dir}"/initrd.img-* \
                         "${boot_dir}"/initramfs-* \
                         "${boot_dir}"/initrd-* ; do
-        [[ ! -f "${oinitramfs}" ]] && continue;
+        [ ! -f "${oinitramfs}" ] && continue;
         list_initramfs+=("$oinitramfs")
     done
 
     # Custom name initramfs in "GRUB_BTRFS_NINIT"
     if [ -n "${GRUB_BTRFS_NINIT}" ] ; then
         for cinitramfs in "${boot_dir}/${GRUB_BTRFS_NINIT[@]}" ; do
-            [[ ! -f "${cinitramfs}" ]] && continue;
+            [ ! -f "${cinitramfs}" ] && continue;
             list_initramfs+=("$cinitramfs")
         done
     fi
@@ -461,7 +461,7 @@ detect_microcode()
                     "${boot_dir}"/amd-ucode.img \
                     "${boot_dir}"/early_ucode.cpio \
                     "${boot_dir}"/microcode.cpio; do
-        [[ ! -f "${oiucode}" ]] && continue;
+        [ ! -f "${oiucode}" ] && continue;
         list_ucode+=("$oiucode")
     done
 
@@ -517,7 +517,7 @@ boot_bounded()
     # Initialize menu entries
     IFS=$'\n'
     for item in $(snapshot_list); do
-        [[ ${limit_snap_show} -le 0 ]] && break; # fix: limit_snap_show=0
+        [ "${limit_snap_show}" -le 0 ] && break; # fix: limit_snap_show=0
         IFS=$oldIFS
         parse_snapshot_list
         boot_dir="$grub_btrfs_mount_point/$snap_dir_name_trim$boot_directory"
@@ -533,12 +533,12 @@ boot_bounded()
         boot_dir_root_grub="$(make_system_path_relative_to_its_root "${boot_dir}")" # convert "boot_directory" to root of GRUB (e.g /boot become /)
         make_menu_entries
         # show snapshot found during run "grub-mkconfig"
-        if [[ "${GRUB_BTRFS_SHOW_SNAPSHOTS_FOUND:-"true"}" = "true" ]]; then
+        if [ "${GRUB_BTRFS_SHOW_SNAPSHOTS_FOUND:-"true"}" = "true" ]; then
             printf "Found snapshot: %s\n" "$item" >&2 ;
         fi
         # Limit snapshots found during run "grub-mkconfig"
         count_limit_snap=$((1+count_limit_snap))
-        [[ $count_limit_snap -ge $limit_snap_show ]] && break;
+        [ "$count_limit_snap" -ge "$limit_snap_show" ] && break;
     done
     IFS=$oldIFS
 }
@@ -558,19 +558,19 @@ boot_separate()
     # Initialize menu entries
     IFS=$'\n'
     for item in $(snapshot_list); do
-        [[ ${limit_snap_show} -le 0 ]] && break; # fix: limit_snap_show=0
+        [ "${limit_snap_show}" -le 0 ] && break; # fix: limit_snap_show=0
         IFS=$oldIFS
         parse_snapshot_list
         detect_rootflags
         title_format
         make_menu_entries
         # show snapshot found during run "grub-mkconfig"
-        if [[ "${GRUB_BTRFS_SHOW_SNAPSHOTS_FOUND:-"true"}" = "true" ]]; then
+        if [ "${GRUB_BTRFS_SHOW_SNAPSHOTS_FOUND:-"true"}" = "true" ]; then
             printf "Found snapshot: %s\n" "$item" >&2 ;
         fi
         # Limit snapshots found during run "grub-mkconfig"
         count_limit_snap=$((1+count_limit_snap))
-        [[ $count_limit_snap -ge $limit_snap_show ]] && break;
+        [ "$count_limit_snap" -ge "$limit_snap_show" ] && break;
     done
     IFS=$oldIFS
 }
@@ -582,15 +582,15 @@ if [ -e "$grub_btrfs_directory/grub-btrfs.cfg" ]; then
 	mv -f "$grub_btrfs_directory/grub-btrfs.cfg" "$grub_btrfs_directory/grub-btrfs.cfg.bkp"
 fi
 # Create mount point then mounting
-[[ ! -d $grub_btrfs_mount_point ]] && mkdir -p "$grub_btrfs_mount_point"
+[ ! -d "$grub_btrfs_mount_point" ] && mkdir -p "$grub_btrfs_mount_point"
 mount -o ro,subvolid=5 /dev/disk/by-uuid/"$root_uuid" "$grub_btrfs_mount_point/" > /dev/null
 trap "unmount_grub_btrfs_mount_point" EXIT # unmounting mount point on EXIT signal
 count_warning_menuentries=0 # Count menuentries
 count_limit_snap=0 # Count snapshots
 check_uuid_required
 # Detects if /boot is a separate partition
-[[ "${GRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION,,}" == "true" ]] && printf "Override boot partition detection : enable \n" >&2 && boot_separate;
-if [[ "$root_uuid" != "$boot_uuid" ]] || [[ "$root_uuid_subvolume" != "$boot_uuid_subvolume" ]]; then boot_separate ; else boot_bounded ; fi
+[ "$(echo "$GRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION}" | tr '[:upper:]' '[:lower:]')" = "true" ] && printf "Override boot partition detection : enable \n" >&2 && boot_separate;
+if [ "$root_uuid" != "$boot_uuid" ] || [ "$root_uuid_subvolume" != "$boot_uuid_subvolume" ]; then boot_separate ; else boot_bounded ; fi
 # Make a submenu in GRUB (grub.cfg)
 cat << EOF
 if [ ! -e "${grub_btrfs_search_directory}/grub-btrfs.cfg" ]; then
@@ -602,13 +602,13 @@ submenu '${submenuname}' ${protection_authorized_users}${unrestricted_access_sub
 fi
 EOF
 # Show warn, menuentries exceeds 250 entries
-[[ $count_warning_menuentries -ge 250 ]] && printf "Generated %s total GRUB entries. You might experience issues loading snapshots menu in GRUB.\n" "${count_warning_menuentries}" >&2 ;
+[ $count_warning_menuentries -ge 250 ] && printf "Generated %s total GRUB entries. You might experience issues loading snapshots menu in GRUB.\n" "${count_warning_menuentries}" >&2 ;
 # Show total found snapshots
-if [[ "${GRUB_BTRFS_SHOW_TOTAL_SNAPSHOTS_FOUND:-"true"}" = "true" && -n "${count_limit_snap}" && "${count_limit_snap}" != "0" ]]; then
+if [ "${GRUB_BTRFS_SHOW_TOTAL_SNAPSHOTS_FOUND:-"true"}" = "true" ] && [ -n "${count_limit_snap}" ]  && [ "${count_limit_snap}" != "0" ]; then
     printf "Found %s snapshot(s)\n" "${count_limit_snap}" >&2 ;
 fi
 # if no snapshot found, delete the "$grub_btrfs_directory/grub-btrfs.new" file and the "$grub_btrfs_directory/grub-btrfs.cfg.bkp" file and exit
-if [[ "${count_limit_snap}" = "0" || -z "${count_limit_snap}" ]]; then
+if [ "${count_limit_snap}" = "0" ] || [ -z "${count_limit_snap}" ]; then
     rm -f "$grub_btrfs_directory/grub-btrfs.new" "$grub_btrfs_directory/grub-btrfs.cfg.bkp"
     print_error "No snapshots found."
 fi
