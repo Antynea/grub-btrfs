@@ -75,7 +75,7 @@ while getopts :V-: opt; do
 done
 
 ## Exit the script, if:
-[ "$(echo "$GRUB_BTRFS_DISABLE" | tr '[:uper:]' '[:lower:]')" = 'true' ] && print_error "GRUB_BTRFS_DISABLE is set to true (default=false)"
+[ "$(echo "$GRUB_BTRFS_DISABLE" | tr '[:upper:]' '[:lower:]')" = 'true' ] && print_error "GRUB_BTRFS_DISABLE is set to true (default=false)"
 if ! type btrfs >/dev/null 2>&1; then print_error "btrfs-progs isn't installed"; fi
 [ -f "${GRUB_BTRFS_MKCONFIG_LIB:-/usr/share/grub/grub-mkconfig_lib}" ] && . "${GRUB_BTRFS_MKCONFIG_LIB:-/usr/share/grub/grub-mkconfig_lib}" || print_error "grub-mkconfig_lib couldn't be found"
 [[ "$(btrfs filesystem df / 2>&1)" == *"not a btrfs filesystem"* ]] && print_error "Root filesystem isn't btrfs"
@@ -581,7 +581,7 @@ count_warning_menuentries=0 # Count menuentries
 count_limit_snap=0 # Count snapshots
 check_uuid_required
 # Detects if /boot is a separate partition
-[ "$(echo "$GRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION}" | tr '[:uper:]' '[:lower:]')" = "true" ] && printf "Override boot partition detection : enable \n" >&2 && boot_separate;
+[ "$(echo "$GRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION}" | tr '[:upper:]' '[:lower:]')" = "true" ] && printf "Override boot partition detection : enable \n" >&2 && boot_separate;
 if [ "$root_uuid" != "$boot_uuid" ] || [ "$root_uuid_subvolume" != "$boot_uuid_subvolume" ]; then boot_separate ; else boot_bounded ; fi
 # Make a submenu in GRUB (grub.cfg)
 cat << EOF
