@@ -315,16 +315,24 @@ snapshot_list()
         fi
         [ ! -d "$grub_btrfs_mount_point/$path_snapshot/boot" ] && continue; # Discard snapshots without /boot folder
 
-        # Parse Snapper & timeshift information
+        # Parse Snapper & timeshift & yabsnap information
         local type_snapshot="N/A"
         local description_snapshot="N/A"
+        
+        # path to yabsnap snapshot meta data
+        local yabsnap_info="$grub_btrfs_mount_point/${path_snapshot%"/"*}/$(echo "${snap[13]}" | awk -F'/' '{print $3 "-meta.json"}')"
+
         if [[ -s "$grub_btrfs_mount_point/${path_snapshot%"/"*}/$snapper_info" ]] ; then
             type_snapshot=$(awk -F"<|>" 'match($2, /^type/) {print $3}' "$grub_btrfs_mount_point/${path_snapshot%"/"*}/$snapper_info") # search matching string beginning "type"
             description_snapshot=$(awk -F"<|>" 'match($2, /^description/) {print $3}' "$grub_btrfs_mount_point/${path_snapshot%"/"*}/$snapper_info") # search matching string beginning "description"
         elif [[ -s "$grub_btrfs_mount_point/${path_snapshot%"/"*}/$timeshift_info" ]] ; then
             type_snapshot=$(awk -F" : " 'match($1, /^[ \t]+"tags"/) {gsub(/"|,/,"");print $2}' "$grub_btrfs_mount_point/${path_snapshot%"/"*}/$timeshift_info") # search matching string beginning "tags"
             description_snapshot=$(awk -F" : " 'match($1, /^[ \t]+"comments"/) {gsub(/"|,/,"");print $2}' "$grub_btrfs_mount_point/${path_snapshot%"/"*}/$timeshift_info") # search matching string beginning "comments" fix '
+        elif [[ -s $yabsnap_info ]] ; then
+            type_snapshot=$(grep -P '^\s*"trigger"' $yabsnap_info | awk -F'"' '{print $4}') # search matching string beginning "trigger"
+            description_snapshot=$(grep -P '^\s*"comment"' $yabsnap_info | awk -F'"' '{print $4}') # search matching string beginning "comment"
         fi
+
         [ -z "$type_snapshot" ] && type_snapshot=("N/A")
         [ -z "$description_snapshot" ] && description_snapshot=("N/A")
 
