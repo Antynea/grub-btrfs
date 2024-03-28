@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 
-GRUB_BTRFS_VERSION=4.13-yabsnap_info_support-2024-03-06T13:43:57+00:00
+GRUB_BTRFS_VERSION=4.13-fix-bashisms-2024-03-27T20:48:48+00:00
 
 # Disable grub-btrfs.
 # Default: "false"
