@@ -224,7 +224,12 @@ make_menu_entries()
             search --no-floppy --fs-uuid  --set=root ${boot_hs} ${boot_uuid}
         else
             search --no-floppy --fs-uuid  --set=root ${boot_uuid}
+        fi"
+        if [ "${SUSE_BTRFS_SNAPSHOT_BOOTING:-"false"}" = "true" ]; then
+            entry "\
+        set btrfs_subvolid=5"
         fi
+        entry "\
         echo 'Loading Snapshot: "${snap_date_trim}" "${snap_dir_name_trim}"'
         echo 'Loading Kernel: "${k}" ...'
         linux \"${boot_dir_root_grub}/"${k}"\" root="${LINUX_ROOT_DEVICE}" ${kernel_parameters} ${rootflags}subvol=\""${snap_dir_name_trim}"\""
@@ -259,7 +264,12 @@ make_menu_entries()
             search --no-floppy --fs-uuid  --set=root ${boot_hs} ${boot_uuid}
         else
             search --no-floppy --fs-uuid  --set=root ${boot_uuid}
+        fi"
+        if [ "${SUSE_BTRFS_SNAPSHOT_BOOTING:-"false"}" = "true" ]; then
+            entry "\
+        set btrfs_subvolid=5"
         fi
+        entry "\
         echo 'Loading Snapshot: "${snap_date_trim}" "${snap_dir_name_trim}"'
         echo 'Loading Kernel: "${k}" ...'
         linux \"${boot_dir_root_grub}/"${k}"\" root="${LINUX_ROOT_DEVICE}" ${kernel_parameters} ${rootflags}subvol=\""${snap_dir_name_trim}"\""
