@@ -134,7 +134,7 @@ case "$(echo "$GRUB_BTRFS_ENABLE_CRYPTODISK" | tr '[:upper:]' '[:lower:]')" in
             list_insmods+=("insmod gcry_rijndael")
             list_insmods+=("insmod gcry_sha256")
             list_insmods+=("insmod ${boot_fs}")
-            list_insmods+=("cryptomount -u $(echo $GRUB_CMDLINE_LINUX_DEFAULT | grep -o -P '(?<=UUID=).*(?=:cryptdev)' | tr -d '-')")
+            list_insmods+=("cryptomount -u $(echo $GRUB_CMDLINE_LINUX_DEFAULT | grep -o -P '(?<=cryptdevice=UUID=).*(?=:cryptdev)')")
             ;;
     *)
             list_insmods=("insmod ${boot_fs}")
