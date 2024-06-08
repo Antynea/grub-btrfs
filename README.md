@@ -274,6 +274,10 @@ After that, the daemon should be restarted with:
 sudo rc-service grub-btrfsd restart
 ```
 
+##### 🔒 Snapshots on LUKS encrypted devices
+By default, grub-btrfs generates entries that does not load modules for dealing with encrypted devices.
+Enable the `GRUB_BTRFS_ENABLE_CRYPTODISK` variable in `/etc/default/grub-btrfs/config` to load said modules and then execute the steps to mount encrypted root after selecting the snapshot.
+
 - - -
 ### Troubleshooting
 If you experience problems with grub-btrfs don't hesitate [to file an issue](https://github.com/Antynea/grub-btrfs/issues/new/choose).

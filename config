@@ -159,6 +159,6 @@ GRUB_BTRFS_IGNORE_PREFIX_PATH=("var/lib/docker" "@var/lib/docker" "@/var/lib/doc
 # Default: "false"
 #GRUB_BTRFS_DISABLE_PROTECTION_SUBMENU="true"
 
-# Enable booting from LUKS encrypted devices
+# Enable booting from snapshots stored on LUKS encrypted devices
 # Default: "false"
 #GRUB_BTRFS_ENABLE_CRYPTODISK="true"
