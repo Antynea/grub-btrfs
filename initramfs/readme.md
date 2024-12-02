@@ -44,6 +44,18 @@ Distributions that use Dracut to make their initramfs (many of the Fedora based 
 Grub-btrfs provides the variable `GRUB_BTRFS_SNAPSHOT_KERNEL_PARAMETERS` to add any command to the kernel command line. Set it to `GRUB_BTRFS_SNAPSHOT_KERNEL_PARAMETERS="rd.live.overlay.overlayfs=1"` to make snapshots immutable when booted into. 
 After changing this run `sudo /etc/grub.d/41_snapshots-btrfs` to generate a new snapshot-submenu with the parameter added. 
 
+#### Debian based distros
+
+1. Copy [grub-btrfs-overlayfs-hook](Debian/grub-btrfs-overlayfs-hook) script to initramfs-tools hooks directory:
+`sudo cp grub-btrfs-overlayfs-hook /etc/initramfs-tools/hooks/`
+
+2. Copy [grub-btrfs-overlayfs-boot](Debian/grub-btrfs-overlayfs-boot) script to initramfs-tools local-bottom scripts directory:
+`sudo cp grub-btrfs-overlayfs-boot /etc/initramfs-tools/scripts/local-bottom/`
+
+3. Update your initramfs
+`sudo update-initramfs -u`
+
+
 #### Other distribution
 Refer to your distribution's documentation or contribute to this project to add a paragraph.
 #
