@@ -73,6 +73,11 @@ Change to "true" if your boot partition is not detected as separate.
 - Default: "false"
 - Example: ~GRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION="true"~
 
+*** ~GRUB_BTRFS_ENABLE_CRYPTODISK~
+Enable booting from snapshots stored on LUKS encrypted devices
+- Default: "false"
+- Example: ~GRUB_BTRFS_ENABLE_CRYPTODISK="true"~
+
 ** CUSTOM KERNELS
 
 *** ~GRUB_BTRFS_NKERNEL~ / ~GRUB_BTRFS_NINIT~ / ~GRUB_BTRFS_CUSTOM_MICROCODE~

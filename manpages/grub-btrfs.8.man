@@ -102,6 +102,14 @@ Default: “false”
 .IP \(em 4
 Example: \fCGRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION="true"\fP
 
+.SS "\GRUB_BTRFS_ENABLE_CRYPTODISK\fP"
+.PP
+Enable booting from snapshots stored on LUKS encrypted devices
+.IP \(em 4
+Default: “false”
+.IP \(em 4
+Example: \GRUB_BTRFS_ENABLE_CRYPTODISK="true"\fP
+
 .SS "CUSTOM KERNELS"
 .SS "\fCGRUB_BTRFS_NKERNEL\fP / \fCGRUB_BTRFS_NINIT\fP / \fCGRUB_BTRFS_CUSTOM_MICROCODE\fP"
 .PP
