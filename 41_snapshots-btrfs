@@ -151,7 +151,9 @@ CLASS="--class snapshots --class gnu-linux --class gnu --class os"
 oldIFS=$IFS
 ## Detect uuid requirement (lvm,btrfs...)
 check_uuid_required() {
-if [ "${root_uuid}" = "" ] || [ "${GRUB_DISABLE_LINUX_UUID}" = "true" ] \
+if [ "${GRUB_DISABLE_LINUX_PARTUUID}" = "false" ]; then
+    LINUX_ROOT_DEVICE=PARTUUID=$(${grub_probe} --device "${root_device}" --target=partuuid 2>/dev/null)
+elif [ "${root_uuid}" = "" ] || [ "${GRUB_DISABLE_LINUX_UUID}" = "true" ] \
     || ! test -e "/dev/disk/by-uuid/${root_uuid}" \
     || ( test -e "${root_device}" && uses_abstraction "${root_device}" lvm ); then
     LINUX_ROOT_DEVICE=${root_device}
