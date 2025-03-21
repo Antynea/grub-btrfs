@@ -91,6 +91,7 @@ limit_snap_show="${GRUB_BTRFS_LIMIT:-50}"
 btrfs_subvolume_sort="--sort=${GRUB_BTRFS_SUBVOLUME_SORT:-"-rootid"}"
 ## Customize GRUB directory, where "grub.cfg" file is saved
 grub_directory=${GRUB_BTRFS_GRUB_DIRNAME:-"/boot/grub"}
+[ -d $grub_directory ] || grub_directory=${GRUB_BTRFS_GRUB_DIRNAME:-"/boot/grub2"}
 ## Customize BOOT directory, where kernels/initrams/microcode is saved.
 boot_directory=${GRUB_BTRFS_BOOT_DIRNAME:-"/boot"}
 ## Customize GRUB-BTRFS.cfg directory, where "grub-btrfs.cfg" file is saved
