@@ -91,6 +91,7 @@ limit_snap_show="${GRUB_BTRFS_LIMIT:-50}"
 btrfs_subvolume_sort="--sort=${GRUB_BTRFS_SUBVOLUME_SORT:-"-rootid"}"
 ## Customize GRUB directory, where "grub.cfg" file is saved
 grub_directory=${GRUB_BTRFS_GRUB_DIRNAME:-"/boot/grub"}
+[ -d $grub_directory ] || grub_directory=${GRUB_BTRFS_GRUB_DIRNAME:-"/boot/grub2"}
 ## Customize BOOT directory, where kernels/initrams/microcode is saved.
 boot_directory=${GRUB_BTRFS_BOOT_DIRNAME:-"/boot"}
 ## Customize GRUB-BTRFS.cfg directory, where "grub-btrfs.cfg" file is saved
@@ -648,15 +649,19 @@ if [ "${count_limit_snap}" = "0" ] || [ -z "${count_limit_snap}" ]; then
 fi
 # Move "grub-btrfs.new" to "grub-btrfs.cfg"
 header_menu
-if "${bindir}/${GRUB_BTRFS_SCRIPT_CHECK:-grub-script-check}" "$grub_btrfs_directory/grub-btrfs.new"; then
-    cat "$grub_btrfs_directory/grub-btrfs.new" > "$grub_btrfs_directory/grub-btrfs.cfg"
-    rm -f "$grub_btrfs_directory/grub-btrfs.new" "$grub_btrfs_directory/grub-btrfs.cfg.bkp"
-else
-if [ -e "$grub_btrfs_directory/grub-btrfs.cfg.bkp" ]; then
-        mv -f "$grub_btrfs_directory/grub-btrfs.cfg.bkp" "$grub_btrfs_directory/grub-btrfs.cfg"
-fi
-	print_error "Syntax errors were detected in generated ${grub_btrfs_directory}/grub-btrfs.new file. The old grub-btrfs.cfg file (if present) have been restored."
-fi
+for s in "${bindir}/$GRUB_BTRFS_SCRIPT_CHECK" "${bindir}/grub-script-check" "${bindir}/grub2-script-check"; do
+	if command -v "$s" &>/dev/null; then
+		if "$s" "$grub_btrfs_directory/grub-btrfs.new"; then
+    			cat "$grub_btrfs_directory/grub-btrfs.new" > "$grub_btrfs_directory/grub-btrfs.cfg"
+    			rm -f "$grub_btrfs_directory/grub-btrfs.new" "$grub_btrfs_directory/grub-btrfs.cfg.bkp"
+		else
+			if [ -e "$grub_btrfs_directory/grub-btrfs.cfg.bkp" ]; then
+        			mv -f "$grub_btrfs_directory/grub-btrfs.cfg.bkp" "$grub_btrfs_directory/grub-btrfs.cfg"
+			fi
+			print_error "Syntax errors were detected in generated ${grub_btrfs_directory}/grub-btrfs.new file. The old grub-btrfs.cfg file (if present) have been restored."
+		fi
+	fi
+done
 
 # warn when this script is run but there is no entry in grub.cfg
 grep "snapshots-btrfs" "${grub_directory}/grub.cfg" >/dev/null 2>&1 || printf "\nWARNING: '%s' needs to run at least once to generate the snapshots (sub)menu entry in grub the main menu. \
