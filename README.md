@@ -131,6 +131,17 @@ To activate it during system startup, run:
 sudo systemctl enable grub-btrfsd
 ```
 
+#### grub-btrfsd openrc instructions
+To start the daemon run:
+```bash
+rc-service grub-btrfsd start
+```
+
+To activate it during system startup run:
+```bash
+rc-update add grub-btrfsd default
+```
+
 ##### 💼 Snapshots not in `/.snapshots` when using systemd
 By default the daemon is watching the directory `/.snapshots`. If the daemon should watch a different directory, it can be edited with:
 ```bash
