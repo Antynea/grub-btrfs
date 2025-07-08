@@ -107,38 +107,82 @@ esac
 if [ -n "${GRUB_BTRFS_PROTECTION_AUTHORIZED_USERS}" ] ; then
     protection_authorized_users="--users ${GRUB_BTRFS_PROTECTION_AUTHORIZED_USERS} "
 fi
-
 ## Probe information of Root and Boot devices
-# Probe info "Root partition"
-root_device=$(${grub_probe} --target=device /) # Root device
-root_uuid=$(${grub_probe} --device ${root_device} --target="fs_uuid" 2>/dev/null) # UUID of the root device
-root_uuid_subvolume=$(btrfs subvolume show / 2>/dev/null) || print_error "UUID of the root subvolume is not available"; # If UUID of root subvolume is not available, then exit
-root_uuid_subvolume=$(awk -F":" 'match($1, /(^[ \t]+UUID)/) {sub(/^[ \t]+/, "", $2); print $2}' <<< "$root_uuid_subvolume") # UUID of the root subvolume '
-# Probe info "Boot partition"
-boot_device=$(${grub_probe} --target=device ${boot_directory}) # Boot device
-boot_uuid=$(${grub_probe} --device ${boot_device} --target="fs_uuid" 2>/dev/null) # UUID of the boot device
-boot_uuid_subvolume=$(btrfs subvolume show "$boot_directory" 2>/dev/null) || boot_uuid_subvolume=" UUID: $root_uuid_subvolume"; # If boot folder isn't a subvolume, then UUID=root_uuid_subvolume
-boot_uuid_subvolume=$(awk -F":" 'match($1, /(^[ \t]+UUID)/) {sub(/^[ \t]+/, "", $2); print $2}' <<< "$boot_uuid_subvolume") # UUID of the boot subvolume '
-boot_hs=$(${grub_probe} --device ${boot_device} --target="hints_string" 2>/dev/null) # hints string
-boot_fs=$(${grub_probe} --device ${boot_device} --target="fs" 2>/dev/null) # Type filesystem of boot device
+# -----------------------------------------------------------
 
-# Enable LUKS encrypted devices support
+# ---------- Root partition ----------
+root_device="$(${grub_probe} --target=device /)"           # e.g. /dev/mapper/enc
+root_uuid="$(${grub_probe} --device "${root_device}" --target=fs_uuid 2>/dev/null)" || true
+
+# Fallback when grub-probe fails (encrypted container, detached header…)
+if [ -z "$root_uuid" ]; then
+    root_uuid="$(blkid -s UUID -o value "${root_device}" 2>/dev/null)"
+fi
+[ -z "$root_uuid" ] && print_error "Cannot determine UUID of ${root_device}"
+
+# Root subvolume UUID
+root_uuid_subvolume="$(btrfs subvolume show / 2>/dev/null | \
+                       awk -F':' '/^\s*UUID/ {gsub(/^[ \t]+/, "", $2); print $2}')"
+[ -z "$root_uuid_subvolume" ] && print_error "UUID of the root subvolume is not available"
+
+# ---------- Boot partition ----------
+boot_device="$(${grub_probe} --target=device "${boot_directory}")"   # e.g. /dev/sdb1
+boot_uuid="$(${grub_probe} --device "${boot_device}" --target=fs_uuid 2>/dev/null)" || true
+
+# Fallback for boot UUID
+if [ -z "$boot_uuid" ]; then
+    boot_uuid="$(blkid -s UUID -o value "${boot_device}" 2>/dev/null)"
+fi
+[ -z "$boot_uuid" ] && print_error "Cannot determine UUID of ${boot_device}"
+
+# If /boot is not a Btrfs subvolume, reuse root subvol UUID
+boot_uuid_subvolume="$(btrfs subvolume show "${boot_directory}" 2>/dev/null | \
+                       awk -F':' '/^\s*UUID/ {gsub(/^[ \t]+/, "", $2); print $2}')" \
+                       || boot_uuid_subvolume="UUID: $root_uuid_subvolume"
+
+# Extra data for GRUB commands
+boot_hs="$(${grub_probe} --device "${boot_device}" --target=hints_string 2>/dev/null)"
+boot_fs="$(${grub_probe} --device "${boot_device}" --target=fs 2>/dev/null)"
+# -----------------------------------------------------------
+
+## Enable LUKS encrypted devices support
 case "$(echo "$GRUB_BTRFS_ENABLE_CRYPTODISK" | tr '[:upper:]' '[:lower:]')" in
     true)
-            list_insmods=()
-            list_insmods+=("insmod gzio")
-            list_insmods+=("insmod part_gpt")
-            list_insmods+=("insmod cryptodisk")
-            list_insmods+=("insmod luks")
-            list_insmods+=("insmod gcry_rijndael")
-            list_insmods+=("insmod gcry_rijndael")
-            list_insmods+=("insmod gcry_sha256")
-            list_insmods+=("insmod ${boot_fs}")
-            list_insmods+=("cryptomount -u $(echo $GRUB_CMDLINE_LINUX_DEFAULT | grep -o -P '(?<=cryptdevice=UUID=).*(?=:cryptdev)')")
-            ;;
+        list_insmods=(
+            "insmod gzio"
+            "insmod part_gpt"
+            "insmod cryptodisk"
+            "insmod luks"
+            "insmod gcry_rijndael"
+            "insmod gcry_rijndael"
+            "insmod gcry_sha256"
+            "insmod ${boot_fs}"
+        )
+
+        # Extract the <source> field of cryptdevice=<source>:<name>[:header]
+        crypt_source="$(printf '%s %s\n' "$GRUB_CMDLINE_LINUX_DEFAULT" "$GRUB_CMDLINE_LINUX" \
+                          | grep -o -P 'cryptdevice=\K[^:]+' || true)"
+
+        # Turn the source into a UUID that cryptomount -u understands
+        crypt_uuid=""
+        if [[ "$crypt_source" =~ ^UUID=.* ]]; then            # already UUID=…
+            crypt_uuid="${crypt_source#UUID=}"
+        elif [[ "$crypt_source" == /dev/* ]]; then            # path → resolve → blkid
+            real_dev=$(readlink -f "$crypt_source" 2>/dev/null || true)
+            [ -b "$real_dev" ] && crypt_uuid=$(blkid -s UUID -o value "$real_dev" 2>/dev/null || true)
+        fi
+
+        # Emit the proper cryptomount command
+        if [[ "$crypt_uuid" =~ ^[0-9a-fA-F-]{36}$ ]]; then
+            list_insmods+=("cryptomount -u ${crypt_uuid}")
+        else
+            # last-resort: scan all crypto containers (works but a bit slower)
+            list_insmods+=("cryptomount -a")
+        fi
+        ;;
     *)
-            list_insmods=("insmod ${boot_fs}")
-            ;;
+        list_insmods=("insmod ${boot_fs}")
+        ;;
 esac
 
 ## Parameters passed to the kernel
@@ -351,7 +395,7 @@ snapshot_list()
         # Parse Snapper & timeshift & yabsnap information
         local type_snapshot="N/A"
         local description_snapshot="N/A"
-        
+
         # path to yabsnap snapshot meta data
         local yabsnap_info="$grub_btrfs_mount_point/${path_snapshot%"/"*}/$(echo "${snap[13]}" | awk -F'/' '{print $3 "-meta.json"}')"
 
