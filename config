@@ -74,7 +74,7 @@ GRUB_BTRFS_IGNORE_SPECIFIC_PATH=("@")
 # Any path starting with the specified string will be ignored.
 # e.g : if `prefix path` = @, all snapshots beginning with "@/..." will be ignored.
 # Default: ("var/lib/docker" "@var/lib/docker" "@/var/lib/docker")
-GRUB_BTRFS_IGNORE_PREFIX_PATH=("var/lib/docker" "@var/lib/docker" "@/var/lib/docker")
+GRUB_BTRFS_IGNORE_PREFIX_PATH=("var/lib/docker" "@var/lib/docker" "@/var/lib/docker" "var/lib/containers" "@var/lib/containers" "@/var/lib/containers")
 
 # Ignore specific type/tag of snapshot during run "grub-mkconfig".
 # For snapper:
