@@ -357,7 +357,19 @@ snapshot_list()
 
         if [[ -s "$grub_btrfs_mount_point/${path_snapshot%"/"*}/$snapper_info" ]] ; then
             type_snapshot=$(awk -F"<|>" 'match($2, /^type/) {print $3}' "$grub_btrfs_mount_point/${path_snapshot%"/"*}/$snapper_info") # search matching string beginning "type"
-            description_snapshot=$(awk -F"<|>" 'match($2, /^description/) {print $3}' "$grub_btrfs_mount_point/${path_snapshot%"/"*}/$snapper_info") # search matching string beginning "description"
+            description_snapshot=$(awk -F"<|>" '
+                function decode_ncrs(str) {
+                    while (match(str, /&#x[0-9A-Fa-f]+;/)) {     # find NCRs
+                        hex = substr(str, RSTART+3, RLENGTH-4)   # hex code of char
+                        char = sprintf("%c", strtonum("0x" hex)) # char itself
+                        str = substr(str, 1, RSTART-1) char substr(str, RSTART+RLENGTH)
+                    }
+                    return str
+                }
+                match($2, /^description/) { # search matching string beginning "description"
+                    print decode_ncrs($3)   # print with decoded NCRs
+                }
+                ' "$grub_btrfs_mount_point/${path_snapshot%"/"*}/$snapper_info")
         elif [[ -s "$grub_btrfs_mount_point/${path_snapshot%"/"*}/$timeshift_info" ]] ; then
             type_snapshot=$(awk -F" : " 'match($1, /^[ \t]+"tags"/) {gsub(/"|,/,"");print $2}' "$grub_btrfs_mount_point/${path_snapshot%"/"*}/$timeshift_info") # search matching string beginning "tags"
             description_snapshot=$(awk -F" : " 'match($1, /^[ \t]+"comments"/) {gsub(/"|,/,"");print $2}' "$grub_btrfs_mount_point/${path_snapshot%"/"*}/$timeshift_info") # search matching string beginning "comments" fix '
