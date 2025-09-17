@@ -488,12 +488,8 @@ detect_microcode()
     list_ucode=()
     # Original intel/amd microcode (auto-detect)
     # See "https://www.gnu.org/software/grub/manual/grub/html_node/Simple-configuration.html"
-    for oiucode in  "${boot_dir}"/intel-uc.img \
-                    "${boot_dir}"/intel-ucode.img \
-                    "${boot_dir}"/amd-uc.img \
-                    "${boot_dir}"/amd-ucode.img \
-                    "${boot_dir}"/early_ucode.cpio \
-                    "${boot_dir}"/microcode.cpio; do
+    for oiucode in ${GRUB_EARLY_INITRD_LINUX_STOCK} ; do
+        oiucode="${boot_dir}/${oiucode}"
         [ ! -f "${oiucode}" ] && continue;
         list_ucode+=("$oiucode")
     done
