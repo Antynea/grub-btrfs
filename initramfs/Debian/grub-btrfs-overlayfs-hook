@@ -1,0 +1,10 @@
+#!/bin/sh
+
+. /usr/share/initramfs-tools/hook-functions
+
+manual_add_modules btrfs
+manual_add_modules overlay
+copy_exec $(which btrfs)
+copy_exec $(which btrfsck)
+copy_exec $(which blkid)
+
