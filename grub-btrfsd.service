@@ -17,7 +17,7 @@ EnvironmentFile=/etc/default/grub-btrfs/config
 # -l, --log-file        Specify a logfile to write to
 # -v, --verbose         Let the log of the daemon be more verbose
 # -s, --syslog          Write to syslog
-ExecStart=/usr/bin/grub-btrfsd --syslog /.snapshots
+ExecStart=@__BIN_DIR__@/grub-btrfsd --syslog /.snapshots
 
 [Install]
 WantedBy=multi-user.target
