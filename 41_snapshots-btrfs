@@ -53,6 +53,16 @@ print_error()
     exit 0
 }
 
+# Sanitize strings before writing them into GRUB scripts.
+# - remove C0 control chars/newlines
+# - escape single quotes so values can be safely embedded in single-quoted GRUB strings
+escape_for_grub()
+{
+    local s
+    s=$(printf "%s" "$1" | tr -d '\000-\010\013-\037' | sed "s/'/'\\''/g")
+    printf "%s" "$s"
+}
+
 # parse arguments
 while getopts :V-: opt; do
     case "$opt" in
@@ -437,6 +447,13 @@ parse_snapshot_list()
     snap_type="$(echo "$item" | cut -d'|' -f3)" # column_3
 
     snap_description="$(echo "$item" | cut -d'|' -f4)" # column_4
+    
+    # Sanitize values to avoid injecting invalid characters into generated GRUB scripts
+    snap_date_trim=$(escape_for_grub "$snap_date_trim")
+    snap_dir_name_trim=$(escape_for_grub "$snap_dir_name_trim")
+    snap_type=$(escape_for_grub "$snap_type")
+    snap_description=$(escape_for_grub "$snap_description")
+
 }
 
 ## Detect kernels in "boot_directory"
@@ -517,7 +534,9 @@ title_format()
             if [[ "${#var}" -lt "${#title_column[${GRUB_BTRFS_TITLE_FORMAT[$key],,}]}" ]]; then # Add extra spaces if length of $var is smaller than the length of column, needed for pretty formatting
                 printf -v var "%-$(((${#title_column[${GRUB_BTRFS_TITLE_FORMAT[$key],,}]}-${#var})+${#var}))s" "${var}";
             fi
-		    var="$(sed  "s/'//g"  <(echo "${var}"))"
+            # escape any single-quotes and strip control chars so GRUB single-quoted
+            # strings are not broken by snapshot metadata
+            var="$(escape_for_grub "${var}")"
             title_menu+="${var}|"
             title_submenu+=" $(trim "${var}") |"
     done
