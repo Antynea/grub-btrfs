@@ -623,9 +623,7 @@ check_uuid_required
 if [ "$root_uuid" != "$boot_uuid" ] || [ "$root_uuid_subvolume" != "$boot_uuid_subvolume" ]; then boot_separate ; else boot_bounded ; fi
 # Make a submenu in GRUB (grub.cfg)
 cat << EOF
-if [ ! -e "${grub_btrfs_search_directory}/grub-btrfs.cfg" ]; then
-echo ""
-else
+if [ -e "${grub_btrfs_search_directory}/grub-btrfs.cfg" ]; then
 submenu '${submenuname}' ${protection_authorized_users}${unrestricted_access_submenu}{
     configfile "${grub_btrfs_search_directory}/grub-btrfs.cfg"
 }
