@@ -163,8 +163,7 @@ fi
 detect_rootflags()
 {
     local fstabflags=""
-    
-    	# Disable adding the mount options from fstab to rootflags, can solve some issues on systems without a initramfs
+    # Disable adding the mount options from fstab to rootflags, can solve some issues on systems without a initramfs
     if [ "$(echo "${GRUB_BTRFS_IGNORE_FSTAB}" | tr '[:upper:]' '[:lower:]')" = "true" ]; then
         rootflags="rootflags=${GRUB_BTRFS_ROOTFLAGS:+$GRUB_BTRFS_ROOTFLAGS,}"
     else
@@ -174,7 +173,6 @@ detect_rootflags()
         rootflags="rootflags=${fstabflags:+$fstabflags,}${GRUB_BTRFS_ROOTFLAGS:+$GRUB_BTRFS_ROOTFLAGS,}"
     fi
 }
-
 
 unmount_grub_btrfs_mount_point()
 {
