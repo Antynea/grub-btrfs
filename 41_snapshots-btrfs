@@ -111,7 +111,7 @@ fi
 # -----------------------------------------------------------
 
 # ---------- Root partition ----------
-root_device="$(${grub_probe} --target=device /)"           # e.g. /dev/mapper/enc
+root_device="$(${grub_probe} --target=device / | head -1)"           # e.g. /dev/mapper/enc
 root_uuid="$(${grub_probe} --device "${root_device}" --target=fs_uuid 2>/dev/null)" || true
 
 # Fallback when grub-probe fails (encrypted container, detached header…)
