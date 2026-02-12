@@ -136,9 +136,11 @@ fi
 [ -z "$boot_uuid" ] && print_error "Cannot determine UUID of ${boot_device}"
 
 # If /boot is not a Btrfs subvolume, reuse root subvol UUID
-boot_uuid_subvolume="$(btrfs subvolume show "${boot_directory}" 2>/dev/null | \
-                       awk -F':' '/^\s*UUID/ {gsub(/^[ \t]+/, "", $2); print $2}')" \
-                       || boot_uuid_subvolume="UUID: $root_uuid_subvolume"
+boot_uuid_subvolume="$(
+    btrfs subvolume show "${boot_directory}" 2>/dev/null | \
+        awk -F':' '/^\s*UUID/ {gsub(/^[ \t]+/, "", $2); print $2; exit}'
+)"
+[ -z "$boot_uuid_subvolume" ] && boot_uuid_subvolume="$root_uuid_subvolume"
 
 # Extra data for GRUB commands
 boot_hs="$(${grub_probe} --device "${boot_device}" --target=hints_string 2>/dev/null)"
