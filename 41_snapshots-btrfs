@@ -197,13 +197,23 @@ CLASS="--class snapshots --class gnu-linux --class gnu --class os"
 oldIFS=$IFS
 ## Detect uuid requirement (lvm,btrfs...)
 check_uuid_required() {
-if [ "${root_uuid}" = "" ] || [ "${GRUB_DISABLE_LINUX_UUID}" = "true" ] \
-    || ! test -e "/dev/disk/by-uuid/${root_uuid}" \
-    || ( test -e "${root_device}" && uses_abstraction "${root_device}" lvm ); then
-    LINUX_ROOT_DEVICE=${root_device}
-else
-    LINUX_ROOT_DEVICE=UUID=${root_uuid}
-fi
+    # Use PARTUUID instead of UUID, can help in initramfs-less systems
+    if [ "$(echo "${GRUB_BTRFS_USE_PARTUUID}" | tr '[:upper:]' '[:lower:]')" = "true" ]; then
+        local partuuid_val=$(blkid -s PARTUUID -o value "${root_device}")
+        if [ -n "${partuuid_val}" ]; then
+            LINUX_ROOT_DEVICE="PARTUUID=${partuuid_val}"
+            return
+        fi
+    fi
+
+    # Original Logic
+    if [ "${root_uuid}" = "" ] || [ "${GRUB_DISABLE_LINUX_UUID}" = "true" ] \
+       || ! test -e "/dev/disk/by-uuid/${root_uuid}" \
+       || ( test -e "${root_device}" && uses_abstraction "${root_device}" lvm ); then
+        LINUX_ROOT_DEVICE=${root_device}
+    else
+        LINUX_ROOT_DEVICE=UUID=${root_uuid}
+    fi
 }
 ## Detect rootflags
 detect_rootflags()
