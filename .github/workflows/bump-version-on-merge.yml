@@ -12,6 +12,7 @@ jobs:
   bump-version:
     name: Bump version in config
     runs-on: ubuntu-latest
+    if: github.actor != 'github-actions[bot]'
     steps:
       - name: Checkout
         uses: actions/checkout@v3
