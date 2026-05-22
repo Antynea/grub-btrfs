@@ -18,11 +18,10 @@ jobs:
         uses: actions/checkout@v3
         with:
           ref: master
-          fetch-tags: true
 
       - name: Update version in config
         run: |
-          version="$(git describe --tags --abbrev=0)-$(git rev-parse --abbrev-ref HEAD)-$(date -u -Iseconds)"
+          version="$(git rev-parse --abbrev-ref HEAD)-$(date -u -Iseconds)"
           sed -i "s/GRUB_BTRFS_VERSION=.*/GRUB_BTRFS_VERSION=${version}/" config
 
       - name: Commit updated config
