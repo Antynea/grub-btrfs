@@ -40,8 +40,39 @@ Re-generate your initramfs
 `mkinitcpio -P` (option -P means, all preset present in `/etc/mkinitcpio.d`)
 
 #### Dracut based distros
-Distributions that use Dracut to make their initramfs (many of the Fedora based Distros) simply have to pass either `rd.live.overlay.readonly=1` (to boot into the snapshot read only) or `rd.live.overlay.overlayfs=1` (to act like a livedisk, that is files can be changed but changes will be lost on the next boot) to their kernel command line in grub. 
-Grub-btrfs provides the variable `GRUB_BTRFS_SNAPSHOT_KERNEL_PARAMETERS` to add any command to the kernel command line. Set it to `GRUB_BTRFS_SNAPSHOT_KERNEL_PARAMETERS="rd.live.overlay.overlayfs=1"` to make snapshots immutable when booted into. 
+Distributions that use Dracut to make their initramfs (many of the Fedora based Distros) have to include the `overlayfs` module into the initramfs and pass either `rd.live.overlay.readonly=1` (to boot into the snapshot read only) or `rd.live.overlay.overlayfs=1` (to act like a livedisk, that is files can be changed but changes will be lost on the next boot) to their kernel command line in grub.
+
+1. Include `overlayfs` module into dracut
+
+```bash
+echo 'add_dracutmodules+=" overlayfs "' | sudo tee /etc/dracut.conf.d/overlayfs.conf
+```
+
+2. Fix for dracut <109
+
+Unfortunately, dracut version <109 has a bug that prevents overlayfs mount from properly working. [A fix has been commited into dracut version 109](https://github.com/dracut-ng/dracut-ng/commit/deeb670c28d12a478bbea95e29677e436d1912fb). If you are still on version < 109, instead of editing `/usr/lib/dracut/modules.d/70overlayfs/mount-overlayfs.sh` directly on your system, which will get overwritten on updates to the dracut package, we can duplicate the whole module with a lower priority number and carry out the patch there. As explained in this [very old notes about dracut](https://wwoods.fedorapeople.org/doc/dracut-notes.html):
+
+> dracut refuses to overwrite files when installing things into the initramfs, so things installed by the the lower numbered modules have priority over the higher ones.
+
+```bash
+sudo cp -r /usr/lib/dracut/modules.d/70overlayfs /usr/lib/dracut/modules.d/69overlayfs
+sudoedit /usr/lib/dracut/modules.d/69overlayfs/mount-overlayfs.sh
+```
+
+Edit the file as per [the commit](https://github.com/dracut-ng/dracut/commit/deeb670c28d12a478bbea95e29677e436d1912fb)
+
+3. Regenerate the initramfs
+
+```
+# for current kernel's initramfs
+sudo dracut -f
+# for all kernels
+sudo dracut -f --regenerate-all
+```
+
+4. Add kernel parameter and regenerate grub snapshot-submenu
+
+Grub-btrfs provides the variable `GRUB_BTRFS_SNAPSHOT_KERNEL_PARAMETERS` in `/etc/default/grub-btrfs/config` to add any command to the kernel command line. Set it to `GRUB_BTRFS_SNAPSHOT_KERNEL_PARAMETERS="rd.live.overlay.overlayfs=1"` to make snapshots immutable when booted into. 
 After changing this run `sudo /etc/grub.d/41_snapshots-btrfs` to generate a new snapshot-submenu with the parameter added. 
 
 #### Other distribution
