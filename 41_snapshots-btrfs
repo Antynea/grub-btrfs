@@ -122,7 +122,7 @@ fi
 
 # Root subvolume UUID
 root_uuid_subvolume="$(btrfs subvolume show / 2>/dev/null | \
-                       awk -F':' '/^\s*UUID/ {gsub(/^[ \t]+/, "", $2); print $2}')"
+                       awk -F':' '/^[[:space:]]*UUID/ {gsub(/^[ \t]+/, "", $2); print $2}')"
 [ -z "$root_uuid_subvolume" ] && print_error "UUID of the root subvolume is not available"
 
 # ---------- Boot partition ----------
@@ -138,7 +138,7 @@ fi
 # If /boot is not a Btrfs subvolume, reuse root subvol UUID
 boot_uuid_subvolume="$(
     btrfs subvolume show "${boot_directory}" 2>/dev/null | \
-        awk -F':' '/^\s*UUID/ {gsub(/^[ \t]+/, "", $2); print $2; exit}'
+        awk -F':' '/^[[:space:]]*UUID/ {gsub(/^[ \t]+/, "", $2); print $2; exit}'
 )"
 [ -z "$boot_uuid_subvolume" ] && boot_uuid_subvolume="$root_uuid_subvolume"
 
