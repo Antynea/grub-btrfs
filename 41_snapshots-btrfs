@@ -44,7 +44,7 @@ grub_btrfs_config="${sysconfdir}/default/grub-btrfs/config"
 [ -f "$grub_btrfs_config" ] && . "$grub_btrfs_config"
 [ -f "${sysconfdir}/default/grub" ] && . "${sysconfdir}/default/grub"
 
-## Logging Handling
+## Logging
 print_info()
 {
     printf "grub-btrfs: %s\n" "$*" >&2
