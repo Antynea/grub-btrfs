@@ -44,12 +44,21 @@ grub_btrfs_config="${sysconfdir}/default/grub-btrfs/config"
 [ -f "$grub_btrfs_config" ] && . "$grub_btrfs_config"
 [ -f "${sysconfdir}/default/grub" ] && . "${sysconfdir}/default/grub"
 
-## Error Handling
+## Logging
+print_info()
+{
+    printf "grub-btrfs: %s\n" "$*" >&2
+}
+
+print_warning()
+{
+    printf "grub-btrfs: Warning: %s\n" "$*" >&2
+}
+
 print_error()
 {
-    local err_msg="$*"
     local bug_report="If you think an error has occurred, please file a bug report at \"https://github.com/Antynea/grub-btrfs\""
-    printf "%s\n" "${err_msg}" "${bug_report}" >&2 ;
+    printf "grub-btrfs: Error: %s\n" "$*" "${bug_report}" >&2
     exit 0
 }
 
@@ -75,10 +84,10 @@ while getopts :V-: opt; do
 done
 
 ## Exit the script, if:
-[ "$(echo "$GRUB_BTRFS_DISABLE" | tr '[:upper:]' '[:lower:]')" = 'true' ] && print_error "GRUB_BTRFS_DISABLE is set to true (default=false)"
-if ! type btrfs >/dev/null 2>&1; then print_error "btrfs-progs isn't installed"; fi
+[ "$(echo "$GRUB_BTRFS_DISABLE" | tr '[:upper:]' '[:lower:]')" = 'true' ] && { print_info "GRUB_BTRFS_DISABLE is set to true (default=false)"; exit 0; }
+if ! type btrfs >/dev/null 2>&1; then print_info "btrfs-progs isn't installed"; exit 0; fi
 [ -f "${GRUB_BTRFS_MKCONFIG_LIB:-/usr/share/grub/grub-mkconfig_lib}" ] && . "${GRUB_BTRFS_MKCONFIG_LIB:-/usr/share/grub/grub-mkconfig_lib}" || print_error "grub-mkconfig_lib couldn't be found"
-[[ "$(btrfs filesystem df / 2>&1)" == *"not a btrfs filesystem"* ]] && print_error "Root filesystem isn't btrfs"
+[[ "$(btrfs filesystem df / 2>&1)" == *"not a btrfs filesystem"* ]] && { print_info "Root filesystem isn't btrfs"; exit 0; }
 
 printf "Detecting snapshots ...\n" >&2 ;
 
@@ -686,7 +695,7 @@ fi
 # if no snapshot found, delete the "$grub_btrfs_directory/grub-btrfs.new" file and the "$grub_btrfs_directory/grub-btrfs.cfg.bkp" file and exit
 if [ "${count_limit_snap}" = "0" ] || [ -z "${count_limit_snap}" ]; then
     rm -f "$grub_btrfs_directory/grub-btrfs.new" "$grub_btrfs_directory/grub-btrfs.cfg.bkp"
-    print_error "No snapshots found."
+    print_info "No snapshots found."; exit 0
 fi
 # Move "grub-btrfs.new" to "grub-btrfs.cfg"
 header_menu
