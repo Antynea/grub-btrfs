@@ -89,7 +89,7 @@ if ! type btrfs >/dev/null 2>&1; then print_info "btrfs-progs isn't installed"; 
 [ -f "${GRUB_BTRFS_MKCONFIG_LIB:-/usr/share/grub/grub-mkconfig_lib}" ] && . "${GRUB_BTRFS_MKCONFIG_LIB:-/usr/share/grub/grub-mkconfig_lib}" || print_error "grub-mkconfig_lib couldn't be found"
 [[ "$(btrfs filesystem df / 2>&1)" == *"not a btrfs filesystem"* ]] && { print_info "Root filesystem isn't btrfs"; exit 0; }
 
-printf "Detecting snapshots ...\n" >&2 ;
+print_info "Detecting snapshots ..."
 
 ## Submenu name
 distro=$(awk -F "=" '/^NAME=/ {gsub(/"/, "", $2); print $2}' /etc/os-release) # escape '
