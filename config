@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 
-GRUB_BTRFS_VERSION=master-2026-05-30T12:36:21+00:00
+GRUB_BTRFS_VERSION=master-2026-05-30T12:41:03+00:00
 
 # Distribution specific auto-detection (e.g. Fedora)
 if [ -f /etc/fedora-release ]; then
