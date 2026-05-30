@@ -50,7 +50,7 @@ echo 'add_dracutmodules+=" overlayfs "' | sudo tee /etc/dracut.conf.d/overlayfs.
 
 2. Fix for dracut <109
 
-Unfortunately, dracut version <109 has a bug that prevents overlayfs mount from properly working. [A fix has been commited into dracut version 109](https://github.com/dracut-ng/dracut-ng/commit/deeb670c28d12a478bbea95e29677e436d1912fb). If you are still on version < 109, instead of editing `/usr/lib/dracut/modules.d/70overlayfs/mount-overlayfs.sh` directly on your system, which will get overwritten on updates to the dracut package, we can duplicate the whole module with a lower priority number and carry out the patch there. As explained in this [very old notes about dracut](https://wwoods.fedorapeople.org/doc/dracut-notes.html):
+Unfortunately, dracut version <109 has a bug that prevents overlayfs mount from properly working. [A fix has been committed into dracut version 109](https://github.com/dracut-ng/dracut-ng/commit/deeb670c28d12a478bbea95e29677e436d1912fb). If you are still on version < 109, instead of editing `/usr/lib/dracut/modules.d/70overlayfs/mount-overlayfs.sh` directly on your system, which will get overwritten on updates to the dracut package, we can duplicate the whole module with a lower priority number and carry out the patch there. As explained in this [very old notes about dracut](https://wwoods.fedorapeople.org/doc/dracut-notes.html):
 
 > dracut refuses to overwrite files when installing things into the initramfs, so things installed by the the lower numbered modules have priority over the higher ones.
 
