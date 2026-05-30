@@ -5,7 +5,7 @@
 name="grub-btrfs daemon"
 command="/usr/bin/grub-btrfsd"
 command_args="$optional_args ${snapshots}"
-pidfile="/run/{RC_SVCNAME}.pid"
+pidfile="/run/${RC_SVCNAME}.pid"
 command_background=true
 
 depend() {
