@@ -240,7 +240,7 @@ sudo rc-service grub-btrfsd start
 
 To activate it during system startup, run:
 ```bash
-sudo rc-config add grub-btrfsd default 
+sudo rc-update add grub-btrfsd default 
 ```
 
 ##### 💼 Snapshots not in `/.snapshots` for OpenRC
