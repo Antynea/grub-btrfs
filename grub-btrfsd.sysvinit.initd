@@ -20,16 +20,27 @@ PIDFILE=/run/$NAME.pid
 
 SCRIPTNAME=/etc/init.d/$NAME
 
-## Timeshift
-DAEMON_ARGS="--syslog --timeshift-auto --verbose"
+SNAPSHOTS="/.snapshots" # Snapper in the root directory
+# SNAPSHOTS="/run/timeshift/backup/timeshift-btrfs/snapshots" # Timeshift < v22.06
 
-## snapper
-# DAEMON_ARGS="--syslog ./snapshots"
+## Optional arguments to run with the daemon
+# Append options to this like this:
+# DAEMON_ARGS="--syslog --timeshift-auto --verbose"
+# Possible options are:
+# -t, --timeshift-auto  Automatically detect Timeshifts snapshot directory for timeshift >= 22.06
+# -o, --timeshift-old   Look for snapshots in directory of Timeshift <v22.06 (requires --timeshift-auto)
+# -l, --log-file        Specify a logfile to write to
+# -v, --verbose         Let the log of the daemon be more verbose
+# -s, --syslog          Write to syslog
+
+DAEMON_ARGS="--syslog" # Snapper
+# DAEMON_ARGS="--syslog --timeshift-auto --verbose" # Timeshift >= 22.06
 
 # Exit if the package is not installed
 [ -x "$DAEMON" ] || exit 0
 
-# Load LSB init functions
+# Load LSB init functions.
+# This is the path for Debian and Devuan, may vary on other distributions.
 . /lib/lsb/init-functions
 
 do_start() {
@@ -39,7 +50,8 @@ do_start() {
         --make-pidfile \
         --pidfile "$PIDFILE" \
         --exec "$DAEMON" -- \
-        $DAEMON_ARGS
+        $DAEMON_ARGS \
+        "$SNAPSHOTS"
 }
 
 do_stop() {
