@@ -11,7 +11,7 @@
 #                    grub-btrfs.cfg.
 ### END INIT INFO
 
-PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+PATH=/usr/sbin:/usr/bin:/sbin:/bin
 
 DESC="grub-btrfs snapshot daemon"
 NAME=grub-btrfsd
