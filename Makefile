@@ -2,9 +2,9 @@ PKGNAME ?= grub-btrfs
 PREFIX ?= /usr
 
 INITCPIO ?= false
-SYSTEMD ?= false
+SYSTEMD ?= true
 OPENRC ?= false
-SYSVINIT ?= true
+SYSVINIT ?= false
 
 BOOT_DIR_DEBIAN ?= /boot/grub
 BOOT_DIR_FEDORA ?= /boot/grub2
@@ -67,7 +67,7 @@ install:
 	 fi
 	@if test "$(SYSVINIT)" = true; then \
 		echo "Installing sysvinit init.d file"; \
-		install -Dm744 grub-btrfsd.sysvinit.initd "$(DESTDIR)/etc/init.d/grub-btrfsd"; \
+		install -Dm755 grub-btrfsd.sysvinit.initd "$(DESTDIR)/etc/init.d/grub-btrfsd"; \
 	 fi
 	@# Arch Linux like distros only :
 	@if test "$(INITCPIO)" = true; then \
