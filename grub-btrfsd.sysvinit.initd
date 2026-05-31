@@ -1,0 +1,90 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          grub-btrfsd
+# Required-Start:    $local_fs $syslog
+# Required-Stop:     $local_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Regenerate grub-btrfs.cfg
+# Description:       Monitors btrfs snapshots created with snapper
+#                    or Timeshift and automatically regenerates
+#                    grub-btrfs.cfg.
+### END INIT INFO
+
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+DESC="grub-btrfs snapshot daemon"
+NAME=grub-btrfsd
+DAEMON=/usr/bin/$NAME
+PIDFILE=/run/$NAME.pid
+
+SCRIPTNAME=/etc/init.d/$NAME
+
+## Timeshift
+DAEMON_ARGS="--syslog --timeshift-auto --verbose"
+
+## snapper
+# DAEMON_ARGS="--syslog ./snapshots"
+
+# Exit if the package is not installed
+[ -x "$DAEMON" ] || exit 0
+
+# Load LSB init functions
+. /lib/lsb/init-functions
+
+do_start() {
+    start-stop-daemon \
+        --start \
+        --background \
+        --make-pidfile \
+        --pidfile "$PIDFILE" \
+        --exec "$DAEMON" -- \
+        $DAEMON_ARGS
+}
+
+do_stop() {
+    start-stop-daemon \
+        --stop \
+        --quiet \
+        --retry=TERM/30/KILL/5 \
+        --pidfile "$PIDFILE"
+}
+
+case "$1" in
+    start)
+        log_daemon_msg "Starting $DESC" "$NAME"
+        if do_start; then
+            log_end_msg 0
+        else
+            log_end_msg 1
+        fi
+        ;;
+    stop)
+        log_daemon_msg "Stopping $DESC" "$NAME"
+        if do_stop; then
+            log_end_msg 0
+        else
+            log_end_msg 1
+        fi
+        ;;
+    restart|force-reload)
+        log_daemon_msg "Restarting $DESC" "$NAME"
+        do_stop
+        sleep 1
+        if do_start; then
+            log_end_msg 0
+        else
+            log_end_msg 1
+        fi
+        ;;
+    status)
+        status_of_proc -p "$PIDFILE" "$DAEMON" "$NAME"
+        exit $?
+        ;;
+    *)
+        echo "Usage: $SCRIPTNAME {start|stop|restart|force-reload|status}"
+        exit 2
+        ;;
+esac
+
+exit 0
