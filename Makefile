@@ -4,6 +4,7 @@ PREFIX ?= /usr
 INITCPIO ?= false
 SYSTEMD ?= true
 OPENRC ?= false
+SYSVINIT ?= false
 
 BOOT_DIR_DEBIAN ?= /boot/grub
 BOOT_DIR_FEDORA ?= /boot/grub2
@@ -63,6 +64,10 @@ install:
 		echo "Installing openRC init.d & conf.d file"; \
 		install -Dm744 grub-btrfsd.initd "$(DESTDIR)/etc/init.d/grub-btrfsd"; \
 		install -Dm644 grub-btrfsd.confd "$(DESTDIR)/etc/conf.d/grub-btrfsd"; \
+	 fi
+	@if test "$(SYSVINIT)" = true; then \
+		echo "Installing sysvinit init.d file"; \
+		install -Dm755 grub-btrfsd.sysvinit.initd "$(DESTDIR)/etc/init.d/grub-btrfsd"; \
 	 fi
 	@# Arch Linux like distros only :
 	@if test "$(INITCPIO)" = true; then \
