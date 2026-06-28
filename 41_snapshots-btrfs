@@ -120,7 +120,10 @@ fi
 # -----------------------------------------------------------
 
 # ---------- Root partition ----------
-root_device="$(${grub_probe} --target=device /)"           # e.g. /dev/mapper/enc
+# head -n1: on a multi-device Btrfs, grub-probe prints one device per line.
+# Passing all of them to --device makes the fs_uuid probe return empty, so
+# keep only the first device (any member yields the pool-wide fs UUID).
+root_device="$(${grub_probe} --target=device / | head -n1)"           # e.g. /dev/mapper/enc
 root_uuid="$(${grub_probe} --device "${root_device}" --target=fs_uuid 2>/dev/null)" || true
 
 # Fallback when grub-probe fails (encrypted container, detached header…)
@@ -135,7 +138,7 @@ root_uuid_subvolume="$(btrfs subvolume show / 2>/dev/null | \
 [ -z "$root_uuid_subvolume" ] && print_error "UUID of the root subvolume is not available"
 
 # ---------- Boot partition ----------
-boot_device="$(${grub_probe} --target=device "${boot_directory}")"   # e.g. /dev/sdb1
+boot_device="$(${grub_probe} --target=device "${boot_directory}" | head -n1)"   # e.g. /dev/sdb1; head -n1: see root_device above (multi-device Btrfs)
 boot_uuid="$(${grub_probe} --device "${boot_device}" --target=fs_uuid 2>/dev/null)" || true
 
 # Fallback for boot UUID
