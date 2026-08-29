@@ -56,7 +56,8 @@ install:
 	@# Systemd init system
 	@if test "$(SYSTEMD)" = true; then \
 		echo "Installing systemd .service file"; \
-		install -Dm644 -t "$(LIB_DIR)/systemd/system/" grub-btrfsd.service; \
+                sed 's:@__BIN_DIR__@:$(BIN_DIR):g' grub-btrfsd.service > "$(TEMP_DIR)/grub-btrfsd.service"; \
+                install -Dm644 -t "$(LIB_DIR)/systemd/system/" "$(TEMP_DIR)/grub-btrfsd.service"; \
 	 fi
 	@# OpenRC init system
 	@if test "$(OPENRC)" = true; then \
