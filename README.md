@@ -274,6 +274,51 @@ After that, the daemon should be restarted with:
 sudo rc-service grub-btrfsd restart
 ```
 
+- - -
+#### grub-btrfsd Sysvinit instructions
+The sysvinit grub-btrfsd script is designed for Debian and
+Debian-based distributions using sysvinit (Devuan, MX Linux, etc). It depends on Linux
+Standards Base (LSB) init functions which are located at
+`/lib/lsb/init-functions` on Debian and Debian-derivatives. These functions may be located in a
+different directory in other distributions using sysvinit, and the
+functions contained therein may differ from those called in the script.
+
+To start the daemon run:
+```bash
+sudo service grub-btrfsd start
+```
+
+To activate it during system startup, run:
+```bash
+sudo update-rc.d grub-btrfsd defaults
+```
+
+##### 💼 Snapshots not in `/.snapshots` for Sysvinit
+By default the daemon is watching the directory `/.snapshots`. If the daemon should watch a different directory, it can be edited by passing different arguments to it.
+Arguments are passed to grub-btrfsd via `DAEMON_ARGS` and `SNAPSHOTS`
+variables in the script `/etc/init.d/grub-btrfsd`.
+The variable `SNAPSHOTS` defines the path the daemon will monitor for
+snapshots.
+
+After editing, the applicable portion of the file should look like this:
+
+``` bash
+SNAPSHOTS="/.snapshots" # Snapper in the root directory
+# SNAPSHOTS="/run/timeshift/backup/timeshift-btrfs/snapshots" # Timeshift < v22.06
+
+## Optional arguments to run with the daemon
+# Append options to this like this:
+# DAEMON_ARGS="--syslog --timeshift-auto --verbose"
+# Possible options are:
+# -t, --timeshift-auto  Automatically detect Timeshifts snapshot directory for timeshift >= 22.06
+# -o, --timeshift-old   Look for snapshots in directory of Timeshift <v22.06 (requires --timeshift-auto)
+# -l, --log-file        Specify a logfile to write to
+# -v, --verbose         Let the log of the daemon be more verbose
+# -s, --syslog          Write to syslog
+
+DAEMON_ARGS="--syslog"
+```
+
 ##### 🔒 Snapshots on LUKS encrypted devices
 By default, grub-btrfs generates entries that does not load modules for dealing with encrypted devices.
 Enable the `GRUB_BTRFS_ENABLE_CRYPTODISK` variable in `/etc/default/grub-btrfs/config` to load said modules and then execute the steps to mount encrypted root after selecting the snapshot.
