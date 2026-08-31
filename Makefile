@@ -22,7 +22,7 @@ TEMP_DIR = ./temp
 .PHONY: install uninstall clean help
 
 install:
-	@if test "$(shell id -u)" != 0; then \
+	@if test "$(shell id -u)" != 0 -a -z "$(DESTDIR)"; then \
 		echo "You are not root, run this target as root please."; \
 		exit 1; \
 	fi
