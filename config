@@ -162,3 +162,8 @@ GRUB_BTRFS_IGNORE_PREFIX_PATH=("var/lib/docker" "@var/lib/docker" "@/var/lib/doc
 # Enable booting from snapshots stored on LUKS encrypted devices
 # Default: "false"
 #GRUB_BTRFS_ENABLE_CRYPTODISK="true"
+
+# Enables the use of root=PARTUUID=... instead of UUID
+# This can help initramfs-less systems to boot into snapshots
+# Default: "false"
+#GRUB_BTRFS_USE_PARTUUID="true"
