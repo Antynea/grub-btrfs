@@ -162,3 +162,8 @@ GRUB_BTRFS_IGNORE_PREFIX_PATH=("var/lib/docker" "@var/lib/docker" "@/var/lib/doc
 # Enable booting from snapshots stored on LUKS encrypted devices
 # Default: "false"
 #GRUB_BTRFS_ENABLE_CRYPTODISK="true"
+
+# Disable adding the boot options automatically gathered from fstab to rootflags
+# Can help booting into snapshots on initramfs-less systems
+# Default: "false"
+#GRUB_BTRFS_IGNORE_FSTAB="true"
