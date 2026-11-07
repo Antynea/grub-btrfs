@@ -666,8 +666,9 @@ boot_separate()
 rm -f "$grub_btrfs_directory/grub-btrfs.new"
 true > "$grub_btrfs_directory/grub-btrfs.new" # Create a "grub-btrfs.new" file in "grub_btrfs_directory"
 # Create a backup of the "$grub_btrfs_directory/grub-btrfs.cfg" file if exist
+# (copy, not move: the current menu must stay usable while the snapshots are scanned)
 if [ -e "$grub_btrfs_directory/grub-btrfs.cfg" ]; then
-	mv -f "$grub_btrfs_directory/grub-btrfs.cfg" "$grub_btrfs_directory/grub-btrfs.cfg.bkp"
+	cp -f "$grub_btrfs_directory/grub-btrfs.cfg" "$grub_btrfs_directory/grub-btrfs.cfg.bkp"
 fi
 # Create mount point then mounting
 [ ! -d "$grub_btrfs_mount_point" ] && mkdir -p "$grub_btrfs_mount_point"
@@ -695,15 +696,15 @@ EOF
 if [ "${GRUB_BTRFS_SHOW_TOTAL_SNAPSHOTS_FOUND:-"true"}" = "true" ] && [ -n "${count_limit_snap}" ]  && [ "${count_limit_snap}" != "0" ]; then
     printf "Found %s snapshot(s)\n" "${count_limit_snap}" >&2 ;
 fi
-# if no snapshot found, delete the "$grub_btrfs_directory/grub-btrfs.new" file and the "$grub_btrfs_directory/grub-btrfs.cfg.bkp" file and exit
+# if no snapshot found, delete the "$grub_btrfs_directory/grub-btrfs.new", "$grub_btrfs_directory/grub-btrfs.cfg" and "$grub_btrfs_directory/grub-btrfs.cfg.bkp" files and exit
 if [ "${count_limit_snap}" = "0" ] || [ -z "${count_limit_snap}" ]; then
-    rm -f "$grub_btrfs_directory/grub-btrfs.new" "$grub_btrfs_directory/grub-btrfs.cfg.bkp"
+    rm -f "$grub_btrfs_directory/grub-btrfs.new" "$grub_btrfs_directory/grub-btrfs.cfg" "$grub_btrfs_directory/grub-btrfs.cfg.bkp"
     print_info "No snapshots found."; exit 0
 fi
-# Move "grub-btrfs.new" to "grub-btrfs.cfg"
+# Move "grub-btrfs.new" to "grub-btrfs.cfg" (a rename, so "grub-btrfs.cfg" is never missing or half written)
 header_menu
 if "${bindir}/${GRUB_BTRFS_SCRIPT_CHECK:-grub-script-check}" "$grub_btrfs_directory/grub-btrfs.new"; then
-    cat "$grub_btrfs_directory/grub-btrfs.new" > "$grub_btrfs_directory/grub-btrfs.cfg"
+    mv -f "$grub_btrfs_directory/grub-btrfs.new" "$grub_btrfs_directory/grub-btrfs.cfg"
     rm -f "$grub_btrfs_directory/grub-btrfs.new" "$grub_btrfs_directory/grub-btrfs.cfg.bkp"
 else
 if [ -e "$grub_btrfs_directory/grub-btrfs.cfg.bkp" ]; then
